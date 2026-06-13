@@ -152,9 +152,9 @@ All three split presentation from business logic; they differ in *how the View c
 | Boilerplate | Low but messy | High (View contracts/interfaces) | Low–medium |
 | Config-change survival | Manual | Manual | Built-in with Jetpack `ViewModel` |
 
-**MVC** — Model, View, Controller. The Controller handles input and updates the Model and View. On Android the Activity tends to be *both* View and Controller, which leads to god classes; rarely used cleanly today.
+**MVC (Model-View-Controller)** — Model, View, Controller. The Controller handles input and updates the Model and View. On Android the Activity tends to be *both* View and Controller, which leads to god classes; rarely used cleanly today.
 
-**MVP** — The **Presenter** holds a reference to the View through an **interface** (the contract). The Presenter pulls data from the Model and pushes it to the View by calling interface methods. Decouples View from logic; was the dominant pattern pre-2017.
+**MVP (Model-View-Presenter)** — The **Presenter** holds a reference to the View through an **interface** (the contract). The Presenter pulls data from the Model and pushes it to the View by calling interface methods. Decouples View from logic; was the dominant pattern pre-2017.
 
 ```kotlin
 // MVP contract
@@ -669,7 +669,7 @@ object DataModule {
 }
 ```
 
-**Note:** DI vs Service Locator — with DI dependencies are *pushed in* (you can't use the object without them); with a Service Locator the object *pulls* them from a registry, which hides dependencies and is harder to test.
+**Note:** DI (Dependency Injection) vs Service Locator — with DI dependencies are *pushed in* (you can't use the object without them); with a Service Locator the object *pulls* them from a registry, which hides dependencies and is harder to test.
 
 ---
 

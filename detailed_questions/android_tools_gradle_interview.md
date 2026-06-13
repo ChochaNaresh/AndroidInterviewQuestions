@@ -94,7 +94,7 @@ The Android build maps high-level config to a fully packaged artifact:
 
 Output formats:
 
-- **APK** — installable package, used for sideloading and testing.
+- **APK (Android Package Kit)** — installable package, used for sideloading and testing.
 - **AAB (Android App Bundle)** — the publishing format for Google Play. You upload the AAB; Play generates optimized, device-specific APKs (split by ABI, density, language) via the bundletool mechanism.
 
 ```bash

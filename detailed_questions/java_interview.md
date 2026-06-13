@@ -174,7 +174,7 @@ How modern (generational) GC works:
 4. **Major / Full GC** — less frequent collection of the old generation; more expensive.
 5. **Mark–Sweep–Compact** — mark reachable objects, sweep the rest, compact to reduce fragmentation.
 
-Common collectors: **G1** (default since Java 9, region-based, low-pause), **ZGC** and **Shenandoah** (sub-millisecond pauses for large heaps), and the older **Parallel** and (removed) CMS collectors. On Android, the runtime is **ART**, which uses a concurrent copying collector tuned for mobile.
+Common collectors: **G1** (default since Java 9, region-based, low-pause), **ZGC** and **Shenandoah** (sub-millisecond pauses for large heaps), and the older **Parallel** and (removed) CMS collectors. On Android, the runtime is **ART (Android Runtime)**, which uses a concurrent copying collector tuned for mobile.
 
 You cannot force GC; `System.gc()` is only a hint. Reference strengths influence collection:
 
@@ -418,7 +418,7 @@ Important rules:
 
 - `finally` runs even if `try` or `catch` executes a `return`, `break`, or `continue`. **Yes — the `finally` block runs even when there is a `return` inside the `try`.**
 - If `finally` itself `return`s or throws, it **overrides** any value/exception from `try`/`catch` — avoid returning from `finally`.
-- The only ways `finally` is skipped: `System.exit()`, JVM crash, the thread being killed, or an infinite loop.
+- The only ways `finally` is skipped: `System.exit()`, JVM (Java Virtual Machine) crash, the thread being killed, or an infinite loop.
 - Multiple `catch` blocks are checked top-to-bottom; more specific exceptions must precede broader ones. Multi-catch (`catch (IOException | SQLException e)`) handles several types in one block.
 - **try-with-resources** auto-closes anything implementing `AutoCloseable`, replacing most manual `finally` cleanup:
 

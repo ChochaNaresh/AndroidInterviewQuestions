@@ -10,7 +10,7 @@ Use **coroutines with `async`/`awaitAll`** inside a `coroutineScope` — each `a
 
 ---
 
-## 2. What is ANR? How can it be prevented?
+## 2. What is ANR (Application Not Responding)? How can it be prevented?
 
 The dialog shown when the main thread is blocked too long: input not handled in ~5s, service callbacks ~20s (foreground) / ~200s (background), `onReceive` 10s (foreground) / 60s (background), or an unresponsive ContentProvider. Caused by slow work on the main thread. Prevent by offloading to coroutines/WorkManager, never doing disk/network on the UI thread (StrictMode catches it), and keeping receivers trivial. Monitor via Android Vitals.
 
@@ -36,7 +36,7 @@ The JVM stays alive while any **user (non-daemon)** thread runs; it does **not**
 
 ## 6. Garbage Collection
 
-GC automatically reclaims heap memory for objects no longer **reachable** from GC roots. ART uses a concurrent, generational collector (young generation collected often/cheaply). It matters because GC pauses and allocation churn cause jank. Reduce object allocations in hot paths (`onDraw`, RecyclerView binding), reuse objects, and avoid leaks (which keep objects reachable forever).
+GC (Garbage Collection) automatically reclaims heap memory for objects no longer **reachable** from GC roots. ART uses a concurrent, generational collector (young generation collected often/cheaply). It matters because GC pauses and allocation churn cause jank. Reduce object allocations in hot paths (`onDraw`, RecyclerView binding), reuse objects, and avoid leaks (which keep objects reachable forever).
 
 ---
 

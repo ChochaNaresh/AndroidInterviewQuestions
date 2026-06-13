@@ -8,13 +8,13 @@
 
 ## 1. What is Gradle?
 
-The build automation system for Android: compiles code, processes resources, runs annotation processors, merges manifests, packages APK/AAB, runs tests, manages dependencies. The **AGP** teaches Gradle everything Android-specific. Key concepts: project, task (DAG), plugin, and the three phases (initialization, configuration, execution). It's incremental, cacheable, and runs as a daemon.
+The build automation system for Android: compiles code, processes resources, runs annotation processors, merges manifests, packages APK/AAB, runs tests, manages dependencies. The **AGP (Android Gradle Plugin)** teaches Gradle everything Android-specific. Key concepts: project, task (DAG - Directed Acyclic Graph), plugin, and the three phases (initialization, configuration, execution). It's incremental, cacheable, and runs as a daemon.
 
 ---
 
 ## 2. The Gradle build system in Android
 
-Maps config to a packaged artifact: compilers → DEX/resources; AGP merges manifests/resources and generates `R`/`BuildConfig`; R8 shrinks/optimizes/obfuscates/dexes (release); packager zips, signs, aligns. Outputs: **APK** (installable/sideload) and **AAB** (Play publishing format that generates per-device split APKs).
+Maps config to a packaged artifact: compilers → DEX/resources; AGP merges manifests/resources and generates `R`/`BuildConfig`; R8 shrinks/optimizes/obfuscates/dexes (release); packager zips, signs, aligns. Outputs: **APK (Android Package Kit)** (installable/sideload) and **AAB (Android App Bundle)** (Play publishing format that generates per-device split APKs).
 
 ---
 
@@ -100,7 +100,7 @@ Lets you use newer Java language features/APIs on older Android by rewriting byt
 
 ## 15. annotationProcessor, kapt, and KSP in Gradle
 
-All feed annotation-based code generation. `annotationProcessor` = Java-only (JSR-269). `kapt` = generates Java **stubs** so Java processors run on Kotlin — slow, on the deprecation path. **KSP** = reads Kotlin symbols directly (no stubs), ~2x faster, recommended (KSP2 is stable and recommended, but still opt-in — not the automatic default). Migrate to KSP where supported; keep kapt only for processors lacking KSP.
+All feed annotation-based code generation. `annotationProcessor` = Java-only (JSR-269). `kapt` (Kotlin Annotation Processing Tool) = generates Java **stubs** so Java processors run on Kotlin — slow, on the deprecation path. **KSP** (Kotlin Symbol Processing) = reads Kotlin symbols directly (no stubs), ~2x faster, recommended (KSP2 is stable and recommended, but still opt-in — not the automatic default). Migrate to KSP where supported; keep kapt only for processors lacking KSP.
 
 ---
 

@@ -36,13 +36,13 @@ Java is always pass-by-value. For primitives the value is copied; for objects th
 
 ## 6. What is the Garbage Collector and how does it work?
 
-The GC automatically reclaims heap memory from objects unreachable from GC roots (thread stacks, statics, JNI). It traces reachability (handles cycles correctly — no reference counting), uses the generational hypothesis (Young: Eden+Survivors, Old), does cheap Minor GCs / expensive Major GCs, and Mark–Sweep–Compact. Collectors: G1 (default), ZGC, Shenandoah; ART on Android. `System.gc()` is only a hint. Reference strengths: strong, soft (caches), weak, phantom.
+The GC (Garbage Collector) automatically reclaims heap memory from objects unreachable from GC roots (thread stacks, statics, JNI). It traces reachability (handles cycles correctly — no reference counting), uses the generational hypothesis (Young: Eden+Survivors, Old), does cheap Minor GCs / expensive Major GCs, and Mark–Sweep–Compact. Collectors: G1 (default), ZGC, Shenandoah; ART (Android Runtime) on Android. `System.gc()` is only a hint. Reference strengths: strong, soft (caches), weak, phantom.
 
 ---
 
 ## 7. The Java Memory Model and happens-before
 
-The JMM defines when one thread's write becomes visible to another and what reorderings are allowed. The core concept is **happens-before**: if A happens-before B, A's effects are visible to B. Established by: program order, monitor unlock→lock, volatile write→read, `Thread.start()`/`join()`, and final fields after safe publication. Without it, stale reads/reorderings occur.
+The JMM (Java Memory Model) defines when one thread's write becomes visible to another and what reorderings are allowed. The core concept is **happens-before**: if A happens-before B, A's effects are visible to B. Established by: program order, monitor unlock→lock, volatile write→read, `Thread.start()`/`join()`, and final fields after safe publication. Without it, stale reads/reorderings occur.
 
 ---
 
@@ -90,7 +90,7 @@ Lock-free thread-safe single-variable ops built on CAS. `get()`/`set()` have vol
 
 ## 15. How do try / catch / finally work?
 
-`try` wraps risky code, `catch` handles matching exceptions, `finally` always runs (even on `return`/`break`/`continue`) — ideal for cleanup. A `return`/`throw` in `finally` overrides the try/catch result (avoid). Only skipped by `System.exit()`, JVM crash, or thread kill. Prefer try-with-resources for `AutoCloseable`.
+`try` wraps risky code, `catch` handles matching exceptions, `finally` always runs (even on `return`/`break`/`continue`) — ideal for cleanup. A `return`/`throw` in `finally` overrides the try/catch result (avoid). Only skipped by `System.exit()`, JVM (Java Virtual Machine) crash, or thread kill. Prefer try-with-resources for `AutoCloseable`.
 
 ---
 

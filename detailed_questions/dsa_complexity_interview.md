@@ -545,7 +545,7 @@ fun merge(l: IntArray, r: IntArray): IntArray {
 }
 ```
 
-### BFS / DFS on graphs & trees — `O(V + E)`
+### BFS (Breadth-First Search) / DFS (Depth-First Search) on graphs & trees — `O(V + E)`
 
 ```kotlin
 // BFS — shortest path in an unweighted graph

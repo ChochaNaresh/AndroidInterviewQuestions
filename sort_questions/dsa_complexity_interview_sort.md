@@ -20,7 +20,7 @@ Describes how an algorithm's resource usage (time/memory) grows as input size `n
 - `O(2ⁿ)` (Exponential) — naive recursion (e.g. recursive Fibonacci).
 - `O(n!)` (Factorial) — brute-force permutations.
 
-Tip: naive `O(2ⁿ)` Fibonacci → `O(n)` with memoization/DP.
+Tip: naive `O(2ⁿ)` Fibonacci → `O(n)` with memoization/DP (Dynamic Programming).
 
 ---
 
@@ -62,13 +62,13 @@ A doubly linked list: each node has value + prev/next pointers. `O(1)` insert/de
 
 ## 8. TreeMap (and sorted structures)
 
-A red-black self-balancing BST keeping keys sorted with `O(log n)` core ops, plus `firstKey`/`floorKey`/`ceilingKey`/range views. `TreeSet` is the set form. Use over HashMap when you need sorted iteration, nearest-key queries, or range scans — trading `O(1)` for `O(log n)`.
+A red-black self-balancing BST (Binary Search Tree) keeping keys sorted with `O(log n)` core ops, plus `firstKey`/`floorKey`/`ceilingKey`/range views. `TreeSet` is the set form. Use over HashMap when you need sorted iteration, nearest-key queries, or range scans — trading `O(1)` for `O(log n)`.
 
 ---
 
 ## 9. Stack and Queue
 
-Abstract data types by access discipline: **Stack** = LIFO (push/pop/peek), **Queue** = FIFO (enqueue/dequeue/peek). Prefer `ArrayDeque` for both (faster than legacy `Stack`, no node overhead) — `O(1)` push/pop/peek. Use `PriorityQueue` (binary heap) for priority order, concurrent queues for thread safety.
+Abstract data types by access discipline: **Stack** = LIFO (Last-In, First-Out) (push/pop/peek), **Queue** = FIFO (First-In, First-Out) (enqueue/dequeue/peek). Prefer `ArrayDeque` for both (faster than legacy `Stack`, no node overhead) — `O(1)` push/pop/peek. Use `PriorityQueue` (binary heap) for priority order, concurrent queues for thread safety.
 
 ---
 
@@ -91,7 +91,7 @@ Pick by need: fast index access → Array/ArrayList; key→value lookup → Hash
 - **Hashing** — trade space for `O(1)` lookup (Two Sum).
 - **Binary search** — `O(log n)` on any monotonic search space.
 - **Divide & conquer / recursion** — often `O(n log n)` (merge sort).
-- **BFS/DFS** — `O(V+E)` graph/tree traversal (BFS for shortest path, DFS for cycles/topo sort).
+- **BFS (Breadth-First Search) / DFS (Depth-First Search)** — `O(V+E)` graph/tree traversal (BFS for shortest path, DFS for cycles/topo sort).
 - **Dynamic programming** — overlapping subproblems + memoization/tabulation turns exponential into polynomial.
 
 ---

@@ -26,9 +26,9 @@ MVVM separates UI from logic via a ViewModel that exposes observable state. Mode
 
 ## 4. MVC vs MVP vs MVVM
 
-- **MVC** — Controller updates Model and View; on Android the Activity is both View and Controller → god classes.
-- **MVP** — Presenter holds a **View interface** reference (1:1, bidirectional); good testability but lots of boilerplate; legacy.
-- **MVVM** — ViewModel exposes observable state, **no** View reference; View observes (unidirectional); built-in config-change survival; recommended for new apps.
+- **MVC (Model-View-Controller)** — Controller updates Model and View; on Android the Activity is both View and Controller → god classes.
+- **MVP (Model-View-Presenter)** — Presenter holds a **View interface** reference (1:1, bidirectional); good testability but lots of boilerplate; legacy.
+- **MVVM (Model-View-ViewModel)** — ViewModel exposes observable state, **no** View reference; View observes (unidirectional); built-in config-change survival; recommended for new apps.
 
 ---
 
@@ -135,7 +135,7 @@ Provides a unified, simplified interface over a complex subsystem, hiding its co
 
 ## 20. Dependency Injection
 
-A class's dependencies are supplied from outside rather than constructed internally — an application of Inversion of Control / DIP. Benefits: decoupling, easy testing with fakes, smaller classes, centralized wiring. Prefer constructor injection. Android: **Hilt** (on Dagger) is recommended; Koin is a service-locator-style alternative. DI pushes dependencies in; a Service Locator pulls them (hides deps, harder to test).
+A class's dependencies are supplied from outside rather than constructed internally — an application of Inversion of Control / DIP. Benefits: decoupling, easy testing with fakes, smaller classes, centralized wiring. Prefer constructor injection. Android: **Hilt** (on Dagger) is recommended; Koin is a service-locator-style alternative. DI (Dependency Injection) pushes dependencies in; a Service Locator pulls them (hides deps, harder to test).
 
 ---
 
