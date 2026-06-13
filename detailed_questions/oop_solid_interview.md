@@ -28,6 +28,13 @@ A comprehensive, interview-ready reference for Object-Oriented Programming funda
 17. [I — Interface Segregation Principle (ISP)](#17-i--interface-segregation-principle-isp)
 18. [D — Dependency Inversion Principle (DIP)](#18-d--dependency-inversion-principle-dip)
 
+**Advanced OOP Concepts**
+19. [Aggregation vs Composition](#19-aggregation-vs-composition)
+20. [Cohesion vs Coupling](#20-cohesion-vs-coupling)
+21. [The Law of Demeter (Principle of Least Knowledge)](#21-the-law-of-demeter-principle-of-least-knowledge)
+22. [What is an Anemic Domain Model?](#22-what-is-an-anemic-domain-model)
+23. [Abstraction vs Encapsulation](#23-abstraction-vs-encapsulation)
+
 ---
 
 ## 1. What is OOP and its four pillars?
@@ -639,3 +646,110 @@ UserViewModel(FakeUserApi())
 **Why it matters:** DIP is the foundation of **dependency injection** (Hilt/Dagger/Koin) and testability in Android. By inverting the dependency, `UserViewModel` no longer knows or cares whether data comes from network, cache, or a fake — you swap implementations at the composition root. Note: *dependency inversion* (the principle) is what *dependency injection* (the technique) implements.
 
 **📚 Reference:** README line 1009, OOP.md Q12
+
+---
+
+## 19. Aggregation vs Composition
+
+**Definition:** Both are forms of association ("has-a" relationships), but they differ in **lifecycle dependency**.
+
+- **Composition:** A strong "has-a" relationship where the child object's lifecycle is bound to the parent. If the parent is destroyed, the child is destroyed. (e.g., A `House` and a `Room`).
+- **Aggregation:** A weak "has-a" relationship where the child object can exist independently of the parent. (e.g., A `Department` and a `Teacher`).
+
+**Kotlin:**
+
+```kotlin
+// Composition: Engine is created by Car and dies with Car
+class Car {
+    private val engine = Engine() 
+}
+
+// Aggregation: Teacher is passed into Department and can exist outside of it
+class Department(val teachers: List<Teacher>)
+```
+
+**Why it matters:** Understanding this distinction helps in designing proper object lifecycles and garbage collection. In Android, a `Fragment` has a composition relationship with its Views, but an aggregation relationship with its `ViewModel`.
+
+---
+
+## 20. Cohesion vs Coupling
+
+**Definitions:**
+
+- **Cohesion:** Measures how closely related and focused the responsibilities of a single module/class are. **High cohesion** is good — a class should do one thing well (aligns with SRP).
+- **Coupling:** Measures the degree of interdependence between different modules/classes. **Low coupling** is good — changing one class shouldn't require changing others.
+
+**Why it matters:** You want **high cohesion and low coupling**. Highly cohesive classes are easier to understand and test. Loosely coupled classes are easier to change and reuse without causing ripple effects across the codebase.
+
+---
+
+## 21. The Law of Demeter (Principle of Least Knowledge)
+
+**Definition:** A design guideline stating that an object should only talk to its immediate friends and not to strangers. "Don't talk to strangers." 
+
+Specifically, a method `M` of object `O` should only invoke methods of:
+1. `O` itself.
+2. Objects passed as arguments to `M`.
+3. Objects instantiated within `M`.
+4. Direct component objects of `O`.
+
+**Violation (Train Wreck):**
+```kotlin
+val zipCode = user.getAddress().getCity().getZipCode() // Bad: deep coupling
+```
+
+**Fixed:**
+```kotlin
+val zipCode = user.getZipCode() // Good: User delegates internally
+```
+
+**Why it matters:** It reduces tight coupling. If the internal structure of `Address` changes, you don't want `User`'s callers to break. It promotes encapsulation and delegation.
+
+---
+
+## 22. What is an Anemic Domain Model?
+
+**Definition:** An **Anemic Domain Model** is an anti-pattern where domain objects are just bags of getters and setters (data structures) with no business logic or behaviour. All the logic is stripped out and placed in external "Service" or "Manager" classes.
+
+**Violation:**
+```kotlin
+// Anemic model: just data
+class User {
+    var isPremium: Boolean = false
+}
+
+// Logic outside the object
+class UserService {
+    fun upgradeUser(user: User) {
+        user.isPremium = true
+    }
+}
+```
+
+**Rich Domain Model (Fixed):**
+```kotlin
+// Rich model: state + behaviour encapsulated
+class User(var isPremium: Boolean = false) {
+    fun upgrade() {
+        this.isPremium = true
+    }
+}
+```
+
+**Why it matters:** Anemic models violate encapsulation — the state is exposed and manipulated from the outside. A Rich Domain Model bundles the state and the behaviour that mutates it, making the object responsible for its own invariants.
+
+---
+
+## 23. Abstraction vs Encapsulation
+
+**Definitions & Differences:**
+While both concepts help in hiding details, they solve different problems at different stages of design.
+
+- **Abstraction** is about **design** (focusing on the *outside* view). It hides the complexity of an operation by providing a simple interface. You expose *what* the object does, but hide *how* it does it.
+- **Encapsulation** is about **implementation** (focusing on the *inside* view). It bundles data and methods together and restricts direct access to the internal state. You protect the integrity of the data.
+
+**Analogy:**
+- **Abstraction:** When you drive a car, you use the steering wheel and pedals. You don't need to know how the combustion engine works to drive it.
+- **Encapsulation:** The engine has a physical hood over it. You cannot reach in and manually mix the fuel and air while it's running; the car protects its internal moving parts from external interference.
+
+**Why it matters:** They complement each other. Abstraction allows clients to use your classes easily without needing to understand their internal complexity, while encapsulation ensures that clients cannot misuse or break the internal state of those classes.

@@ -116,3 +116,33 @@ Clients shouldn't depend on methods they don't use — prefer many small, role-s
 ## 18. D — Dependency Inversion Principle (DIP)
 
 High-level and low-level modules should both depend on **abstractions**, not each other; abstractions shouldn't depend on details. Instead of a ViewModel instantiating a concrete API, define a `UserDataSource` interface and inject the implementation — allowing fakes in tests. DIP is the foundation of dependency injection (Hilt/Dagger/Koin); DI is the technique that implements the principle.
+
+---
+
+## 19. Aggregation vs Composition
+
+**Composition** is a strong "has-a" relationship (child dies with parent). **Aggregation** is a weak "has-a" relationship (child can outlive parent). Example: A Car owns its Engine (Composition), but merely references a Driver (Aggregation).
+
+---
+
+## 20. Cohesion vs Coupling
+
+**Cohesion** measures how focused a single class's responsibilities are (high cohesion = good, aligns with SRP). **Coupling** measures how dependent classes are on each other (low coupling = good, changing one doesn't break others).
+
+---
+
+## 21. The Law of Demeter (Principle of Least Knowledge)
+
+An object should only talk to its immediate friends, not strangers. Avoid "train wrecks" like `user.getAddress().getCity().getZipCode()`. Instead, `user.getZipCode()` should internally delegate. This prevents deep coupling to internal structures.
+
+---
+
+## 22. What is an Anemic Domain Model?
+
+An anti-pattern where domain objects are just bags of data (getters/setters) and all business logic is in external "Service" classes. A **Rich Domain Model** encapsulates both state and the behaviour that modifies it, protecting invariants.
+
+---
+
+## 23. Abstraction vs Encapsulation
+
+**Abstraction** hides complexity by providing a simple interface (focuses on *what* an object does). **Encapsulation** bundles data with methods and restricts access to internal state (focuses on protecting *how* data is managed). Analogy: Abstraction is using a steering wheel to drive; Encapsulation is the hood protecting the engine from being tampered with.
