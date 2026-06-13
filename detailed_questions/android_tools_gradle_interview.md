@@ -27,7 +27,7 @@ Accurate as of 2026: **R8 is the default code shrinker**, **KSP (KSP2) is the re
 14. [Desugaring in Android](#14-desugaring-in-android)
 
 ### Annotation Processing
-15. [annotationProcessor, kapt, and KSP in Gradle](#15-annotationprocessor-kapt-and-ksp-in-gradle)
+15. [annotationProcessor vs kapt vs KSP in Gradle](#15-annotationprocessor-vs-kapt-vs-ksp-in-gradle)
 
 ### APK Size & Build Speed
 16. [APK size reduction](#16-apk-size-reduction)
@@ -487,7 +487,7 @@ Trade-offs: a small APK size increase and a minor build-time cost, in exchange f
 
 ---
 
-## 15. annotationProcessor, kapt, and KSP in Gradle
+## 15. annotationProcessor vs kapt vs KSP in Gradle
 
 All three feed **annotation-based code generation** (Room, Dagger/Hilt, Moshi codegen, etc.), but they differ by language and mechanism.
 

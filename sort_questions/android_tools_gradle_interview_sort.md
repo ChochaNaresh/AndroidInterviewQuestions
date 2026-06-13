@@ -98,7 +98,7 @@ Lets you use newer Java language features/APIs on older Android by rewriting byt
 
 ### Annotation Processing
 
-## 15. annotationProcessor, kapt, and KSP in Gradle
+## 15. annotationProcessor vs kapt vs KSP in Gradle
 
 All feed annotation-based code generation. `annotationProcessor` = Java-only (JSR-269). `kapt` (Kotlin Annotation Processing Tool) = generates Java **stubs** so Java processors run on Kotlin — slow, on the deprecation path. **KSP** (Kotlin Symbol Processing) = reads Kotlin symbols directly (no stubs), ~2x faster, recommended (KSP2 is stable and recommended, but still opt-in — not the automatic default). Migrate to KSP where supported; keep kapt only for processors lacking KSP.
 

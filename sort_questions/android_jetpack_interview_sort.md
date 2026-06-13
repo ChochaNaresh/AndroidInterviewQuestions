@@ -176,3 +176,15 @@ A key-value map (backed by the saved-instance `Bundle`) injected into a ViewMode
 ## 26. Paging 3 (PagingSource, Pager, RemoteMediator)
 
 Loads large datasets incrementally as the user scrolls. Core pieces: `PagingSource` (implements `load()`), `Pager` + `PagingConfig` (exposes `Flow<PagingData<T>>`), `PagingDataAdapter`/`collectAsLazyPagingItems()` (consumes + surfaces `LoadState`), and `RemoteMediator` for offline-first with Room as source of truth. `cachedIn(scope)` keeps pages alive across config changes. The recommended answer for "infinite scrolling."
+
+---
+
+## 27. How does WorkManager handle constraints and retries?
+
+WorkManager only runs when constraints (e.g., `NetworkType.CONNECTED`, battery not low, device idle) are met. If a constraint fails during execution, the worker is stopped and rescheduled. For retries, returning `Result.retry()` uses the configured `BackoffPolicy` (exponential or linear) and delay to reschedule the work automatically.
+
+---
+
+## 28. DataStore vs SharedPreferences
+
+**DataStore** is fully asynchronous (Coroutines/Flow), safe to call on the UI thread, and offers type safety via Proto DataStore. **SharedPreferences** is synchronous, lacks type safety, and its asynchronous `apply()` can still block the UI thread during lifecycle transitions, leading to ANRs. Always use DataStore for new projects to prevent ANRs.

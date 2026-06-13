@@ -23,6 +23,8 @@ Each question includes detailed explanations, Kotlin code snippets, trade-offs, 
 12. [How does WorkManager guarantee task execution?](#12-how-does-workmanager-guarantee-task-execution)
 25. [SavedStateHandle (surviving process death in a ViewModel)](#25-savedstatehandle-surviving-process-death-in-a-viewmodel)
 26. [Paging 3 (PagingSource, Pager, RemoteMediator)](#26-paging-3-pagingsource-pager-remotemediator)
+27. [How does WorkManager handle constraints and retries?](#27-how-does-workmanager-handle-constraints-and-retries)
+28. [DataStore vs SharedPreferences](#28-datastore-vs-sharedpreferences)
 
 ### Others
 13. [Serializable vs Parcelable — which is best?](#13-serializable-vs-parcelable--which-is-best)
@@ -937,6 +939,27 @@ class RepoViewModel(api: Api) : ViewModel() {
 **Why it matters:** "How do you implement infinite scrolling / load a large list efficiently?" is a classic question. Paging 3 is the recommended answer; mentioning `PagingSource` + `Pager` + `cachedIn`, `LoadState`-driven UI, and `RemoteMediator` for offline-first signals current, production-grade knowledge.
 
 **📚 Reference:** [Paging 3 overview](https://developer.android.com/topic/libraries/architecture/paging/v3-overview)
+
+---
+
+## 28. DataStore vs SharedPreferences
+
+**DataStore** is Jetpack's modern data storage solution designed to replace **SharedPreferences**.
+
+| Aspect | SharedPreferences | DataStore (Preferences / Proto) |
+| --- | --- | --- |
+| **API** | Synchronous (`commit`) and asynchronous (`apply`) | Fully asynchronous (Coroutines + Flow) |
+| **Thread Safety** | Can block UI thread (even `apply` can cause ANRs during lifecycle transitions) | Safe to call on UI thread (runs on `Dispatchers.IO` internally) |
+| **Type Safety** | No type safety (can throw ClassCastException) | PreferencesDataStore (no type safety) / ProtoDataStore (strong type safety via Protocol Buffers) |
+| **Error Handling** | None | Built-in error handling via Flow (`catch` operator) |
+| **Migration** | N/A | Built-in `SharedPreferencesMigration` |
+
+**Why we use DataStore instead of SharedPreferences:**
+1. **Prevents ANRs:** SharedPreferences `apply()` seems asynchronous, but Android's `Activity` lifecycle waits for all pending `apply()` writes to finish before `onStop()`, frequently causing ANRs if the disk is slow. DataStore is completely asynchronous and safe.
+2. **Type Safety (Proto):** SharedPreferences just holds primitives. If you expect a String but it's an Int, it crashes. Proto DataStore uses code-generation to ensure types are strictly checked at compile-time.
+3. **Reactive:** DataStore exposes a `Flow<T>`, so your UI or repository automatically updates whenever the value on disk changes, unlike the clunky `OnSharedPreferenceChangeListener`.
+
+**When to use which:** Always use **DataStore** for new greenfield projects. Migrate existing apps to DataStore if you are experiencing ANRs from SharedPreferences writes.
 
 ---
 
