@@ -146,3 +146,27 @@ An anti-pattern where domain objects are just bags of data (getters/setters) and
 ## 23. Abstraction vs Encapsulation
 
 **Abstraction** hides complexity by providing a simple interface (focuses on *what* an object does). **Encapsulation** bundles data with methods and restricts access to internal state (focuses on protecting *how* data is managed). Analogy: Abstraction is using a steering wheel to drive; Encapsulation is the hood protecting the engine from being tampered with.
+
+---
+
+## 24. Static vs Dynamic Binding (Early vs Late Binding)
+
+**Static binding** resolves method calls at compile-time (used for static, private, final methods, and overloading). **Dynamic binding** resolves method calls at runtime based on the actual object type (used for overridden methods, powering polymorphism). 
+
+---
+
+## 25. Upcasting vs Downcasting
+
+**Upcasting** is casting a child object to a parent reference; it is implicit and always safe. **Downcasting** is casting a parent reference back to a child type; it is explicit, potentially unsafe, and requires a type check (e.g., `is` or `instanceof`) to avoid `ClassCastException`.
+
+---
+
+## 26. Stateful vs Stateless Objects
+
+**Stateful objects** hold mutable data that can change over time; they require synchronization in multithreading. **Stateless objects** hold no mutable data and return results based solely on input arguments; they are inherently thread-safe and easy to test.
+
+---
+
+## 27. Is-A vs Has-A Relationships
+
+**Is-A** represents inheritance (a `Dog` is an `Animal`), creating tight coupling. **Has-A** represents composition/aggregation (a `Car` has an `Engine`), delegating work to another object. The golden rule is to favour "Has-A" (composition) over "Is-A" (inheritance) for flexible design.

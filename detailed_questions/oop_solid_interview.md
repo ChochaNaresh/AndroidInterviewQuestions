@@ -34,6 +34,10 @@ A comprehensive, interview-ready reference for Object-Oriented Programming funda
 21. [The Law of Demeter (Principle of Least Knowledge)](#21-the-law-of-demeter-principle-of-least-knowledge)
 22. [What is an Anemic Domain Model?](#22-what-is-an-anemic-domain-model)
 23. [Abstraction vs Encapsulation](#23-abstraction-vs-encapsulation)
+24. [Static vs Dynamic Binding (Early vs Late Binding)](#24-static-vs-dynamic-binding-early-vs-late-binding)
+25. [Upcasting vs Downcasting](#25-upcasting-vs-downcasting)
+26. [Stateful vs Stateless Objects](#26-stateful-vs-stateless-objects)
+27. [Is-A vs Has-A Relationships](#27-is-a-vs-has-a-relationships)
 
 ---
 
@@ -753,3 +757,79 @@ While both concepts help in hiding details, they solve different problems at dif
 - **Encapsulation:** The engine has a physical hood over it. You cannot reach in and manually mix the fuel and air while it's running; the car protects its internal moving parts from external interference.
 
 **Why it matters:** They complement each other. Abstraction allows clients to use your classes easily without needing to understand their internal complexity, while encapsulation ensures that clients cannot misuse or break the internal state of those classes.
+
+---
+
+## 24. Static vs Dynamic Binding (Early vs Late Binding)
+
+**Definitions:**
+Binding refers to the link between a method call and the actual method implementation executed.
+
+- **Static Binding (Early Binding):** The method to be called is determined by the compiler at **compile time**. This happens with `private`, `static`, `final` methods, and **method overloading**, because these cannot be overridden.
+- **Dynamic Binding (Late Binding):** The method to be called is determined by the JVM at **runtime** based on the actual object type, not the reference type. This happens with **method overriding** (virtual methods).
+
+**Example:**
+```kotlin
+open class Animal {
+    open fun sound() = println("Animal sound") // Dynamic binding
+}
+class Dog : Animal() {
+    override fun sound() = println("Bark")
+}
+
+fun main() {
+    val myAnimal: Animal = Dog()
+    myAnimal.sound() // Dynamic binding: resolved at runtime to Dog.sound() -> "Bark"
+}
+```
+
+**Why it matters:** Dynamic binding is the engine behind runtime polymorphism, allowing you to write code against base classes/interfaces without worrying about the exact concrete type. Static binding is faster but inflexible.
+
+---
+
+## 25. Upcasting vs Downcasting
+
+**Definitions:**
+Both refer to casting an object reference between parent and child types in an inheritance hierarchy.
+
+- **Upcasting:** Casting a child object to a parent reference. It is **always safe** and happens implicitly. You lose access to child-specific methods, but you guarantee that the object fulfills the parent's contract.
+- **Downcasting:** Casting a parent reference back to a child type. It is **unsafe** because the parent reference might not actually point to that specific child type. It requires an explicit cast and usually a type check (e.g., `is` in Kotlin, `instanceof` in Java) to avoid `ClassCastException`.
+
+**Example:**
+```kotlin
+open class View
+class Button : View() { fun click() {} }
+
+val view: View = Button() // Upcasting: Implicit and safe
+
+if (view is Button) {
+    view.click() // Downcasting: Safe due to 'is' check (Kotlin smart casts it automatically)
+}
+```
+
+**Why it matters:** Upcasting enables polymorphism (treating all Views as `View`). Downcasting is sometimes necessary when you need specific capabilities of a subclass, but overusing it often signals a poor abstraction or a violation of OCP.
+
+---
+
+## 26. Stateful vs Stateless Objects
+
+**Definitions:**
+
+- **Stateful Object:** An object that holds data (state) which can change over time. Its methods depend on or modify this internal state. (e.g., A `ViewModel` holding UI state, or a `User` entity).
+- **Stateless Object:** An object that holds no mutable data. It behaves exactly the same way no matter how many times you call its methods or when you call them. (e.g., A utility class, a pure function, or a Mapper/Converter).
+
+**Why it matters:** Stateless objects are inherently **thread-safe**, easy to test, and can often be singletons. Stateful objects require careful synchronization in multithreaded environments (like Android's background processing) and are harder to test because their behavior depends on previous interactions. 
+
+---
+
+## 27. Is-A vs Has-A Relationships
+
+**Definitions:**
+These describe how objects relate to one another to achieve code reuse.
+
+- **Is-A (Inheritance):** A tight coupling where one class is a specialized version of another. Implemented via extending a class or implementing an interface. 
+  *Example:* A `Dog` **is-a** `Animal`. A `Button` **is-a** `View`.
+- **Has-A (Composition / Aggregation):** A looser coupling where one class uses or contains an instance of another class to delegate work. 
+  *Example:* A `Car` **has-a** `Engine`. A `ViewModel` **has-a** `Repository`.
+
+**Why it matters:** Understanding this distinction helps you avoid inheritance abuse. Favouring "Has-A" (composition) over "Is-A" (inheritance) makes systems more modular and easier to refactor, as you avoid the "fragile base class" problem.
