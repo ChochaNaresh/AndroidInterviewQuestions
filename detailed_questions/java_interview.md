@@ -1,6 +1,6 @@
 # Java Interview Questions
 
-A comprehensive, code-driven reference covering the core Java topics that come up in Android and backend interviews: the `String` class and string pool, primitives vs. wrapper types, pass-by-value semantics, the Java Memory Model and garbage collection, concurrency primitives (`synchronized`, `volatile`, locks, the atomic package, `ThreadPoolExecutor`), exception handling, object copying and serialization, equality, the `final`/`finally`/`finalize` trio, `static`, reflection, the `String`/`StringBuffer`/`StringBuilder` family, iterators, generics, and the collection types. Answers reflect Java behavior as of 2026 (Java 21+ LTS era, though the semantics described are stable across modern versions).
+A comprehensive, code-driven reference covering the core Java topics that come up in Android and backend interviews: the `String` class and string pool, primitives vs. wrapper types, pass-by-value semantics, the Java Memory Model and garbage collection, concurrency primitives (`synchronized`, `volatile`, locks, the atomic package, `ThreadPoolExecutor`), exception handling, object copying and serialisation, equality, the `final`/`finally`/`finalize` trio, `static`, reflection, the `String`/`StringBuffer`/`StringBuilder` family, iterators, generics, and the collection types. Answers reflect Java behaviour as of 2026 (Java 21+ LTS era, though the semantics described are stable across modern versions).
 
 ---
 
@@ -16,7 +16,7 @@ A comprehensive, code-driven reference covering the core Java topics that come u
 8. [What does synchronized mean?](#8-what-does-synchronized-mean)
 9. [What is the volatile modifier?](#9-what-is-the-volatile-modifier)
 10. [Object-level lock vs class-level lock](#10-object-level-lock-vs-class-level-lock)
-11. [Monitor and synchronization](#11-monitor-and-synchronization)
+11. [Monitor and synchronisation](#11-monitor-and-synchronisation)
 12. [What is a ThreadPoolExecutor?](#12-what-is-a-threadpoolexecutor)
 13. [Concurrency vs Parallelism](#13-concurrency-vs-parallelism)
 14. [The atomic package: get, set, lazySet, compareAndSet, weakCompareAndSet](#14-the-atomic-package-get-set-lazyset-compareandset-weakcompareandset)
@@ -24,7 +24,7 @@ A comprehensive, code-driven reference covering the core Java topics that come u
 16. [Checked vs Unchecked exceptions](#16-checked-vs-unchecked-exceptions)
 17. [throw vs throws](#17-throw-vs-throws)
 18. [Shallow vs Deep copy](#18-shallow-vs-deep-copy)
-19. [Serialization and Deserialization](#19-serialization-and-deserialization)
+19. [Serialization and Deserialisation](#19-serialisation-and-deserialisation)
 20. [The transient modifier](#20-the-transient-modifier)
 21. [What are anonymous classes?](#21-what-are-anonymous-classes)
 22. [== vs equals()](#22--vs-equals)
@@ -44,7 +44,9 @@ A comprehensive, code-driven reference covering the core Java topics that come u
 
 ## 1. How is the String class implemented and why is it immutable?
 
-`String` is a final class. Internally it wraps a character store that is declared `final` and is never exposed for mutation. (Historically this was a `char[]`; since Java 9, with Compact Strings, it is a `byte[]` plus a one-byte `coder` flag that records LATIN-1 vs UTF-16 to save memory.) Because the backing array reference is `final` and never handed out, a `String` object's value can never change after construction. There is no primitive `String` type — every string is an object.
+**String immutability** means that the `String` class is declared final and wraps a final character array, ensuring its value cannot be modified after instantiation.
+
+Internally it wraps a character store that is declared `final` and is never exposed for mutation. (Historically this was a `char[]`; since Java 9, with Compact Strings, it is a `byte[]` plus a one-byte `coder` flag that records LATIN-1 vs UTF-16 to save memory.) Because the backing array reference is `final` and never handed out, a `String` object's value can never change after construction. There is no primitive `String` type — every string is an object.
 
 Any method that "modifies" a string actually returns a **new** `String`:
 
@@ -58,7 +60,7 @@ System.out.println(upper); // "HELLO, WORLD!"
 Why immutability was chosen:
 
 - **Security** — strings are used for file paths, network connections, class loading, and credentials. If a string could be mutated after a security check, a caller could change it between the check and the use (a TOCTOU attack).
-- **Thread safety** — immutable objects can be shared freely across threads without synchronization.
+- **Thread safety** — immutable objects can be shared freely across threads without synchronisation.
 - **String pool / interning** — immutability is what makes pooling and literal sharing safe (see Q2).
 - **hashCode caching** — because the value never changes, `String` caches its hash code on first computation, making it an ideal `HashMap` key.
 
@@ -70,7 +72,9 @@ Why immutability was chosen:
 
 ## 2. What is the String pool?
 
-The **String pool** (a.k.a. the string intern pool) is a region of the heap where the JVM stores one canonical instance of each distinct string literal. When the compiler encounters a literal, it records it in the constant pool; at runtime that literal resolves to a single shared `String` instance in the pool. Two identical literals therefore refer to the *same* object.
+**String Pool** means a special memory region in the JVM heap that stores unique string instances to optimise memory usage.
+
+the string intern pool) is a region of the heap where the JVM stores one canonical instance of each distinct string literal. When the compiler encounters a literal, it records it in the constant pool; at runtime that literal resolves to a single shared `String` instance in the pool. Two identical literals therefore refer to the *same* object.
 
 ```java
 String a = "java";
@@ -99,7 +103,9 @@ Interning saves memory and makes `==` comparisons of literals work, but internin
 
 ## 3. Difference between Integer and int (and autoboxing)
 
-`int` is a **primitive** — a raw 32-bit value stored directly (on the stack for locals, inline in objects for fields), with no methods and no `null`. `Integer` is a **wrapper class** that boxes an `int` inside an object on the heap, adds utility methods (`parseInt`, `compareTo`, `MAX_VALUE`, etc.), and can be `null`.
+**Primitive vs wrapper classes** means the distinction between raw value types stored on the stack (primitives), and their corresponding object wrappers stored on the heap (wrappers).
+
+`Integer` is a **wrapper class** that boxes an `int` inside an object on the heap, adds utility methods (`parseInt`, `compareTo`, `MAX_VALUE`, etc.), and can be `null`.
 
 ```java
 int x = 5;            // primitive, cannot be null
@@ -127,6 +133,8 @@ System.out.println(c == d); // false — outside cache, distinct objects
 
 ## 4. What are the 8 primitive types in Java?
 
+**Primitive data types** means the standard built-in value types in Java, consisting of byte, short, int, long, float, double, char, and boolean.
+
 | Type | Size | Default | Range / Notes |
 |---|---|---|---|
 | `byte` | 8-bit | `0` | -128 to 127 |
@@ -144,7 +152,7 @@ Each has a corresponding wrapper: `Byte`, `Short`, `Integer`, `Long`, `Float`, `
 
 ## 5. Are objects passed by reference or by value?
 
-**Java is always pass-by-value.** What is copied depends on the parameter type:
+**Pass-by-value** means that Java always passes a copy of the actual argument value (primitive value or object reference copy) to methods.
 
 - For a **primitive**, the value itself is copied. Changes inside the method do not affect the caller.
 - For an **object**, the *reference* (the pointer) is copied by value. Both the original and the copy point to the same object, so mutating the object's fields is visible to the caller — but **reassigning the parameter** to a new object does not affect the caller's variable.
@@ -164,7 +172,9 @@ This is why people mistakenly say objects are passed by reference — the *objec
 
 ## 6. What is the Garbage Collector and how does it work?
 
-The **Garbage Collector (GC)** automatically reclaims heap memory occupied by objects that are no longer reachable, freeing the developer from manual `free()`/`delete`. An object is **alive** as long as it is reachable through a chain of references from a *GC root* (active thread stacks, static fields, JNI references). When no such chain exists, the object is eligible for collection.
+**Garbage Collector (GC)** means the automated memory management system in the JVM that reclaims heap space occupied by unreachable objects.
+
+An object is **alive** as long as it is reachable through a chain of references from a *GC root* (active thread stacks, static fields, JNI references). When no such chain exists, the object is eligible for collection.
 
 How modern (generational) GC works:
 
@@ -189,7 +199,9 @@ You cannot force GC; `System.gc()` is only a hint. Reference strengths influence
 
 ## 7. The Java Memory Model and happens-before
 
-The **Java Memory Model (JMM)** defines when a write by one thread becomes visible to a read by another, and what reorderings the compiler/CPU may perform. Without synchronization, each thread may cache variables in registers or CPU caches, so one thread can fail to see another's updates indefinitely.
+**Java Memory Model (JMM)** means a set of specifications defining how threads interact through memory and when writes by one thread become visible to others.
+
+Without synchronisation, each thread may cache variables in registers or CPU caches, so one thread can fail to see another's updates indefinitely.
 
 The core concept is **happens-before**: if action A happens-before action B, then A's memory effects are visible to B. Rules that establish it:
 
@@ -205,7 +217,9 @@ Without a happens-before edge, the JMM permits stale reads and surprising reorde
 
 ## 8. What does synchronized mean?
 
-`synchronized` provides **mutual exclusion** and **visibility** by acquiring an object's intrinsic lock (monitor). Only one thread can hold a given monitor at a time, so synchronized blocks guarded by the same monitor cannot run concurrently. Entering the block establishes a happens-before relationship with the previous release, guaranteeing memory visibility.
+**synchronized keyword** means a mutual exclusion lock mechanism that protects code blocks or methods from concurrent execution by multiple threads.
+
+Only one thread can hold a given monitor at a time, so synchronized blocks guarded by the same monitor cannot run concurrently. Entering the block establishes a happens-before relationship with the previous release, guaranteeing memory visibility.
 
 ```java
 class Counter {
@@ -232,7 +246,9 @@ class Counter {
 
 ## 9. What is the volatile modifier?
 
-`volatile` marks a field as always read from and written to **main memory**, never a thread-local cache. It guarantees **visibility** and prevents instruction reordering across the access, but it does **not** provide atomicity for compound operations.
+**volatile keyword** means a field modifier that forces threads to read and write the field directly from main memory rather than caching it.
+
+It guarantees **visibility** and prevents instruction reordering across the access, but it does **not** provide atomicity for compound operations.
 
 ```java
 class Worker {
@@ -255,7 +271,7 @@ Use `volatile` for simple flags and the "double-checked locking" singleton idiom
 
 ## 10. Object-level lock vs class-level lock
 
-Both use `synchronized`, but they protect different scopes:
+**synchronized method vs synchronized block** means the difference between locking the entire method on the receiver object or class, and locking a specific custom code region on a selected monitor object.
 
 - An **object-level lock** is acquired on a specific instance (`this` or any instance object). It serializes threads operating on the **same instance**; different instances have independent locks and run concurrently.
 - A **class-level lock** is acquired on the `Class` object (one per class per classloader). It serializes threads across **all instances** of the class — used to guard static state.
@@ -278,9 +294,11 @@ A thread holding the object lock of an instance does **not** block another threa
 
 ---
 
-## 11. Monitor and synchronization
+## 11. Monitor and synchronisation
 
-A **monitor** is the synchronization construct that backs `synchronized`. Every Java object has an associated intrinsic lock (the monitor). The JVM implements `synchronized` with the `monitorenter` / `monitorexit` bytecodes: entering acquires the monitor, exiting (including via exception) releases it.
+**Monitor** means the synchronisation construct backing Java's `synchronized` keyword, allowing threads to acquire locks on objects.
+
+Every Java object has an associated intrinsic lock (the monitor). The JVM implements `synchronized` with the `monitorenter` / `monitorexit` bytecodes: entering acquires the monitor, exiting (including via exception) releases it.
 
 A monitor also provides a **wait set** used by the inter-thread coordination methods, which must be called while holding the monitor:
 
@@ -312,7 +330,9 @@ Always re-check the condition in a `while` loop (not `if`) to defend against spu
 
 ## 12. What is a ThreadPoolExecutor?
 
-`ThreadPoolExecutor` is the workhorse implementation of `ExecutorService`. Instead of spawning a fresh `Thread` per task (expensive in memory and scheduling), it maintains a reusable pool of worker threads that pull tasks from a queue. This caps concurrency, reuses threads, and smooths out bursty workloads.
+**ThreadPoolExecutor** means a class that manages a pool of worker threads and executes submitted tasks using configurable queues.
+
+Instead of spawning a fresh `Thread` per task (expensive in memory and scheduling), it maintains a reusable pool of worker threads that pull tasks from a queue. This caps concurrency, reuses threads, and smooths out bursty workloads.
 
 Constructor parameters:
 
@@ -346,6 +366,8 @@ The `Executors` factory provides presets (`newFixedThreadPool`, `newCachedThread
 
 ## 13. Concurrency vs Parallelism
 
+**Concurrency vs Parallelism** means the difference between dealing with multiple tasks concurrently on a single core (concurrency), and executing multiple tasks simultaneously on multiple CPU cores (parallelism).
+
 - **Concurrency** is about *dealing with* many tasks at once — structuring a program so multiple tasks make progress in overlapping time periods. On a single CPU core this is achieved by interleaving (time-slicing); the tasks are *in progress* together but not necessarily *executing* at the same instant.
 - **Parallelism** is about *doing* many tasks at the same instant — literally executing on multiple cores/CPUs simultaneously. Parallelism requires hardware with multiple execution units.
 
@@ -363,7 +385,9 @@ Concurrency is a structuring/design concern; parallelism is an execution/hardwar
 
 ## 14. The atomic package: get, set, lazySet, compareAndSet, weakCompareAndSet
 
-`java.util.concurrent.atomic` (e.g. `AtomicInteger`, `AtomicLong`, `AtomicReference`) provides lock-free, thread-safe single-variable operations built on hardware **Compare-And-Swap (CAS)** instructions. The shared method set:
+**Atomic classes** means thread-safe variable wrappers in `java.util.concurrent.atomic` that perform lock-free operations using Compare-And-Swap (CAS) instructions.
+
+`AtomicInteger`, `AtomicLong`, `AtomicReference`) provides lock-free, thread-safe single-variable operations built on hardware **Compare-And-Swap (CAS)** instructions. The shared method set:
 
 - **`get()`** — reads the current value with **volatile read** semantics (always the latest value).
 - **`set(v)`** — writes a new value with **volatile write** semantics; the write is immediately visible to other threads and acts as a happens-before edge.
@@ -397,7 +421,7 @@ CAS-based atomics scale better than locks under moderate contention because ther
 
 ## 15. How do try / catch / finally work?
 
-`try` wraps code that may throw; `catch` handles matching exceptions; `finally` always runs (whether or not an exception occurred or was caught), making it ideal for cleanup.
+**try-catch-finally** means a block structure used for exception handling, where `try` executes code, `catch` handles exceptions, and `finally` runs cleanup code regardless of success or failure.
 
 ```java
 public int read() {
@@ -432,7 +456,7 @@ try (BufferedReader br = new BufferedReader(new FileReader("f.txt"))) {
 
 ## 16. Checked vs Unchecked exceptions
 
-All exceptions descend from `Throwable` (`Error` and `Exception`):
+**Exception hierarchy** means the structural tree of throwable classes in Java, dividing errors into non-recoverable `Error`s and recoverable `Exception`s.
 
 - **Checked exceptions** extend `Exception` (but not `RuntimeException`). The compiler **forces** you to either catch them or declare them with `throws`. They model recoverable, expected failure conditions — e.g. `IOException`, `SQLException`, `ClassNotFoundException`.
 - **Unchecked exceptions** extend `RuntimeException`. The compiler does **not** require handling. They typically signal programming bugs — e.g. `NullPointerException`, `IllegalArgumentException`, `ArrayIndexOutOfBoundsException`, `ArithmeticException`.
@@ -456,6 +480,8 @@ Guideline: throw checked exceptions for conditions a well-written caller can rea
 
 ## 17. throw vs throws
 
+**throw vs throws** means the distinction between raising a specific exception instance in code (throw), and declaring potential exceptions in a method signature (throws).
+
 - **`throw`** is a statement that actually *raises* an exception instance at runtime — from inside a method or block.
 - **`throws`** is part of a method *signature* declaring which checked exceptions the method may propagate, shifting the handling obligation to callers.
 
@@ -475,7 +501,7 @@ You can `throw` one exception object; you can `throws` multiple types (comma-sep
 
 ## 18. Shallow vs Deep copy
 
-When copying an object that holds references to other (mutable) objects, the question is whether you copy the references or the referenced objects too.
+**Shallow vs Deep copy** means the difference between copying only primitive values and object references (shallow), and recursively copying all referenced objects (deep).
 
 - **Shallow copy** — duplicates the top-level object but copies the **references** to nested objects. The copy and the original share the same nested objects, so mutating a nested object through one is visible through the other. `Object.clone()` is shallow by default.
 - **Deep copy** — recursively duplicates the object *and* every object it references, producing a fully independent graph.
@@ -509,22 +535,24 @@ deep.address.city = "SF";
 System.out.println(p1.address.city); // unchanged
 ```
 
-Trade-offs: shallow copies are fast and cheap but risk unintended shared-state mutation; deep copies are safe and independent but costlier and must handle cycles. Common deep-copy techniques: manual copy constructors (preferred), serialization round-trip, or copy libraries.
+Trade-offs: shallow copies are fast and cheap but risk unintended shared-state mutation; deep copies are safe and independent but costlier and must handle cycles. Common deep-copy techniques: manual copy constructors (preferred), serialisation round-trip, or copy libraries.
 
 **📚 Reference:** <https://www.linkedin.com/posts/amit-shekhar-iitbhu_outcomeschool-softwareengineering-activity-7224635014641016834-j8X1>
 
 ---
 
-## 19. Serialization and Deserialization
+## 19. Serialization and Deserialisation
 
-**Serialization** converts an object's state into a byte stream so it can be persisted to disk or sent over a network. **Deserialization** reconstructs the object from that byte stream. In core Java this is enabled by implementing the marker interface `java.io.Serializable`.
+**Serialization** means the process of converting an object's state into a byte stream for storage or transmission.
+
+**Deserialisation** reconstructs the object from that byte stream. In core Java this is enabled by implementing the marker interface `java.io.Serializable`.
 
 ```java
 class User implements Serializable {
     private static final long serialVersionUID = 1L; // version control
     private String name;
-    private transient String password; // excluded from serialization
-    private static int count;           // static is NOT serialized (class-level)
+    private transient String password; // excluded from serialisation
+    private static int count;           // static is NOT serialised (class-level)
     User(String n, String p) { name = n; password = p; }
 }
 
@@ -543,11 +571,11 @@ try (ObjectInputStream in =
 
 Key points:
 
-- **`serialVersionUID`** identifies the class version. If you change a class without updating compatibly, a mismatched UID causes `InvalidClassException` on deserialization. Always declare it explicitly.
-- `transient` fields and `static` fields are not serialized; on deserialization, transient fields get default values (`null`/`0`).
-- The constructor is **not** called during deserialization; the object is rebuilt from the stream.
+- **`serialVersionUID`** identifies the class version. If you change a class without updating compatibly, a mismatched UID causes `InvalidClassException` on deserialisation. Always declare it explicitly.
+- `transient` fields and `static` fields are not serialised; on deserialisation, transient fields get default values (`null`/`0`).
+- The constructor is **not** called during deserialisation; the object is rebuilt from the stream.
 - You can customize the process with `writeObject`/`readObject` private methods or use `Externalizable` for full control.
-- Native Java serialization has well-known security and performance pitfalls (deserialization-of-untrusted-data attacks). On Android, `Parcelable` is faster for IPC, and for general data interchange JSON (Gson/Moshi/kotlinx.serialization) or protobuf is usually preferred.
+- Native Java serialisation has well-known security and performance pitfalls (deserialisation-of-untrusted-data attacks). On Android, `Parcelable` is faster for IPC, and for general data interchange JSON (Gson/Moshi/kotlinx.serialisation) or protobuf is usually preferred.
 
 **📚 Reference:** <https://www.linkedin.com/posts/amit-shekhar-iitbhu_outcomeschool-softwareengineer-tech-activity-7371542771142373376-NbFD>
 
@@ -555,7 +583,9 @@ Key points:
 
 ## 20. The transient modifier
 
-`transient` marks an instance field to be **excluded from serialization**. When the object is serialized, transient fields are skipped; when deserialized, they are restored to their default value (`null` for references, `0`/`false` for primitives).
+**transient keyword** means a field modifier that excludes a variable from serialisation.
+
+When the object is serialised, transient fields are skipped; when deserialised, they are restored to their default value (`null` for references, `0`/`false` for primitives).
 
 ```java
 class Session implements Serializable {
@@ -565,13 +595,15 @@ class Session implements Serializable {
 }
 ```
 
-Use it for: sensitive data (passwords, tokens) you don't want written out, fields that can be recomputed/derived, or non-serializable resources like live connections, threads, or streams. It applies only to serialization — it has no effect at runtime otherwise.
+Use it for: sensitive data (passwords, tokens) you don't want written out, fields that can be recomputed/derived, or non-serializable resources like live connections, threads, or streams. It applies only to serialisation — it has no effect at runtime otherwise.
 
 ---
 
 ## 21. What are anonymous classes?
 
-An **anonymous class** is a class without a name, declared and instantiated in a single expression. It is used to provide a one-off implementation of an interface or subclass on the spot — typically for listeners and callbacks.
+**Anonymous class** means an inner class defined and instantiated in a single expression without a name.
+
+It is used to provide a one-off implementation of an interface or subclass on the spot — typically for listeners and callbacks.
 
 ```java
 // Implementing an interface inline
@@ -600,6 +632,8 @@ Characteristics:
 
 ## 22. == vs equals()
 
+**== vs equals()** means the choice between comparing object reference memory addresses (==), and comparing logical content values (equals).
+
 - **`==`** compares **references** for objects (do both operands point to the same instance?) and raw values for primitives.
 - **`equals()`** compares **logical equality** as defined by the class. The default `Object.equals()` is just `==`, but classes like `String`, `Integer`, and collections override it for value comparison.
 
@@ -620,7 +654,9 @@ Rule of thumb: use `==` for primitives and for true identity checks (including `
 
 ## 23. The hashCode() and equals() contract
 
-`equals()` defines logical equality; `hashCode()` returns an int bucket used by hash-based collections (`HashMap`, `HashSet`, `Hashtable`). They are bound by a contract that **must** be honored, especially when used as keys:
+**equals() and hashCode() contract** means the rule that if two objects are logically equal, they must return the same hash code value.
+
+They are bound by a contract that **must** be honored, especially when used as keys:
 
 1. **Consistency** — repeated calls return the same result if the object isn't modified.
 2. **equals → hashCode** — if `a.equals(b)` is `true`, then `a.hashCode() == b.hashCode()` **must** hold.
@@ -652,7 +688,7 @@ class Point {
 
 ## 24. final, finally, and finalize
 
-Three unrelated things with confusingly similar names:
+**Final, Finally, and Finalize** means three distinct Java constructs: a modifier for immutability (final), an exception cleanup block (finally), and a deprecated garbage collection callback (finalize).
 
 - **`final`** — a modifier for immutability/non-extensibility:
   - `final` variable → assign once (a constant or, for objects, a fixed *reference*; the object itself can still mutate).
@@ -675,7 +711,7 @@ list.add("ok");                  // allowed — object mutates
 
 ## 25. The static keyword (variables, methods, blocks)
 
-`static` binds a member to the **class itself** rather than to any instance:
+**static keyword** means a modifier that binds a member to the class itself rather than to any class instances.
 
 - **Static variable** — a single copy shared across all instances of the class. Changing it through one instance affects all (it belongs to the class, not the object). Good for constants and shared counters.
 - **Static method** — invoked without an instance (`Math.max(...)`). It cannot use `this` or access non-static (instance) members directly, because there's no instance context. (So: a static method *cannot* use non-static members.)
@@ -702,7 +738,9 @@ Static members are initialized at class-load time, before any instance exists. S
 
 ## 26. Can a static method be overridden?
 
-**No — static methods cannot be overridden; they are *hidden*.** Overriding is based on runtime polymorphism via the object's actual type (dynamic dispatch). Static methods belong to the class and are resolved at **compile time** based on the *declared* (reference) type, not the runtime object — this is **method hiding**, not overriding.
+**Static method hiding** means declaring a static method in a subclass with the same signature as one in the superclass, which hides it instead of overriding it.
+
+Static methods belong to the class and are resolved at **compile time** based on the *declared* (reference) type, not the runtime object — this is **method hiding**, not overriding.
 
 ```java
 class Parent {
@@ -725,7 +763,9 @@ A child can declare a static method with the same signature (covariant return al
 
 ## 27. What is Reflection?
 
-**Reflection** (`java.lang.reflect`) lets a program inspect and manipulate classes, fields, methods, and constructors **at runtime**, even ones unknown at compile time. You can discover type metadata, instantiate objects, invoke methods, and read/write fields dynamically — including private members (by calling `setAccessible(true)`).
+**Reflection** means the runtime capability to inspect, instantiate, and manipulate classes, fields, and methods dynamically.
+
+You can discover type metadata, instantiate objects, invoke methods, and read/write fields dynamically — including private members (by calling `setAccessible(true)`).
 
 ```java
 Class<?> clazz = Class.forName("com.example.User");
@@ -739,13 +779,15 @@ f.setAccessible(true);          // bypass private access
 f.set(obj, "secret");
 ```
 
-Uses: dependency-injection frameworks (Spring, Dagger/Hilt), serialization libraries (Gson/Jackson), JUnit test discovery, ORMs, and IDE/tooling. Trade-offs: it is **slower** than direct calls, **bypasses compile-time type safety** and encapsulation, can break under the Java Platform Module System / `setAccessible` restrictions, and complicates obfuscation/optimization (on Android, reflected members must be kept in ProGuard/R8 rules). Use it sparingly and prefer compile-time alternatives (annotation processing / code generation) where possible.
+Uses: dependency-injection frameworks (Spring, Dagger/Hilt), serialisation libraries (Gson/Jackson), JUnit test discovery, ORMs, and IDE/tooling. Trade-offs: it is **slower** than direct calls, **bypasses compile-time type safety** and encapsulation, can break under the Java Platform Module System / `setAccessible` restrictions, and complicates obfuscation/optimisation (on Android, reflected members must be kept in ProGuard/R8 rules). Use it sparingly and prefer compile-time alternatives (annotation processing / code generation) where possible.
 
 **📚 Reference:** <https://x.com/amitiitbhu/status/1819234916812341567>
 
 ---
 
 ## 28. String vs StringBuffer vs StringBuilder
+
+**String vs StringBuilder vs StringBuffer** means the comparison between immutable character sequences (String), mutable non-thread-safe sequences (StringBuilder), and mutable thread-safe sequences (StringBuffer).
 
 | | `String` | `StringBuilder` | `StringBuffer` |
 |---|---|---|---|
@@ -771,7 +813,7 @@ String result = sb.toString();
 - Use **`StringBuffer`** only when the same builder instance is shared and mutated across multiple threads (its methods are `synchronized`).
 - Use **`String`** for fixed/constant text and when you need a safe shared/key value.
 
-(Note: simple `a + b` concatenations the compiler optimizes; the concern is concatenation in loops.)
+(Note: simple `a + b` concatenations the compiler optimises; the concern is concatenation in loops.)
 
 **📚 Reference:** <https://outcomeschool.com/blog/string-vs-stringbuffer-vs-stringbuilder>
 
@@ -779,7 +821,9 @@ String result = sb.toString();
 
 ## 29. Fail-fast vs fail-safe iterators
 
-- **Fail-fast** iterators throw `ConcurrentModificationException` if the underlying collection is **structurally modified** (add/remove) during iteration by anything other than the iterator's own `remove()`. They detect modification via an internal `modCount` counter and fail immediately rather than risk undefined behavior. Examples: `ArrayList`, `HashMap`, `HashSet`, `Vector` iterators. They iterate the live collection directly.
+**Fail-fast vs Fail-safe iterators** means the difference between iterators that throw exceptions on concurrent modification (fail-fast), and iterators that traverse a copy without throwing exceptions (fail-safe).
+
+- **Fail-fast** iterators throw `ConcurrentModificationException` if the underlying collection is **structurally modified** (add/remove) during iteration by anything other than the iterator's own `remove()`. They detect modification via an internal `modCount` counter and fail immediately rather than risk undefined behaviour. Examples: `ArrayList`, `HashMap`, `HashSet`, `Vector` iterators. They iterate the live collection directly.
 
 - **Fail-safe** (more precisely *weakly consistent*) iterators operate over a **snapshot or a tolerant view**, so concurrent modification does not throw. They never see a `ConcurrentModificationException` but may not reflect modifications made after the iterator was created. Examples: `CopyOnWriteArrayList` (iterates a snapshot copy), `ConcurrentHashMap` (weakly consistent view).
 
@@ -807,7 +851,9 @@ Trade-offs: fail-fast gives early bug detection at the cost of throwing on concu
 
 ## 30. Generics in Java
 
-**Generics** parameterize types, enabling **compile-time type safety** and eliminating most casts. Instead of storing `Object` and casting, you declare the element type once; the compiler enforces it and inserts casts for you.
+**Java Generics** means compile-time type parameterisation that enforces type safety and is erased by the compiler at runtime.
+
+Instead of storing `Object` and casting, you declare the element type once; the compiler enforces it and inserts casts for you.
 
 ```java
 List<String> names = new ArrayList<>();
@@ -838,6 +884,8 @@ Wildcards control variance:
 
 ## 31. Arrays vs ArrayList
 
+**Array vs ArrayList** means the comparison between a fixed-size, primitive-supporting array, and a dynamically-resized object collection.
+
 | | Array | `ArrayList` |
 |---|---|---|
 | Size | **Fixed** at creation | **Dynamic** (auto-resizes) |
@@ -865,7 +913,7 @@ Use an **array** when the size is known and fixed, you need maximum performance,
 
 ## 32. HashSet vs TreeSet
 
-Both implement `Set` (no duplicates), but differ in ordering and performance:
+**TreeSet vs HashSet** means the choice between a sorted set backed by a red-black tree (TreeSet), and an unsorted set backed by a hash map (HashSet).
 
 | | `HashSet` | `TreeSet` |
 |---|---|---|
@@ -894,7 +942,7 @@ Use **`HashSet`** when you only need uniqueness and fast membership tests (the c
 
 ## 33. HashMap vs HashSet
 
-They serve different purposes and one is built on the other:
+**HashMap vs HashTable** means the choice between a modern, non-thread-safe hash map (HashMap), and a legacy, synchronized hash table (HashTable).
 
 - **`HashMap<K,V>`** stores **key→value** pairs. Keys are unique; you look up a value by its key in O(1) average. Allows one `null` key and multiple `null` values.
 - **`HashSet<E>`** stores **a set of unique elements** (no values). It is internally backed by a `HashMap` — each element is stored as a key mapped to a shared dummy value (`PRESENT`). So a `HashSet` is essentially "the key set of a HashMap."

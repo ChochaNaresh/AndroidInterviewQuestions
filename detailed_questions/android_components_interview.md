@@ -74,10 +74,9 @@ targeting practices for API 34+). Where an older API has been superseded
 
 ## 1. Why does an Android app lag?
 
-An app "lags" when it fails to render a frame within the budget the display
-imposes. On a 60 Hz screen you have ~16.6 ms per frame (8.3 ms at 120 Hz). If the
-main (UI) thread is busy past that window, the frame is **janky** (skipped or
-late), and the user perceives stutter.
+**App lag** means the stutter or visual delay that occurs when the app's main thread fails to render a frame within the display's refresh rate window.
+
+An app "lags" when it fails to render a frame within the budget the display imposes. On a 60 Hz screen you have ~16.6 ms per frame (8.3 ms at 120 Hz). If the main (UI) thread is busy past that window, the frame is **janky** (skipped or late), and the user perceives stutter.
 
 Common causes:
 
@@ -92,7 +91,7 @@ Common causes:
   `onBindViewHolder()`.
 - **Memory leaks** — leaked activities/bitmaps shrink the available heap and
   increase GC.
-- **Layout/measure thrash**, unoptimized images, and synchronous animations.
+- **Layout/measure thrash**, unoptimised images, and synchronous animations.
 
 How to diagnose: Android Studio Profiler, Systrace/Perfetto, `Choreographer`
 frame callbacks, StrictMode (to catch disk/network on the main thread), and
@@ -107,11 +106,9 @@ The fix is almost always: **move work off the main thread** (coroutines/`Dispatc
 
 ## 2. What is `Context`? Application vs Activity Context
 
-`Context` is an abstract handle to the Android system and to your app's
-environment. It provides access to resources (`getString`, `getDrawable`),
-assets, system services (`getSystemService`), preferences, databases, file
-directories, and the ability to start activities, bind services, and send
-broadcasts. Almost every Android API needs a `Context`.
+**Context** means an abstract handle to the Android environment that provides access to system services, resources, and application information.
+
+It provides access to resources (`getString`, `getDrawable`), assets, system services (`getSystemService`), preferences, databases, file directories, and the ability to start activities, bind services, and send broadcasts. Almost every Android API needs a `Context`.
 
 Two contexts you must distinguish:
 
@@ -144,9 +141,9 @@ or a long-lived singleton leaks the entire activity (and its view tree). Prefer
 
 ## 3. How does Zygote make Android apps start faster?
 
-**Zygote** is a special process started by `init` at boot. It preloads and
-initializes the core Android framework classes and shared resources (the ART
-runtime, common system classes, drawables, etc.) **once**.
+**Zygote** means a warm parent process that preloads core Android framework classes and resource pools at boot time to rapidly fork new app processes.
+
+Zygote is a special process started by `init` at boot. It preloads and initialises the core Android framework classes and shared resources (the ART runtime, common system classes, drawables, etc.) **once**.
 
 When you launch an app, Android does **not** start a fresh VM from scratch.
 Instead, Zygote **forks** itself. Thanks to the OS copy-on-write (COW) memory
@@ -169,7 +166,9 @@ which is the core reason cold starts are not catastrophically slow.
 
 ## 4. What are the Android application components?
 
-App components are the essential building blocks and entry points of an app:
+**Application components** means the fundamental building blocks of an Android application, consisting of Activities, Services, BroadcastReceivers, and ContentProviders.
+
+These essential building blocks and entry points are:
 
 - **Activity** — a single screen with a UI; handles user interaction.
 - **Service** — runs long-running work in the background with no UI (e.g. music
@@ -193,7 +192,9 @@ must be declared in `AndroidManifest.xml`.
 
 ## 5. What is the project structure of an Android app?
 
-A typical Gradle-based Android project:
+**Project structure** means the layout of an Android project consisting of module configurations, source directories, and resource folders organised for the Gradle build system.
+
+A typical project layout is as follows:
 
 ```text
 ProjectRoot/
@@ -231,8 +232,9 @@ ProjectRoot/
 
 ## 6. What is `AndroidManifest.xml`?
 
-The manifest is the app's mandatory descriptor, read by the OS and Play Store
-**before** any code runs. It declares:
+**AndroidManifest.xml** means a mandatory XML descriptor file at the root of the project that declares the app's metadata, components, permissions, and requirements to the OS.
+
+The manifest is read by the OS and Play Store **before** any code runs. It declares:
 
 - The **package name** / application id (identity).
 - All **components** — `<activity>`, `<service>`, `<receiver>`, `<provider>` —
@@ -266,10 +268,9 @@ Note: since Android 12 (API 31), any component with an intent filter must set
 
 ## 7. What is the `Application` class?
 
-`Application` is the base class representing the whole app process. A single
-instance is created when the process starts and lives as long as the process
-does — making it the natural place for **process-wide initialization** and
-global state.
+**Application** means a base class that represents the entire application process and maintains global state across all components.
+
+A single instance is created when the process starts and lives as long as the process does — making it the natural place for **process-wide initialisation** and global state.
 
 ```kotlin
 class MyApp : Application() {
@@ -300,8 +301,9 @@ Key points:
 
 ## 8. ART vs Dalvik
 
-Both are execution environments that run Android's DEX (Dalvik Executable)
-bytecode, but differ in how they compile it:
+**ART (Android Runtime)** means the modern managed runtime environment that compiles DEX bytecode using hybrid Ahead-Of-Time and Just-In-Time compilation, whereas **Dalvik** was the legacy runtime that compiled bytecode strictly via a Just-In-Time compiler.
+
+Both execution environments run Android's DEX (Dalvik Executable) bytecode, but compile it differently:
 
 - **Dalvik** (default up to Android 4.4): used a **Just-In-Time (JIT)** compiler,
   compiling bytecode to native code at runtime as needed. Small install
@@ -321,8 +323,9 @@ Trade-off summary: Dalvik = smaller/faster install, slower run; ART = faster run
 
 ## 9. What is ANR (Application Not Responding)?
 
-An **ANR** is the system dialog shown when the app's main thread is blocked too
-long, signaling the UI is frozen. Triggers:
+**ANR (Application Not Responding)** means a system-triggered dialog shown to the user when the main thread of an application remains blocked for too long.
+
+This dialog signals that the UI is frozen. Triggers:
 
 - **Input dispatch timeout** — no response to an input event within ~5 seconds.
 - **`BroadcastReceiver`** — `onReceive()` not finishing within ~10s (foreground)
@@ -338,9 +341,9 @@ block the UI thread, use `StrictMode` to detect violations, and inspect
 
 ## 10. What is ADB (Android Debug Bridge)?
 
-ADB is a command-line tool and client-server protocol for communicating with a
-device/emulator. It is used to install/uninstall apps, push/pull files, read
-logs, run a shell on the device, and debug. Common commands:
+**ADB (Android Debug Bridge)** means a versatile command-line utility that facilitates communication, debugging, and command execution between a development machine and an Android device.
+
+It runs a client-server protocol used to install/uninstall apps, push/pull files, read logs, run a shell on the device, and debug. Common commands:
 
 ```bash
 adb devices                       # list connected devices
@@ -358,16 +361,12 @@ device, and a **server** process mediating between them.
 
 ## 11. Process vs Thread vs Task
 
-- **Process** — an OS-level execution context. Each Android app normally runs in
-  its **own process** with its **own VM instance** and isolated memory. The
-  system can kill processes to reclaim resources. Components can be split into
-  multiple processes via `android:process` in the manifest.
-- **Thread** — the smallest unit of execution **within** a process. Threads in a
-  process share memory. The **main/UI thread** handles UI and event dispatch;
-  additional threads handle background work.
-- **Task** — a **user-facing** concept: an ordered stack (back stack) of
-  activities the user interacts with as they move through the app(s). A task can
-  span multiple apps/processes and is governed by launch modes and task affinity.
+**Process** means an isolated OS-level resource allocation boundary, **thread** means the smallest unit of execution within a process, and **task** means a collection of user-facing activities arranged in a back stack.
+
+Details:
+- **Process** — an OS-level execution context where each Android app normally runs in its **own process** with its **own VM instance** and isolated memory. The system can kill processes to reclaim resources. Components can be split into multiple processes via `android:process` in the manifest.
+- **Thread** — the smallest unit of execution **within** a process. Threads in a process share memory. The **main/UI thread** handles UI and event dispatch; additional threads handle background work.
+- **Task** — a **user-facing** concept: an ordered stack (back stack) of activities the user interacts with as they move through the app(s). A task can span multiple apps/processes and is governed by launch modes and task affinity.
 
 In short: process = resource/isolation boundary; thread = unit of execution;
 task = the user's navigation journey through activities.
@@ -376,7 +375,9 @@ task = the user's navigation journey through activities.
 
 ## 12. Looper, Handler, and MessageQueue
 
-These three implement Android's per-thread message loop:
+**Looper** means a helper class that keeps a thread alive to run a message loop, **MessageQueue** is a queue holding runnable tasks or messages, and **Handler** is a mechanism used to post tasks or send messages to a specific looper's queue.
+
+These three components work together to implement Android's per-thread message loop:
 
 - **MessageQueue** — a queue of `Message`/`Runnable` items to be processed,
   ordered by dispatch time.
@@ -402,9 +403,9 @@ In modern code, coroutines/`Dispatchers.Main` largely replace manual Handler use
 
 ## 13. What is an `Activity` and its lifecycle?
 
-An **Activity** is a single, focused screen the user interacts with. The system
-drives it through lifecycle callbacks as it becomes visible, gains/loses focus,
-and is destroyed. Override these to acquire/release resources at the right time.
+**Activity** means a single, focused screen that presents a user interface and manages its lifecycle through a series of system-driven callbacks.
+
+Override these callbacks to acquire or release resources at the right time.
 
 Lifecycle callbacks (in order for a typical launch → exit):
 
@@ -439,15 +440,11 @@ onCreate -> onStart -> onResume -> [RUNNING]
 
 ## 14. Difference between `onCreate()` and `onStart()`
 
-- **`onCreate()`** is called **once** when the activity instance is first
-  created. It's where one-time setup happens: `setContentView()`, view binding,
-  reading the `savedInstanceState` bundle, wiring ViewModels. The activity is
-  **not yet visible**.
-- **`onStart()`** is called **every time** the activity becomes **visible** to
-  the user — both after `onCreate()` on first launch and after `onRestart()` when
-  the user returns from a stopped state. It runs more than once over the
-  activity's life and is where you (re)start visible-only work (e.g. register a
-  location listener you stop in `onStop()`).
+**onCreate()** means the one-time lifecycle callback where initial setup and view inflation are performed when an activity is created, whereas **onStart()** is a callback invoked every time the activity becomes visible to the user.
+
+Differences:
+- **`onCreate()`** is called **once** when the activity instance is first created. It's where one-time setup happens: `setContentView()`, view binding, reading the `savedInstanceState` bundle, wiring ViewModels. The activity is **not yet visible**.
+- **`onStart()`** is called **every time** the activity becomes **visible** to the user — both after `onCreate()` on first launch and after `onRestart()` when the user returns from a stopped state. It runs more than once over the activity's life and is where you (re)start visible-only work (e.g. register a location listener you stop in `onStop()`).
 
 Mnemonic: `onCreate` = "set up once"; `onStart` = "now visible, possibly again".
 
@@ -457,9 +454,9 @@ Mnemonic: `onCreate` = "set up once"; `onStart` = "now visible, possibly again".
 
 ## 15. Why call `setContentView()` in `onCreate()`?
 
-`setContentView()` inflates the XML layout and attaches the resulting view
-hierarchy to the activity's window so the UI exists and can be referenced (e.g.
-`findViewById`). It belongs in `onCreate()` because:
+**setContentView()** means the method that inflates the XML layout and attaches the view tree to the activity's window, which is called in `onCreate()` to ensure view initialisation happens only once.
+
+It belongs in `onCreate()` because:
 
 - `onCreate()` runs **once** per instance — you want to build the view tree once,
   not on every visibility change. Putting it in `onStart()`/`onResume()` would
@@ -477,10 +474,9 @@ called in `onCreate()`.
 
 ## 16. When is only `onDestroy()` called without `onPause()`/`onStop()`?
 
-If you call **`finish()` inside `onCreate()`** (before the activity ever becomes
-visible/resumed), the activity never reaches `onStart()`/`onResume()`, so it
-also never goes through `onPause()`/`onStop()` — the system goes straight from
-`onCreate()` to **`onDestroy()`**.
+**Direct destruction** means destroying an activity immediately from `onCreate()` by calling `finish()`, which bypasses the visibility-related `onPause()` and `onStop()` states.
+
+If you call `finish()` inside `onCreate()` before the activity ever becomes visible or resumed, the system goes straight from `onCreate()` to `onDestroy()`.
 
 ```kotlin
 override fun onCreate(savedInstanceState: Bundle?) {
@@ -504,8 +500,9 @@ was never started/resumed.)
 
 ## 17. `onSaveInstanceState()` and `onRestoreInstanceState()`
 
-These handle **transient UI state** across system-initiated destruction (config
-change like rotation, or process death while in the background).
+**onSaveInstanceState()** means a callback used to write transient UI state into a `Bundle` before destruction, whereas **onRestoreInstanceState()** is a callback invoked during recreation to restore the saved state.
+
+These callbacks handle transient UI state across system-initiated destruction (such as configuration changes or process death while in the background).
 
 - **`onSaveInstanceState(outState: Bundle)`** — called before the activity may be
   destroyed (typically after `onStop` on modern versions). Write small UI state
@@ -542,8 +539,9 @@ real data to disk/DB. `ViewModel` + `SavedStateHandle` covers both.
 
 ## 18. Preventing data loss on rotation (ViewModel + saved state)
 
-On rotation (and other config changes) the activity is **destroyed and
-recreated** by default. Use a layered strategy:
+**State persistence strategy** means combining `ViewModel` to retain rich data across configuration changes with `SavedStateHandle` to preserve essential transient data across process death.
+
+On rotation (and other configuration changes) the activity is destroyed and recreated by default. Use a layered strategy:
 
 1. **`ViewModel`** for in-memory UI data. A `ViewModel` is lifecycle-aware and is
    **not** destroyed on configuration change — the recreated activity reconnects
@@ -573,7 +571,9 @@ bypasses resource re-selection.)
 
 ## 19. Lifecycle sequence across multiple activities (A → B → C transparent)
 
-Activity C is **transparent** (it does not fully cover B). Sequence:
+**Lifecycle coordination** means the deterministic sequence of visibility and focus transitions that occur across activities during navigation.
+
+For example, if Activity C is transparent (not fully covering B), the sequence is:
 
 1. **Go A → B** (B opaque): `A.onPause` → `B.onCreate` → `B.onStart` →
    `B.onResume` → `A.onStop` (A is fully covered, so it stops).
@@ -597,8 +597,9 @@ Key insight tested here: a transparent/non-fullscreen activity pauses but does
 
 ## 20. What are launch modes?
 
-`launchMode` (in the manifest) and intent flags control how an activity instance
-is created and placed in the back stack/task.
+**Launch modes** means instructions in the manifest or intent flags that define how a new activity instance is instantiated and integrated into a task's back stack.
+
+`launchMode` in the manifest and intent flags control this behaviour.
 
 - **`standard`** (default): always creates a **new instance** in the caller's
   task. Multiple instances can coexist (even of the same activity).
@@ -622,7 +623,7 @@ override fun onNewIntent(intent: Intent) {
 }
 ```
 
-Trade-off: `singleTask`/`singleInstance` change task/back-stack behavior and can
+Trade-off: `singleTask`/`singleInstance` change task/back-stack behaviour and can
 surprise users; reserve them for genuine single-instance screens (launchers,
 auth, system-like dialogs).
 
@@ -632,10 +633,9 @@ auth, system-like dialogs).
 
 ## 21. What is a `Fragment` and its lifecycle?
 
-A **Fragment** is a reusable, modular portion of UI hosted **inside** an activity
-(or another fragment). It has its own lifecycle and back stack but is always tied
-to its host's lifecycle. Fragments enable adaptive layouts (e.g. master-detail on
-tablets), view-pager pages, and navigation destinations.
+**Fragment** means a modular, reusable user interface component that lives within a host activity and manages its own lifecycle distinct from the activity's instance.
+
+It is hosted inside an activity (or another fragment). It has its own lifecycle and back stack but is always tied to its host's lifecycle. Fragments enable adaptive layouts (e.g. master-detail on tablets), view-pager pages, and navigation destinations.
 
 A Fragment has **two intertwined lifecycles**: the fragment instance and its
 **view**. Key callbacks (creation order):
@@ -669,11 +669,11 @@ fragment, in `onViewCreated`.
 
 ## 22. `Fragment` vs `Activity` — relationship and when to use each
 
-- An **Activity** is a top-level, system-managed component with a window and an
-  entry in the manifest; it's an entry point the OS can launch.
-- A **Fragment** is a sub-component that **lives inside** an activity (or another
-  fragment) and manages a piece of that activity's UI. It cannot exist on its own
-  — it needs a host. A single activity can host many fragments and swap them.
+**Activity** means a top-level entry point that provides a window and a base context, whereas **Fragment** is a UI sub-component hosted inside an activity for flexible, modular screen designs.
+
+Key differences:
+- An **Activity** is a top-level, system-managed component with a window and an entry in the manifest; it's an entry point the OS can launch.
+- A **Fragment** is a sub-component that lives inside an activity (or another fragment) and manages a piece of that activity's UI. It cannot exist on its own — it needs a host. A single activity can host many fragments and swap them.
 
 Relationship: the activity provides the window and overall lifecycle; fragments
 are modular UI chunks the activity composes and the `FragmentManager` controls.
@@ -697,11 +697,9 @@ launched by an external implicit intent, or a distinct task.
 
 ## 23. Why use only the default constructor for a `Fragment`?
 
-The framework **recreates fragments using reflection** by calling the **no-arg
-(default) constructor** — for example after a configuration change or process
-death restoration. If you add a custom constructor with parameters, the system
-cannot call it during recreation, so it either crashes or silently creates the
-fragment without your data, losing state.
+**No-argument constructor** means the default constructor that the Android system uses to recreate a fragment via reflection, requiring all initial parameters to be passed via a persistent `Bundle` argument instead.
+
+The framework recreates fragments using reflection by calling the no-arg constructor after a configuration change or process death. If you add a custom constructor with parameters, the system cannot call it during recreation, leading to crashes or state loss.
 
 Correct pattern: pass arguments via a `Bundle` set with `setArguments()` (often
 via a `newInstance` factory). The system **automatically saves and restores
@@ -729,16 +727,11 @@ with.
 
 ## 24. `add` vs `replace` and `addToBackStack()`
 
-Within a `FragmentTransaction`:
+**add()** means stacking a fragment on top of the container without disturbing existing fragments, **replace()** means removing all existing fragments from the container before adding the new one, and **addToBackStack()** preserves the transaction to allow back-button navigation.
 
-- **`add(containerId, fragment)`** — **adds** a new fragment on top; the existing
-  fragment(s) **remain attached and their views stay**. The old fragment is not
-  destroyed and does **not** run `onPause`/`onStop`/`onDestroyView` — both can be
-  active (and overlapping) in the same container.
-- **`replace(containerId, fragment)`** — **removes** all fragments currently in
-  the container, then adds the new one. The removed fragment runs `onPause` →
-  `onStop` → `onDestroyView` (its view is gone). When you navigate back, that
-  fragment's `onCreateView` is invoked again.
+Within a `FragmentTransaction`:
+- **`add(containerId, fragment)`** — **adds** a new fragment on top; the existing fragment(s) **remain attached and their views stay**. The old fragment is not destroyed and does **not** run `onPause`/`onStop`/`onDestroyView` — both can be active (and overlapping) in the same container.
+- **`replace(containerId, fragment)`** — **removes** all fragments currently in the container, then adds the new one. The removed fragment runs `onPause` → `onStop` → `onDestroyView` (its view is gone). When you navigate back, that fragment's `onCreateView` is invoked again.
 
 In short: with `replace`, lifecycle callbacks (`onPause`, `onStop`,
 `onCreateView`, etc.) fire for the outgoing fragment; with `add` they don't,
@@ -763,7 +756,9 @@ supportFragmentManager.commit {
 
 ## 25. `FragmentPagerAdapter` vs `FragmentStatePagerAdapter` (and ViewPager2)
 
-These were the two adapters for the legacy **`ViewPager`**:
+**ViewPager adapters** means legacy classes that manage fragment pages: `FragmentPagerAdapter` keeps all instances in memory, `FragmentStatePagerAdapter` destroys instances to save memory, and **ViewPager2** is their modern replacement built on `RecyclerView`.
+
+These were the two adapters for the legacy `ViewPager`:
 
 - **`FragmentPagerAdapter`** — keeps **every visited fragment instance in
   memory**; only the **view** is destroyed when off-screen (it calls
@@ -803,11 +798,9 @@ Migration mapping: `getCount()` → `getItemCount()`, `getItem()` →
 
 ## 26. What is a retained `Fragment`?
 
-A retained fragment is one whose **instance survives configuration changes** —
-`setRetainInstance(true)` told the `FragmentManager` not to destroy/recreate the
-fragment on rotation (only its view goes through `onDestroyView`/`onCreateView`).
-Historically this was used to hold expensive objects (threads, bitmaps, network
-state) across rotation without re-fetching.
+**Retained fragment** means a legacy fragment that had `setRetainInstance(true)` enabled so its instance survived configuration changes, which is now deprecated in favour of `ViewModel`.
+
+Historically this was used to hold expensive objects (threads, bitmaps, network state) across rotation without re-fetching. Only its view goes through `onDestroyView`/`onCreateView` on rotation.
 
 **Important (2026):** `setRetainInstance` is **deprecated**. The recommended
 replacement is **`ViewModel`**, which is purpose-built to survive config changes,
@@ -827,8 +820,9 @@ private val vm: MyViewModel by viewModels()
 
 ## 27. How to communicate between two Fragments?
 
-Fragments should **never talk to each other directly** (it couples them and
-breaks reuse). Options, preferred first:
+**Fragment communication** means transferring data between fragments using a shared, activity-scoped `ViewModel` or the dedicated Fragment Result API to maintain loose coupling.
+
+Fragments should **never talk to each other directly** (it couples them and breaks reuse). Options, preferred first:
 
 1. **Shared `ViewModel` scoped to the host activity** — both fragments obtain the
    same `ViewModel` via `activityViewModels()` and communicate through it
@@ -865,10 +859,9 @@ Avoid `findFragmentById`/casting to call another fragment's methods directly.
 
 ## 28. What is a `Bundle`? Size limits
 
-A **`Bundle`** is a key-value map for passing data between Android components and
-across the process boundary. It stores values via the **`Parcelable`** mechanism
-(it serializes to a `Parcel`), which is why it's used for `Intent` extras,
-fragment `arguments`, and `onSaveInstanceState`.
+**Bundle** means a key-value mapping class designed to pass parcelable data across IPC boundaries, limited to a total Binder transaction buffer of approximately 1 MB.
+
+It stores values via the `Parcelable` mechanism (it serialises to a `Parcel`), which is why it's used for `Intent` extras, fragment `arguments`, and `onSaveInstanceState`.
 
 - Used in: `Intent.putExtra`/extras, `Fragment.setArguments`,
   `onSaveInstanceState`/`onRestoreInstanceState`, `startActivityForResult`
@@ -889,13 +882,14 @@ repository/DB instead.
 
 ## 29. Transferring objects between activities — Serializable vs Parcelable
 
-Put data in `Intent` extras / a `Bundle`. For custom objects you need either
-`Serializable` or `Parcelable`:
+**Parcelable** means an Android-specific serialisation interface optimised for fast IPC without reflection, whereas **Serializable** is a standard Java interface that relies on slower reflection-based serialisation.
 
-- **`Serializable`** — a Java marker interface; serialization is automatic but
+Put data in `Intent` extras / a `Bundle`. For custom objects you need either `Serializable` or `Parcelable`:
+
+- **`Serializable`** — a Java marker interface; serialisation is automatic but
   uses **reflection**, which is **slow** and creates many temporary objects (GC
   pressure). Easy to use, poor performance.
-- **`Parcelable`** — an Android-specific interface optimized for IPC; you
+- **`Parcelable`** — an Android-specific interface optimised for IPC; you
   describe how to write/read fields, so **no reflection** → significantly faster
   and more memory-efficient. The recommended approach on Android.
 
@@ -913,20 +907,17 @@ val user = intent.getParcelableExtra("user", User::class.java) // API 33+ typed 
 Trade-off: `Parcelable` is faster but more verbose (mitigated by `@Parcelize`);
 `Serializable` is simpler but slower. Remember the Bundle size limit — pass ids,
 not large payloads. (`transient` can be used to exclude a field from Java
-serialization.)
+serialisation.)
 
 ---
 
 ## 30. `Dialog` vs `DialogFragment`
 
-- **`Dialog`** — a basic floating window. It is **not lifecycle-aware** and is
-  effectively owned by the activity directly; on a **configuration change
-  (rotation) it is dismissed/leaks** because nothing re-creates it, and you can
-  hit window-leak warnings if the activity is destroyed while the dialog shows.
-- **`DialogFragment`** — wraps a dialog inside a fragment, so it participates in
-  the fragment lifecycle and **`FragmentManager`**. It **survives configuration
-  changes** (re-created and re-shown automatically), handles its own state, and
-  integrates with the back stack.
+**DialogFragment** means a fragment wrapper around a dialog that integrates with the `FragmentManager` to survive configuration changes, whereas **Dialog** is a basic floating window that lacks lifecycle awareness.
+
+Differences:
+- **`Dialog`** — a basic floating window. It is **not lifecycle-aware** and is effectively owned by the activity directly; on a **configuration change (rotation) it is dismissed/leaks** because nothing re-creates it.
+- **`DialogFragment`** — wraps a dialog inside a fragment, so it participates in the fragment lifecycle and **`FragmentManager`**. It **survives configuration changes** (re-created and re-shown automatically), handles its own state, and integrates with the back stack.
 
 Recommendation: always use **`DialogFragment`** for dialogs that should persist
 across rotation. Use a bare `Dialog` only for trivial, transient prompts.
@@ -951,10 +942,9 @@ ConfirmDialog().show(supportFragmentManager, "confirm")
 
 ## 31. What is an `Intent`? Explicit vs Implicit
 
-An **`Intent`** is an asynchronous messaging object used to request an action
-from a component — start an `Activity`, start/bind a `Service`, or deliver a
-`broadcast`. It carries the action, optional data (`Uri`), category, type, and
-**extras** (a `Bundle`).
+**Intent** means a messaging object used to request an action from another component, where **explicit intent** specifies the target component class and **implicit intent** declares a generic action to perform.
+
+An **`Intent`** carries the action, optional data (`Uri`), category, type, and extras (a `Bundle`).
 
 **Explicit Intent** — names the exact target component (by class/package). Used
 for navigation **within your app**.
@@ -984,11 +974,9 @@ in the manifest due to package-visibility restrictions.
 
 ## 32. What is a `BroadcastReceiver`? Types of broadcasts
 
-A **`BroadcastReceiver`** is a component that responds to system-wide or app
-**broadcast** messages (events) — e.g. connectivity changes, battery low, boot
-completed, or your own custom events. It has a single entry point,
-`onReceive(context, intent)`, which must finish quickly (it runs on the main
-thread; long work risks an ANR — offload to `goAsync()` or `WorkManager`).
+**BroadcastReceiver** means a component that listens for and responds to system-wide or application-specific event notifications.
+
+It has a single entry point, `onReceive(context, intent)`, which must finish quickly (it runs on the main thread; long work risks an ANR — offload to `goAsync()` or `WorkManager`).
 
 Registration:
 
@@ -1031,7 +1019,9 @@ ContextCompat.registerReceiver(
 
 ## 33. How broadcasts pass messages around your app
 
-Broadcasts are a **publish/subscribe** mechanism built on `Intent`s:
+**Broadcast messaging** means a publish-subscribe communication mechanism where publishers send intents and registered receivers consume them via `onReceive()`.
+
+Broadcasts are built on `Intent`s:
 
 1. A **sender** builds an `Intent` describing an event (action + optional extras)
    and calls `sendBroadcast(intent)` (or ordered/explicit variants).
@@ -1060,10 +1050,9 @@ sendBroadcast(Intent("com.app.DOWNLOAD_DONE").setPackage(packageName).putExtra("
 
 ## 34. What is a `PendingIntent`? (and Sticky Intent)
 
-A **`PendingIntent`** is a token that **wraps an `Intent` plus the permission to
-execute it**, which you hand to **another app or the system** so it can fire that
-intent **later, on your behalf**, with **your** app's identity/permissions — even
-if your process is dead at that time.
+**PendingIntent** means a token that wraps an intent and grants another application or the system permission to execute it later using the sender's identity and privileges.
+
+It allows another app or the system to fire the wrapped intent on your behalf, even if your process is dead at that time.
 
 Common uses: **notification** actions/content, **alarms** (`AlarmManager`),
 **App Widgets**, and geofencing/location callbacks.
@@ -1094,11 +1083,9 @@ because it had no delivery guarantees or security. Don't use it in new code.
 
 ## 35. What is a `Service`? Its lifecycle
 
-A **`Service`** is a component that performs **long-running work without a UI**.
-It can keep running even when the user switches away (subject to modern
-background limits). It does **not** create its own thread — by default it runs on
-the **main thread** (see Q36). Note: a component can **bind** to a service to
-interact with it, including **IPC** if the service runs in a separate process.
+**Service** means an application component that performs long-running background tasks without displaying a user interface.
+
+It can keep running even when the user switches away (subject to background limits). It does not create its own thread — by default it runs on the main thread. A component can bind to a service to interact with it via IPC.
 
 Two ways to run a service, with two lifecycle paths:
 
@@ -1136,10 +1123,9 @@ navigation.
 
 ## 36. On which thread does a `Service` run?
 
-By default a `Service` runs on the application's **main (UI) thread** — the same
-thread as your activities. It is **not** a separate thread or process. Therefore,
-doing blocking work (network, disk, heavy CPU) directly in `onStartCommand()` or
-`onBind()` will **block the UI and can cause an ANR**.
+**Service thread execution** means that services run on the application's main thread by default, requiring background threads or coroutines to perform blocking work.
+
+A service is not a separate thread or process. Doing blocking work directly in `onStartCommand()` or `onBind()` will block the UI and cause an ANR.
 
 To do real work, **create your own background thread / coroutine** inside the
 service:
@@ -1165,14 +1151,13 @@ default.
 
 ## 37. `Service` vs `IntentService`
 
-- **`Service`** — runs on the **main thread**; you manage threading yourself; can
-  be started and/or bound; handles **multiple, concurrent or long-lived** tasks;
-  you control when it stops. Can run in a separate process.
-- **`IntentService`** (subclass of `Service`) — created its **own background
-  worker thread**, processed each start `Intent` **sequentially** in
-  `onHandleIntent()` (off the main thread), and **stopped itself automatically**
-  when the queue was empty. Designed for **short, fire-and-forget** background
-  tasks. It always ran in the app process and couldn't be bound meaningfully.
+**Service vs IntentService** means the distinction between a standard Service running on the main thread, and the deprecated IntentService which ran tasks sequentially on a worker thread.
+
+**IntentService** is a deprecated subclass of `Service` that automatically created a worker thread to process tasks sequentially and stopped itself when done, whereas a standard **Service** runs on the main thread and must be stopped manually.
+
+Differences:
+- **`Service`** — runs on the **main thread**; you manage threading yourself; can be started and/or bound; handles multiple, concurrent or long-lived tasks.
+- **`IntentService`** — created its own background worker thread, processed start intents sequentially in `onHandleIntent()`, and stopped itself automatically when the queue was empty.
 
 Summary: `IntentService` = short async tasks on a built-in worker thread,
 auto-stops; `Service` = long/flexible work, your own threading, manual stop.
@@ -1188,11 +1173,9 @@ service for immediate work. Don't use `IntentService` in new code.
 
 ## 38. What is a Foreground Service?
 
-A **foreground service** performs work the **user is actively aware of** and must
-display a **persistent notification** so it isn't silently killed. Examples:
-music playback, navigation, active file upload/download, fitness tracking. Because
-the user sees it, the system gives it higher priority and does **not** subject it
-to the same background-execution limits.
+**Foreground service** means a high-priority service that performs work visible to the user and must display a persistent notification.
+
+Examples include music playback, navigation, active file upload/download, and fitness tracking. Because the user sees it, the system does not subject it to the same background-execution limits.
 
 Modern requirements (Android 9+ → 14):
 
@@ -1233,11 +1216,9 @@ for long tasks).
 
 ## 39. What is `JobScheduler`?
 
-`JobScheduler` is a system service (API 21+) for scheduling **deferrable
-background jobs** that run under **constraints** — e.g. only on Wi-Fi/unmetered
-network, while charging, when idle, or with a deadline. The OS **batches** jobs
-across apps to save battery and intelligently picks when to run them. You define a
-`JobService` and submit a `JobInfo`.
+**JobScheduler** means a system service that schedules background jobs to run under specific system constraints, batching tasks to optimise battery consumption.
+
+The OS batches jobs across apps to save battery and intelligently picks when to run them. You define a `JobService` and submit a `JobInfo`.
 
 ```kotlin
 val job = JobInfo.Builder(JOB_ID, ComponentName(this, MyJobService::class.java))
@@ -1259,9 +1240,9 @@ prefer `WorkManager`.
 
 ## 40. How does `WorkManager` guarantee task execution?
 
-`WorkManager` is the Jetpack library for **deferrable, guaranteed** background
-work — work that must run eventually even across **app exits, device reboots, and
-process death**, optionally under constraints.
+**WorkManager** means a persistent Jetpack background library that schedules deferrable, guaranteed tasks and stores their states in a local SQLite database to survive app restarts and reboots.
+
+The work runs eventually even across app exits, device reboots, and process death, optionally under constraints.
 
 How it guarantees execution:
 
@@ -1300,7 +1281,9 @@ work (use coroutines).
 
 ## 41. What can you use for background processing in Android?
 
-Pick the tool by **whether work must finish, when, and whether the user sees it**:
+**Background processing** means a strategy where you use Kotlin coroutines for short-lived in-process tasks, `WorkManager` for guaranteed deferrable tasks, and foreground services for immediate user-visible tasks.
+
+You select the appropriate background tool based on whether the work must finish, when it should run, and whether it is visible to the user:
 
 - **Kotlin Coroutines / `Dispatchers.IO`** — in-process async work tied to a
   lifecycle/`ViewModel` scope. Best for work that only needs to run **while the
@@ -1330,7 +1313,9 @@ service**; exact time → **AlarmManager**.
 
 ## 42. How can two distinct Android apps interact?
 
-Several mechanisms depending on coupling and security:
+**App interaction** means communication between separate applications using implicit intents, content providers, shared databases, or bound services over AIDL.
+
+Several mechanisms are available depending on coupling and security:
 
 - **Implicit Intents + intent filters** — the most common, loosely coupled way.
   One app sends an action (`ACTION_VIEW`, `ACTION_SEND`, custom action); another
@@ -1364,9 +1349,9 @@ correct `android:exported` settings.
 
 ## 43. Can an app run in multiple processes? How?
 
-Yes. By default all components run in one process named after the app's package,
-but you can place a component in another process with the **`android:process`**
-attribute in the manifest:
+**Multi-process app** means an application configured to run separate components in isolated process spaces using the `android:process` attribute in the manifest.
+
+By default all components run in one process, but you can place a component in another process with `android:process` in the manifest:
 
 ```xml
 <service
@@ -1398,13 +1383,9 @@ and overhead. Singletons and static state are **not** shared across processes.
 
 ## 44. What is AIDL? Steps to create a bound service with AIDL
 
-**AIDL (Android Interface Definition Language)** lets you define a programmatic
-interface that two processes can use to communicate via **IPC**. Android uses the
-**Binder** mechanism; AIDL generates the marshalling (proxy/stub) code that
-serializes method calls and arguments across the process boundary. Use AIDL
-**only when** you need multiple apps/processes to call into your service
-**concurrently** with method-level IPC; for single-app cross-process messaging,
-`Messenger` (which serializes calls onto one thread) is simpler.
+**AIDL (Android Interface Definition Language)** means a compiler-generated interface that allows processes to interact via Binder-based inter-process communication.
+
+AIDL generates the marshalling (proxy/stub) code that serialises method calls and arguments across the process boundary. Use it only when you need multiple apps/processes to call your service concurrently; otherwise, `Messenger` is simpler.
 
 Steps to create an AIDL-backed bound service:
 
@@ -1459,10 +1440,9 @@ thread-safe); handle `DeadObjectException` / `RemoteException`.
 
 ## 45. What is a `ContentProvider` and when is it used?
 
-A **`ContentProvider`** encapsulates a set of data and exposes it through a
-standard, URI-addressed interface (`content://authority/path`) accessed via a
-**`ContentResolver`**. It abstracts the underlying storage (SQLite, files,
-network) behind `query()`, `insert()`, `update()`, `delete()`, and `getType()`.
+**ContentProvider** means a component that encapsulates structured data access and exposes it securely to other applications using content URIs.
+
+It exposes data through a standard URI-addressed interface (`content://authority/path`) accessed via a `ContentResolver`, abstracting SQLite, files, or network behind basic CRUD operations.
 
 When it's used:
 

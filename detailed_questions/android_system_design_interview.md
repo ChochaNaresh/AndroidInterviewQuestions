@@ -42,10 +42,10 @@ A reusable framework to open any design answer with:
 19. [Hash vs Encrypt vs Encode](#19-hash-vs-encrypt-vs-encode)
 20. [Webhook vs Polling](#20-webhook-vs-polling)
 21. [Options for Real-Time Updates in an Android App](#21-options-for-real-time-updates-in-an-android-app)
-22. [Options for Network Optimization in a Mobile App](#22-options-for-network-optimization-in-a-mobile-app)
+22. [Options for Network Optimisation in a Mobile App](#22-options-for-network-optimisation-in-a-mobile-app)
 23. [Firebase Remote Config in Android](#23-firebase-remote-config-in-android)
 24. [Accurate Time in Android](#24-accurate-time-in-android)
-25. [Query Optimization in SQLite](#25-query-optimization-in-sqlite)
+25. [Query Optimisation in SQLite](#25-query-optimisation-in-sqlite)
 26. [WebSocket vs Socket.IO](#26-websocket-vs-socketio)
 27. [Symmetric vs Asymmetric Encryption](#27-symmetric-vs-asymmetric-encryption)
 28. [SMS Retriever API in Android](#28-sms-retriever-api-in-android)
@@ -54,7 +54,7 @@ A reusable framework to open any design answer with:
 
 ## 1. Design an Image Loading Library
 
-Build a library like Glide / Coil / Picasso: load images from a URL (or resource/file) into an `ImageView` efficiently, with caching, transformations, and correct behaviour during view recycling.
+**Image loading library design** means architecting a system that handles asynchronous image fetching, downsampling, multi-tier caching, and lifecycle-aware view binding.
 
 ### Requirements
 
@@ -165,13 +165,13 @@ ImageLoader.with(context)
 - Caching transformed bitmaps speeds redraws but multiplies disk usage; caching only originals saves space but re-transforms each time.
 - Aggressive memory cache = fewer decodes but higher OOM risk on low-end devices; size it from `ActivityManager.getMemoryClass()`.
 
-**📚 Reference:** https://outcomeschool.com/blog/android-image-loading-library-optimize-memory-usage, https://outcomeschool.com/blog/android-image-loading-library-use-bitmap-pool-for-responsive-ui, https://outcomeschool.com/blog/android-image-loading-library-solve-the-slow-loading-issue
+**📚 Reference:** https://outcomeschool.com/blog/android-image-loading-library-optimise-memory-usage, https://outcomeschool.com/blog/android-image-loading-library-use-bitmap-pool-for-responsive-ui, https://outcomeschool.com/blog/android-image-loading-library-solve-the-slow-loading-issue
 
 ---
 
 ## 2. Design a File Downloader Library
 
-Build a PRDownloader-style library: download large files reliably with pause/resume, progress callbacks, and parallel/chunked downloads.
+**File downloader library design** means architecting a component that supports parallel chunk downloading, paused resume states, and database-backed download queue persistence.
 
 ### Requirements
 
@@ -257,7 +257,7 @@ For a large file you can split it into N ranges, download them on N threads into
 
 ## 3. Design WhatsApp
 
-A real-time 1:1 and group messaging app with delivery receipts, presence, media, and end-to-end encryption.
+**Real-time messaging architecture** means designing a system that handles WebSocket connections, offline queuing, delivery receipts, and end-to-end encryption.
 
 ### Requirements
 
@@ -338,7 +338,7 @@ Lightweight ephemeral events over the socket (not persisted): `typing`, `online`
 
 ## 4. Design Instagram Stories
 
-Ephemeral, full-screen, auto-advancing media (image/video) that expires after 24 hours, with a tray of who-has-stories at the top of the feed.
+**Ephemeral media architecture** means designing a system that delivers full-screen media slides, pre-fetches next slides, and updates user story states in real-time.
 
 ### Requirements
 
@@ -415,14 +415,14 @@ SeenState(segmentId, seenAt)   // local; synced so ring clears across devices
 
 ## 5. Design a Networking Library
 
-A Retrofit/Volley-style HTTP client wrapper: declarative API definitions, async execution, JSON parsing, interceptors, caching, and error handling.
+**HTTP networking client design** means building a declarative interface wrapper that handles request queuing, interceptors, thread-switching, and response parsing.
 
 ### Requirements
 
 **Functional**
 - GET/POST/PUT/DELETE, headers, query/path params, request/multipart body.
 - Async with callbacks / coroutines / Flow.
-- Pluggable serialization (JSON via Moshi/Gson/kotlinx).
+- Pluggable serialisation (JSON via Moshi/Gson/kotlinx).
 - Interceptors (auth, logging, retry).
 - Response & error model; cancellation.
 
@@ -507,7 +507,7 @@ sealed interface NetResult<out T> {
 
 ## 6. Design Facebook Nearby Friends
 
-Opt-in feature showing which friends are near you, with periodic location sharing and proximity notifications.
+**Geospatial service architecture** means designing a system that tracks periodic user coordinates, queries coordinates using spatial indexing, and pushes proximity notifications.
 
 ### Requirements
 
@@ -560,7 +560,7 @@ Server: UserLocation(userId, geohash, lat, lng, ts, ttl)  // TTL so stale locati
 
 ## 7. Design a Caching Library
 
-A general-purpose, multi-tier cache (memory + disk) with pluggable eviction, TTL, and serialization — usable for objects, responses, or bitmaps.
+**Multi-tier caching architecture** means designing a storage engine that combines fast in-memory LRU storage with persistent disk storage under eviction rules.
 
 ### Requirements
 
@@ -634,7 +634,9 @@ interface EvictionPolicy<K> {
 
 ## 8. Location-Based App Design Problems
 
-A catch-all category: ride-hailing, food delivery, geofenced reminders, fitness trackers. Interviewers probe **battery, accuracy, permissions, and background limits**.
+**Location tracking architecture** means designing a battery-efficient system that fetches coordinates via Fused Location Provider, caches offline coordinates, and handles network drift.
+
+Interviewers probe **battery, accuracy, permissions, and background limits**.
 
 ### Core building blocks
 
@@ -678,7 +680,7 @@ geofencingClient.addGeofences(request, pendingIntent) // OS fires PendingIntent 
 
 ## 9. Offline-First App Architecture
 
-Design an app that works fully offline and syncs when connectivity returns — the local database is the single source of truth.
+**Offline-first application architecture** means designing a local-database-centric sync flow where the local database is the single source of truth for the UI.
 
 ### Principle: local DB is the source of truth
 
@@ -729,7 +731,7 @@ Entity(... , syncState [SYNCED|PENDING|FAILED], updatedAt, serverVersion)
 
 ## 10. Design an LRU Cache
 
-Implement a Least-Recently-Used cache with O(1) `get` and `put`.
+**LRU cache implementation** means designing a key-value data structure using a hash map combined with a doubly linked list to achieve O(1) retrieval and eviction.
 
 ### Approach: HashMap + Doubly-Linked List
 
@@ -787,7 +789,7 @@ class LRUCache<K, V>(private val capacity: Int) {
 
 ## 11. Design an Analytics Library
 
-A library to track events (screen views, taps, custom events) and reliably batch-upload them to a backend, even across network loss and app restarts.
+**Analytics tracking library design** means building a component that buffers client events locally and batch-uploads them to a server to optimise battery and network.
 
 ### Requirements
 
@@ -847,7 +849,7 @@ fun track(name: String, props: Map<String, Any> = emptyMap()) {
 
 ## 12. Design a Logging Library
 
-A Timber-style logging facade: tagged, leveled logs routed to pluggable sinks (Logcat in debug, crash reporter / file / remote in release), with PII safety and low overhead.
+**Logging facade architecture** means designing a lightweight logging framework that exposes a simple interface and routes logs to multiple pluggable sinks.
 
 ### Requirements
 
@@ -911,7 +913,7 @@ else { Log.plant(CrashSink()); Log.plant(FileSink(rotateBytes = 5_000_000)) }
 
 ## 13. Design the Uber App
 
-A ride-hailing app: riders request rides, the system matches a nearby driver, both see live location, with trip lifecycle, pricing, and payments.
+**Ride-sharing system architecture** means designing a real-time matching system that tracks driver coordinates, manages ride state machines, and broadcasts maps.
 
 ### Requirements
 
@@ -977,7 +979,7 @@ DriverLocation(tripId, lat, lng, bearing, ts)
 
 ## 14. HTTP Request vs Long-Polling vs WebSocket vs SSE
 
-Four ways a client gets data from a server, ordered by how "real-time" they are.
+**Real-time web communication protocols** means the various techniques to push data from server to client, ranging from standard HTTP to bi-directional WebSockets.
 
 | | HTTP Request | Long-Polling | WebSocket | SSE |
 |---|---|---|---|---|
@@ -1012,7 +1014,7 @@ A long-lived HTTP response of `text/event-stream` where the **server streams eve
 
 ## 15. How Voice and Video Calls Work
 
-Real-time peer-to-peer audio/video, typically over **WebRTC**.
+**WebRTC communication architecture** means setting up real-time audio/video streams using peer-to-peer connections facilitated by STUN, TURN, and signaling servers.
 
 ### Pipeline
 1. **Capture** — mic + camera produce raw audio/video frames.
@@ -1050,7 +1052,7 @@ WebRTC continuously adapts bitrate/resolution to measured bandwidth and loss, us
 
 ## 16. Data Syncing on Unstable Networks
 
-How to keep client and server data consistent when connectivity is intermittent.
+**Data synchronisation on unstable networks** means implementing retry mechanisms, network detection, conflict resolution, and idempotent operations.
 
 ### Strategy
 
@@ -1073,7 +1075,7 @@ Writes feel instant (optimistic), nothing is lost, retries don't duplicate, and 
 
 ## 17. How "Where Is My Train" Works Without Internet
 
-The app shows live-ish train running status and location without an active data connection.
+**Offline navigation architecture** means determining train locations without internet by parsing active GPS coordinates and mapping them to pre-loaded offline route schedules.
 
 ### Key techniques
 
@@ -1093,7 +1095,7 @@ The "magic" is **precomputed offline data + on-device sensors (GPS + cell tower)
 
 ## 18. Database Normalization vs Denormalization
 
-Two opposing strategies for structuring relational data.
+**Database normalization vs denormalization** means the choice between dividing data to eliminate redundancy (normalization), and combining data to speed up reads (denormalization).
 
 ### Normalization
 Organize data to **minimize redundancy** by splitting into multiple related tables (per normal forms: 1NF, 2NF, 3NF…). Each fact is stored **once**; relationships use foreign keys.
@@ -1102,7 +1104,7 @@ Organize data to **minimize redundancy** by splitting into multiple related tabl
 - **Cons**: reads need **JOINs** across tables, which can be slower; more complex queries.
 
 ### Denormalization
-Deliberately **introduce redundancy** — duplicate or pre-join data into fewer tables — to optimize reads.
+Deliberately **introduce redundancy** — duplicate or pre-join data into fewer tables — to optimise reads.
 
 - **Pros**: faster reads (fewer/no JOINs), simpler read queries, great for read-heavy / reporting workloads.
 - **Cons**: data duplication → larger storage, **update anomalies** (must update every copy), risk of inconsistency, heavier writes.
@@ -1127,7 +1129,7 @@ Local mobile DBs often lean **slightly denormalized** for fast UI reads (e.g. st
 
 ## 19. Hash vs Encrypt vs Encode
 
-Three frequently-confused operations with completely different purposes.
+**Data representation security** means the distinct processes of generating one-way signatures (hashing), reversing data via keys (encryption), and transforming data formats (encoding).
 
 | | Encode | Encrypt | Hash |
 |---|---|---|---|
@@ -1157,7 +1159,7 @@ A **one-way** function mapping input to a fixed-length digest. You cannot revers
 
 ## 20. Webhook vs Polling
 
-Two ways for system A to learn about events in system B.
+**Event notification models** means the choice between a publisher pushing event updates via HTTP callbacks (webhook), and a subscriber requesting updates periodically (polling).
 
 ### Polling
 Client **repeatedly asks** "any new data?" on a schedule.
@@ -1188,7 +1190,7 @@ Phones can't host webhooks reliably (no stable public URL, OS background limits)
 
 ## 21. Options for Real-Time Updates in an Android App
 
-Ways to get fresh data to an Android client, from cheapest to most real-time.
+**Android real-time data push options** means the mechanisms like Firebase Cloud Messaging (FCM), WebSockets, or Server-Sent Events (SSE) used to push data from server to client.
 
 1. **Polling (short)** — periodic `GET` on a timer. Simple, works everywhere; wasteful, latency = interval. Good for low-urgency dashboards.
 2. **Long-polling** — server holds the request until data arrives. Near real-time over plain HTTP; reconnect overhead. (See [Q14](#14-http-request-vs-long-polling-vs-websocket-vs-sse).)
@@ -1209,15 +1211,15 @@ Battery, OS background limits (Doze, background execution limits), and connectio
 
 ---
 
-## 22. Options for Network Optimization in a Mobile App
+## 22. Options for Network Optimisation in a Mobile App
 
-Techniques to make mobile networking faster, cheaper, and more battery-efficient.
+**Mobile network optimisation** means techniques like compression, request batching, caching, image downsampling, and connection pooling to reduce latency and data use.
 
 ### Payload
 - **Compression** — gzip/Brotli request & response bodies.
 - **Efficient formats** — Protocol Buffers / FlatBuffers over verbose JSON for hot paths.
 - **Pagination & field selection** — request only what's needed (GraphQL/sparse fieldsets); avoid over-fetching.
-- **Image optimization** — server-side resizing, WebP/AVIF, correct resolution per device, thumbnails first.
+- **Image optimisation** — server-side resizing, WebP/AVIF, correct resolution per device, thumbnails first.
 
 ### Caching & avoiding requests
 - **HTTP caching** — `Cache-Control`, `ETag`/`If-None-Match`, `Last-Modified` → `304 Not Modified` saves the body.
@@ -1228,7 +1230,7 @@ Techniques to make mobile networking faster, cheaper, and more battery-efficient
 - **Connection reuse / keep-alive & HTTP/2 multiplexing** — avoid repeated TLS handshakes; one connection, many streams.
 - **HTTP/3 (QUIC)** — faster setup, better on lossy mobile links.
 - **CDN** — serve static assets from the edge.
-- **DNS / TLS optimizations** — session resumption, fewer round trips.
+- **DNS / TLS optimisations** — session resumption, fewer round trips.
 
 ### Scheduling & battery
 - **Batch requests** — coalesce many small calls; align with radio wake windows.
@@ -1245,10 +1247,10 @@ Techniques to make mobile networking faster, cheaper, and more battery-efficient
 
 ## 23. Firebase Remote Config in Android
 
-A cloud service to change app behavior and appearance **without publishing an update**.
+**Firebase Remote Config** means a cloud-based service that enables developers to dynamically update application parameters and behaviour without releasing an update.
 
 ### What it is
-A cloud-stored set of **key–value parameters**. You define defaults in the app; the server can override them. The app fetches and applies new values at runtime, so you can tune behavior remotely.
+A cloud-stored set of **key–value parameters**. You define defaults in the app; the server can override them. The app fetches and applies new values at runtime, so you can tune behaviour remotely.
 
 ### Use cases
 - **Feature flags** — turn features on/off remotely; kill-switch a broken feature.
@@ -1290,7 +1292,7 @@ remoteConfig.fetchAndActivate().addOnCompleteListener { task ->
 
 ## 24. Accurate Time in Android
 
-Getting trustworthy time is harder than it looks because the user (and clock drift) can change device time.
+**Trustworthy time synchronisation** means obtaining reliable timestamps by querying network time servers (NTP) to bypass local device clock manipulations.
 
 ### The clock APIs
 
@@ -1319,9 +1321,9 @@ fun trustedNow(): Long = SystemClock.elapsedRealtime() + offset   // accurate ep
 
 ---
 
-## 25. Query Optimization in SQLite
+## 25. Query Optimisation in SQLite
 
-How to make SQLite queries fast on Android (Room sits on top of SQLite).
+**SQLite query optimisation** means accelerating database queries by adding indexes, using write-ahead logging (WAL), and avoiding nested sub-queries.
 
 ### Techniques
 
@@ -1329,7 +1331,7 @@ How to make SQLite queries fast on Android (Room sits on top of SQLite).
 
 2. **Select only needed columns** — `SELECT col1, col2` not `SELECT *`; fetching unused columns (especially BLOBs) wastes I/O and memory. In Room, project into a small POJO.
 
-3. **Use `EXPLAIN QUERY PLAN`** — inspect whether a query uses an index ("SEARCH … USING INDEX") or does a full table scan ("SCAN"). Optimize the scans.
+3. **Use `EXPLAIN QUERY PLAN`** — inspect whether a query uses an index ("SEARCH … USING INDEX") or does a full table scan ("SCAN"). Optimise the scans.
 
 4. **Filter and paginate** — add `WHERE` to limit rows; use `LIMIT`/`OFFSET` or keyset pagination (Paging 3) instead of loading everything.
 
@@ -1357,7 +1359,7 @@ SELECT id, title FROM message WHERE chatId = ? ORDER BY ts DESC LIMIT 50;
 
 ## 26. WebSocket vs Socket.IO
 
-A common confusion — one is a protocol, the other is a library on top of it.
+**WebSocket vs Socket.IO** means the difference between a standard TCP-based protocol (WebSocket), and a feature-rich, callback-based client-server wrapper library (Socket.IO).
 
 ### WebSocket
 A **standardized transport protocol** (RFC 6455) providing a single, persistent, full-duplex TCP connection between client and server, established via an HTTP upgrade handshake. It's low-level: you get raw message frames and must build everything else (reconnection, acknowledgements, rooms, fallbacks) yourself.
@@ -1395,7 +1397,7 @@ A raw WebSocket client **cannot** talk to a Socket.IO server (and vice versa) di
 
 ## 27. Symmetric vs Asymmetric Encryption
 
-Two families of encryption, often combined in practice.
+**Symmetric vs Asymmetric encryption** means the choice between using a single shared key for both encryption and decryption (symmetric), and using a public-private key pair (asymmetric).
 
 ### Symmetric encryption
 **One shared secret key** encrypts and decrypts.
@@ -1428,7 +1430,7 @@ The best of both: use **asymmetric** to securely exchange a random **symmetric s
 
 ## 28. SMS Retriever API in Android
 
-Read a one-time SMS verification code automatically **without requesting the `READ_SMS` permission**.
+**SMS Retriever API** means an Android-specific framework that allows an application to read a verification SMS code automatically without requesting SMS permissions.
 
 ### The problem it solves
 OTP autofill traditionally required `READ_SMS`, a sensitive permission Google restricts (and which lets you read *all* the user's SMS). The **SMS Retriever API** lets you receive just your own verification message — no permission, no privacy concern, no Play policy issue.

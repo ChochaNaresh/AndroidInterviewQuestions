@@ -43,7 +43,9 @@ A comprehensive, interview-ready reference for Object-Oriented Programming funda
 
 ## 1. What is OOP and its four pillars?
 
-**Object-Oriented Programming (OOP)** is a paradigm that models software as a collection of **objects** — bundles of state (fields) and behaviour (methods) — that interact with each other. It is the foundation of Android development: `Activity`, `View`, `ViewModel`, and your domain models are all classes/objects.
+**Object-Oriented Programming (OOP)** means a programming paradigm that models software as a collection of interacting objects containing state and behaviour.
+
+It is the foundation of Android development: `Activity`, `View`, `ViewModel`, and your domain models are all classes/objects.
 
 The four pillars:
 
@@ -62,7 +64,7 @@ The four pillars:
 
 ## 2. Encapsulation
 
-**Definition:** Encapsulation bundles data (fields) and the methods that operate on that data into a single unit (a class) and restricts direct access to the internal state, exposing it only through a controlled API (getters/setters or methods). This protects invariants — the object stays in a valid state.
+**Encapsulation** means hiding internal implementation details and exposing only necessary functionality.
 
 **Kotlin:**
 
@@ -96,7 +98,7 @@ In Kotlin, `val`/`var` properties generate getters/setters automatically; you tu
 
 ## 3. Inheritance
 
-**Definition:** Inheritance lets a subclass derive fields and behaviour from a superclass, modelling an **"is-a"** relationship and enabling code reuse and specialization.
+**Inheritance** means a mechanism that allows one class to acquire properties and methods from another class.
 
 **Kotlin** (classes are `final` by default — you must mark them `open`):
 
@@ -133,7 +135,7 @@ class Dog extends Animal {
 
 ## 4. Polymorphism
 
-**Definition:** Polymorphism ("many forms") means a single interface or reference type can refer to objects of different concrete types, and the actual method invoked is resolved by the object's real type. Two kinds:
+**Polymorphism** means a capability where a single interface can take multiple different forms (one name, many forms).
 
 - **Runtime / subtype polymorphism** — method **overriding**, resolved via dynamic dispatch at runtime.
 - **Compile-time / ad-hoc polymorphism** — method **overloading**, resolved by the compiler from the argument signature.
@@ -155,7 +157,7 @@ printArea(Square(3.0))   // 9.0
 
 ## 5. Abstraction
 
-**Definition:** Abstraction exposes only the essential, high-level behaviour of an object while hiding implementation details. In Java/Kotlin it is expressed via `interface` and `abstract class`.
+**Abstraction** means hiding implementation details and exposing only necessary functionality.
 
 ```kotlin
 abstract class Repository<T> {
@@ -178,7 +180,7 @@ class UserRepository(private val api: Api) : Repository<User>() {
 
 ## 6. Abstract class vs Interface
 
-**Definitions:**
+**Abstract class vs Interface** means the choice between a partially implemented class that can maintain state (Abstract class), and a stateless contract that classes must implement (Interface).
 
 - An **abstract class** is a class that may contain both concrete (implemented) and abstract (unimplemented) methods, can hold state (fields), can have constructors, and **cannot be instantiated** — it must be extended. A class can extend **only one** abstract class.
 - An **interface** is a contract: a set of method/property signatures (and, since Java 8 / always in Kotlin, default method implementations) describing what implementers must provide. It cannot hold mutable state (Kotlin interface properties have no backing field). A class can implement **many** interfaces.
@@ -221,7 +223,7 @@ class Button(id: String) : UiComponent(id), Clickable {
 
 ## 7. Method overloading vs overriding
 
-**Definitions:**
+**Overloading vs Overriding** means the distinction between defining multiple methods with the same name but different signatures in a class (overloading), and replacing a superclass method implementation in a subclass (overriding).
 
 - **Overloading** — multiple methods in the *same* class share the same name but differ in parameter list (number/type/order). Resolved at **compile time** (static/ad-hoc polymorphism). Return type alone does **not** distinguish overloads.
 - **Overriding** — a subclass provides a new implementation of a method inherited from a superclass/interface with the *same signature*. Resolved at **runtime** (dynamic dispatch).
@@ -258,7 +260,7 @@ println(b.greet())   // "Hello from Derived" — resolved at runtime
 
 ## 8. Access modifiers
 
-**Definition:** Access modifiers control the visibility/scope of classes, members, and constructors.
+**Access modifiers** means keywords that control the visibility and access scope of classes, constructors, methods, and variables.
 
 **Java** (strictest → most lenient):
 
@@ -297,7 +299,9 @@ class Config {
 
 ## 9. Can an interface implement (extend) another interface?
 
-**Yes.** An interface can extend one or more other interfaces, inheriting their abstract members. In **Java** the keyword is `extends` (an interface uses `extends`, not `implements`, because it is not providing implementations — only enlarging the contract). In **Kotlin** there are no `extends`/`implements` keywords at all; you use a colon `:` for both class inheritance and interface conformance. You can add new members to the sub-interface freely but cannot remove inherited ones.
+**Interface inheritance** means the capability of an interface to extend one or more other interfaces to inherit and expand their contracts.
+
+In **Java** the keyword is `extends` (an interface uses `extends`, not `implements`, because it is not providing implementations — only enlarging the contract). In **Kotlin** there are no `extends`/`implements` keywords at all; you use a colon `:` for both class inheritance and interface conformance. You can add new members to the sub-interface freely but cannot remove inherited ones.
 
 **Java:**
 
@@ -335,7 +339,7 @@ A **class** can also implement multiple interfaces but extend only one (abstract
 
 ## 10. Composition vs Inheritance
 
-**Definitions:**
+**Composition vs Inheritance** means the architectural choice between building complex behaviour by combining objects (Composition), and reusing behaviour through a hierarchical taxonomy (Inheritance).
 
 - **Inheritance** ("is-a") — a class extends another, inheriting its API and behaviour. Tight coupling: the subclass depends on the superclass's internals.
 - **Composition** ("has-a") — a class holds instances of other classes and delegates work to them. Looser coupling, swappable parts.
@@ -372,6 +376,8 @@ class Service(logger: Logger) : Logger by logger   // delegates Logger to the fi
 
 ## 11. static, static method overriding, constructor inheritance
 
+**Static members** means class-level variables and methods that belong to the class itself rather than individual instances.
+
 - **`static` (Java):** static members belong to the **class**, not an instance — shared across all instances and accessible without one. Kotlin has no `static` keyword; you use `companion object`, top-level declarations, or `object` (singleton) instead.
 
   ```kotlin
@@ -394,7 +400,7 @@ class Service(logger: Logger) : Logger by logger   // delegates Logger to the fi
 
 ## 12. The String Pool in Java
 
-**Definition:** The **String Pool** (a.k.a. string intern pool) is a special storage area in the JVM heap where the runtime keeps a single shared copy of each distinct **string literal**. When you write a literal, the JVM checks the pool: if an equal string already exists it returns that reference; otherwise it adds the new one. This is possible because `String` is **immutable**.
+**String Pool** means a special memory area in the JVM heap that stores unique string literals to optimise memory usage.
 
 ```java
 String a = "hello";            // created in the pool
@@ -415,7 +421,7 @@ System.out.println(a == d);     // true
 
 **Kotlin note:** Kotlin string literals compile to the same JVM strings and share the pool. Kotlin's `==` maps to `.equals()` (structural equality) and `===` is reference equality.
 
-**Why it matters:** It explains the classic `==` vs `equals()` trap and why string literals are memory-efficient. Interning is a memory optimization but overusing `intern()` on dynamic strings can bloat the pool.
+**Why it matters:** It explains the classic `==` vs `equals()` trap and why string literals are memory-efficient. Interning is a memory optimisation but overusing `intern()` on dynamic strings can bloat the pool.
 
 **📚 Reference:** README line 1025
 
@@ -423,7 +429,9 @@ System.out.println(a == d);     // true
 
 ## 13. SOLID overview
 
-**SOLID** is a set of five object-oriented design principles (popularized by Robert C. Martin) that make software easier to maintain, extend, and test:
+**SOLID** means a set of five object-oriented design principles that make software modular, maintainable, and easily testable.
+
+Martin) that make software easier to maintain, extend, and test:
 
 | Letter | Principle | Core idea |
 |---|---|---|
@@ -446,7 +454,7 @@ System.out.println(a == d);     // true
 
 ## 14. S — Single Responsibility Principle (SRP)
 
-**Definition:** A class should have **only one reason to change** — i.e. one responsibility. *"One chef cannot run the whole restaurant."*
+**Single Responsibility Principle (SRP)** means a design principle stating that a class should have only one reason to change.
 
 **Violation** — a class doing fetching, parsing, and persisting:
 
@@ -492,7 +500,7 @@ class UserRepository(
 
 ## 15. O — Open/Closed Principle (OCP)
 
-**Definition:** Software entities (classes, modules, functions) should be **open for extension but closed for modification** — add new behaviour by adding code, not by editing existing, tested code. *"Trying new shoes doesn't require you to saw your feet off."*
+**Open/Closed Principle (OCP)** means a software design principle stating that code entities should be open for extension but closed for modification.
 
 **Violation** — adding a shape means editing `AreaCalculator` every time:
 
@@ -528,7 +536,7 @@ class AreaCalculator {
 
 ## 16. L — Liskov Substitution Principle (LSP)
 
-**Definition:** Objects of a supertype should be **replaceable with objects of a subtype without breaking** the correctness of the program. A subtype must honour the behavioural contract of its parent (no strengthening preconditions, no weakening postconditions, no surprising exceptions).
+**Liskov Substitution Principle (LSP)** means a design principle stating that objects of a superclass should be replaceable with objects of its subclasses without breaking the application.
 
 **Violation** — the classic Rectangle/Square problem:
 
@@ -570,7 +578,7 @@ class Square(val side: Int) : Shape { override fun area() = side * side }
 
 ## 17. I — Interface Segregation Principle (ISP)
 
-**Definition:** **Clients should not be forced to depend on methods they do not use.** Prefer many small, role-specific interfaces over one large general-purpose one.
+**Interface Segregation Principle (ISP)** means a design principle stating that clients should not be forced to depend on methods they do not actually use.
 
 **Violation** — a fat interface forces unrelated implementations to stub methods:
 
@@ -614,7 +622,7 @@ class AllInOne : Printer, Scanner, Fax {
 
 ## 18. D — Dependency Inversion Principle (DIP)
 
-**Definition:** High-level modules should not depend on low-level modules; **both should depend on abstractions**. And abstractions should not depend on details — details depend on abstractions. *"Program to an interface, not an implementation. You wouldn't wire a lamp directly to your house."*
+**Dependency Inversion Principle (DIP)** means a design principle stating that high-level modules should depend on abstractions rather than low-level concretions.
 
 **Violation** — `ViewModel` (high-level) directly instantiates a concrete data source (low-level):
 
@@ -655,7 +663,7 @@ UserViewModel(FakeUserApi())
 
 ## 19. Aggregation vs Composition
 
-**Definition:** Both are forms of association ("has-a" relationships), but they differ in **lifecycle dependency**.
+**Aggregation vs Composition** means the distinction between a weak relationship where the child object can exist independently of the parent (Aggregation), and a strong relationship where the child's lifecycle is bound to the parent (Composition).
 
 - **Composition:** A strong "has-a" relationship where the child object's lifecycle is bound to the parent. If the parent is destroyed, the child is destroyed. (e.g., A `House` and a `Room`).
 - **Aggregation:** A weak "has-a" relationship where the child object can exist independently of the parent. (e.g., A `Department` and a `Teacher`).
@@ -678,7 +686,7 @@ class Department(val teachers: List<Teacher>)
 
 ## 20. Cohesion vs Coupling
 
-**Definitions:**
+**Cohesion vs Coupling** means the architectural metric comparing how focused a class's internal responsibilities are (Cohesion), with how dependent different classes are on one another (Coupling).
 
 - **Cohesion:** Measures how closely related and focused the responsibilities of a single module/class are. **High cohesion** is good — a class should do one thing well (aligns with SRP).
 - **Coupling:** Measures the degree of interdependence between different modules/classes. **Low coupling** is good — changing one class shouldn't require changing others.
@@ -689,7 +697,7 @@ class Department(val teachers: List<Teacher>)
 
 ## 21. The Law of Demeter (Principle of Least Knowledge)
 
-**Definition:** A design guideline stating that an object should only talk to its immediate friends and not to strangers. "Don't talk to strangers." 
+**Law of Demeter** means a design guideline stating that an object should only interact with its direct dependencies and avoid talking to strangers.
 
 Specifically, a method `M` of object `O` should only invoke methods of:
 1. `O` itself.
@@ -713,7 +721,7 @@ val zipCode = user.getZipCode() // Good: User delegates internally
 
 ## 22. What is an Anemic Domain Model?
 
-**Definition:** An **Anemic Domain Model** is an anti-pattern where domain objects are just bags of getters and setters (data structures) with no business logic or behaviour. All the logic is stripped out and placed in external "Service" or "Manager" classes.
+**Anemic Domain Model** means an anti-pattern where domain objects contain only data and getters/setters without any business logic.
 
 **Violation:**
 ```kotlin
@@ -746,8 +754,7 @@ class User(var isPremium: Boolean = false) {
 
 ## 23. Abstraction vs Encapsulation
 
-**Definitions & Differences:**
-While both concepts help in hiding details, they solve different problems at different stages of design.
+**Abstraction vs Encapsulation** means the difference between hiding complexity by showing only essential interfaces (Abstraction), and hiding internal state by restricting direct access (Encapsulation).
 
 - **Abstraction** is about **design** (focusing on the *outside* view). It hides the complexity of an operation by providing a simple interface. You expose *what* the object does, but hide *how* it does it.
 - **Encapsulation** is about **implementation** (focusing on the *inside* view). It bundles data and methods together and restricts direct access to the internal state. You protect the integrity of the data.
@@ -762,8 +769,7 @@ While both concepts help in hiding details, they solve different problems at dif
 
 ## 24. Static vs Dynamic Binding (Early vs Late Binding)
 
-**Definitions:**
-Binding refers to the link between a method call and the actual method implementation executed.
+**Static vs Dynamic binding** means the difference between resolving method calls at compile-time (Static binding), and resolving them at runtime based on the actual object type (Dynamic binding).
 
 - **Static Binding (Early Binding):** The method to be called is determined by the compiler at **compile time**. This happens with `private`, `static`, `final` methods, and **method overloading**, because these cannot be overridden.
 - **Dynamic Binding (Late Binding):** The method to be called is determined by the JVM at **runtime** based on the actual object type, not the reference type. This happens with **method overriding** (virtual methods).
@@ -789,8 +795,7 @@ fun main() {
 
 ## 25. Upcasting vs Downcasting
 
-**Definitions:**
-Both refer to casting an object reference between parent and child types in an inheritance hierarchy.
+**Upcasting vs Downcasting** means the distinction between casting a subclass reference up to a superclass type (upcasting), and casting a superclass reference down to a subclass type (downcasting).
 
 - **Upcasting:** Casting a child object to a parent reference. It is **always safe** and happens implicitly. You lose access to child-specific methods, but you guarantee that the object fulfills the parent's contract.
 - **Downcasting:** Casting a parent reference back to a child type. It is **unsafe** because the parent reference might not actually point to that specific child type. It requires an explicit cast and usually a type check (e.g., `is` in Kotlin, `instanceof` in Java) to avoid `ClassCastException`.
@@ -813,19 +818,18 @@ if (view is Button) {
 
 ## 26. Stateful vs Stateless Objects
 
-**Definitions:**
+**Stateful vs Stateless objects** means the difference between objects that hold mutable state requiring synchronisation (stateful), and objects that perform pure operations without state (stateless).
 
 - **Stateful Object:** An object that holds data (state) which can change over time. Its methods depend on or modify this internal state. (e.g., A `ViewModel` holding UI state, or a `User` entity).
 - **Stateless Object:** An object that holds no mutable data. It behaves exactly the same way no matter how many times you call its methods or when you call them. (e.g., A utility class, a pure function, or a Mapper/Converter).
 
-**Why it matters:** Stateless objects are inherently **thread-safe**, easy to test, and can often be singletons. Stateful objects require careful synchronization in multithreaded environments (like Android's background processing) and are harder to test because their behavior depends on previous interactions. 
+**Why it matters:** Stateless objects are inherently **thread-safe**, easy to test, and can often be singletons. Stateful objects require careful synchronisation in multithreaded environments (like Android's background processing) and are harder to test because their behaviour depends on previous interactions. 
 
 ---
 
 ## 27. Is-A vs Has-A Relationships
 
-**Definitions:**
-These describe how objects relate to one another to achieve code reuse.
+**Is-A vs Has-A relationships** means the difference between inheritance subclassing (Is-A), and composition aggregation (Has-A).
 
 - **Is-A (Inheritance):** A tight coupling where one class is a specialized version of another. Implemented via extending a class or implementing an interface. 
   *Example:* A `Dog` **is-a** `Animal`. A `Button` **is-a** `View`.

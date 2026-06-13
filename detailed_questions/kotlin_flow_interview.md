@@ -44,8 +44,9 @@ Lifecycle 2.8+).
 
 ## 1. What is a Flow? Builder, operator, collector
 
-A `Flow<T>` is a cold asynchronous data stream that sequentially emits values
-and completes normally or with an exception. It is built on suspend functions,
+**Flow** means a cold asynchronous data stream that produces multiple sequential values and executes only upon collection.
+
+It is built on suspend functions,
 so emission and collection are non-blocking and respect structured concurrency.
 
 A Flow pipeline has three parts:
@@ -84,8 +85,9 @@ Key properties:
 
 ## 2. Flow builders: flow, flowOf, asFlow
 
-```kotlin
-// 1. flow { } — most general; can call suspend functions and emit
+**Flow builders** means factory functions like `flow { }`, `flowOf()`, and `.asFlow()` used to construct new data stream instances.
+
+flow { } — most general; can call suspend functions and emit
 val f1 = flow {
     emit(fetchUser())          // suspend call allowed
     emit(fetchUser())
@@ -122,8 +124,9 @@ flow { emit(loadFile()) }.flowOn(Dispatchers.IO)
 
 ## 3. flowOn and dispatchers
 
-`flowOn` changes the `CoroutineContext` (typically the dispatcher) used by the
-**upstream** flow — every operator and the builder above the `flowOn` call. It
+**flowOn** means the operator used to change the execution context of upstream emissions while maintaining consumer context.
+
+It
 does not affect downstream operators or the collector. This is the Flow
 equivalent of RxJava's `subscribeOn`.
 
@@ -156,8 +159,9 @@ There is no `observeOn` in Flow; the collector context plays that role, and
 
 ## 4. Intermediate operators: filter, map, transform
 
-Intermediate operators are lazy — they describe a transformation and only run
-when collected. They run sequentially in the collector's context (unless moved
+**Intermediate operators** means lazy transformation functions (like `map`, `filter`, and `transform`) that return a new Flow without starting collection.
+
+They run sequentially in the collector's context (unless moved
 with `flowOn`).
 
 ```kotlin
@@ -193,7 +197,7 @@ error/cancellation, where `cause` is non-null).
 
 ## 5. Combining flows: zip and combine
 
-Both merge two flows, but with different pairing semantics.
+**zip vs combine** means the difference between pairing emissions index-for-index (zip), and pairing the latest emissions whenever either flow emits (combine).
 
 `zip` pairs values **by index** — it waits for both flows to emit the n-th value
 before producing a result, and completes when the shorter flow completes. It is
@@ -232,7 +236,8 @@ combine(queryFlow, filterFlow) { query, filter ->
 
 ## 6. flatMapConcat, flatMapMerge, flatMapLatest
 
-These operators transform each value into a new flow and flatten the results.
+**Flow flattening operators** means operators that transform emissions into new flows and merge them, handling them sequentially (flatMapConcat), concurrently (flatMapMerge), or by cancelling active ones when new emissions arrive (flatMapLatest).
+
 They differ in how concurrent inner flows are handled.
 
 ```kotlin
@@ -280,7 +285,9 @@ ids.flatMapLatest { requestDetails(it) }
 
 ## 7. retry and retryWhen
 
-`retry` re-subscribes to the upstream flow when it fails. Useful for transient
+**retry** means an operator that automatically re-subscribes to the upstream flow when an exception is thrown to handle transient errors.
+
+Useful for transient
 network errors.
 
 ```kotlin
@@ -317,8 +324,7 @@ above any operators whose side effects you do not want repeated.
 
 ## 8. debounce, distinctUntilChanged, sample
 
-These rate-limiting / filtering operators are central to search and event
-streams.
+**Flow filtering operators** means rate-limiting operations that filter emissions by time delay (debounce), deduplicate consecutive values (distinctUntilChanged), or emit periodic snapshots (sample).
 
 - **debounce(timeout)** — emits a value only if `timeout` ms have passed without
   a newer value. Filters out rapid bursts (e.g. fast typing).
@@ -350,8 +356,9 @@ periods.
 
 ## 9. Terminal operators
 
-Terminal operators are suspend functions that start collection and return a
-result (or `Unit`). Nothing runs until a terminal operator is invoked.
+**Terminal operators** means suspending functions (like `collect`, `first`, or `toList`) that start the collection of a Flow and return a result.
+
+Nothing runs until a terminal operator is invoked.
 
 ```kotlin
 // collect — most common, processes each emission
@@ -388,8 +395,9 @@ declarative.
 
 ## 10. Cold Flow vs Hot Flow
 
-A **cold** flow does not produce values until collected, and each collector
-triggers an independent execution of the producer. `flow { }`, `flowOf`, Room
+**Cold flow vs Hot flow** means the distinction between streams that run their producer block from scratch for each collector (cold), and streams that broadcast values to multiple collectors concurrently (hot).
+
+`flow { }`, `flowOf`, Room
 queries, and Retrofit flows are cold.
 
 A **hot** flow produces values regardless of collectors and shares a single
@@ -423,8 +431,9 @@ hot.value = 1      // emitted whether or not anyone collects
 
 ## 11. StateFlow
 
-`StateFlow` is a hot, state-holder flow that always has a current value and emits
-the latest value to new collectors. It is the coroutine-native replacement for
+**SharedFlow** means a hot flow that broadcasts values to all active collectors and does not retain state by default.
+
+It is the coroutine-native replacement for
 `LiveData` for UI state.
 
 ```kotlin
@@ -457,8 +466,9 @@ Use `StateFlow` for observable state (the current screen state). Always expose
 
 ## 12. SharedFlow
 
-`SharedFlow` is a hot flow for broadcasting values (events) to multiple
-collectors. Unlike `StateFlow` it has no current value, supports configurable
+**StateFlow** means a hot, state-holding flow that always retains its latest value and emits it to new collectors.
+
+Unlike `StateFlow` it has no current value, supports configurable
 replay, and does not conflate by default.
 
 ```kotlin
@@ -483,7 +493,7 @@ Use cases:
 
 `emit` suspends when the buffer is full; `tryEmit` is non-suspending and returns
 `false` if it could not add the value. Configure `onBufferOverflow` to control
-backpressure behavior.
+backpressure behaviour.
 
 **📚 Reference:** [StateFlow and SharedFlow](https://outcomeschool.com/blog/stateflow-and-sharedflow)
 
@@ -491,8 +501,9 @@ backpressure behavior.
 
 ## 13. callbackFlow
 
-`callbackFlow` bridges callback-based APIs (location updates, Firebase
-listeners, sensor managers) into a Flow. It runs in a coroutine and lets you
+**conflate** means a Flow operator that skips intermediate emissions to deliver only the latest value when the collector is slower than the emitter.
+
+It runs in a coroutine and lets you
 emit from callbacks via a `SendChannel`.
 
 ```kotlin
@@ -525,8 +536,9 @@ Key points:
 
 ## 14. channelFlow
 
-`channelFlow` is similar to `callbackFlow` but intended for **concurrent**
-emission from multiple coroutines. It provides a channel-backed flow whose block
+**buffer** means a Flow operator that runs the collector and emitter in separate coroutines to process emissions concurrently.
+
+It provides a channel-backed flow whose block
 can `launch` child coroutines that all emit via `send`.
 
 ```kotlin
@@ -554,8 +566,9 @@ producers; use `callbackFlow` for callback registration.
 
 ## 15. stateIn vs shareIn
 
-Both convert a cold flow into a hot, shared flow tied to a `CoroutineScope` —
-the standard way to share one upstream (e.g. a Room query) among multiple
+**stateIn vs shareIn** means the choice between converting a cold flow into a StateFlow holding a state (stateIn), and converting it into a SharedFlow broadcasting events (shareIn).
+
+a Room query) among multiple
 collectors without re-running it per collector.
 
 - **`stateIn`** produces a `StateFlow` — has a current value, conflated, requires
@@ -605,8 +618,7 @@ Use `stateIn` for UI state; use `shareIn` for shared event/data streams.
 
 ## 16. collect vs collectLatest
 
-Both are terminal collectors, but they differ in how they handle a new value
-arriving while the previous one is still being processed.
+**collect vs collectLatest** means the choice between processing every emission sequentially (collect), and cancelling the active processing block when a new emission arrives (collectLatest).
 
 - **`collect`** processes each value to completion before accepting the next.
   Slow processing applies backpressure to the producer.
@@ -638,9 +650,7 @@ every value must be fully handled. There are analogous `mapLatest` and
 
 ## 17. Exception handling: the catch operator
 
-Flow exception handling follows two principles: **exception transparency** (a
-flow must not catch exceptions thrown downstream of itself) and explicit
-handling via the `catch` operator and `try/catch` at the collector.
+**Flow exception transparency** means handling exceptions using the `catch` operator to catch upstream errors while letting downstream collector errors propagate.
 
 The `catch` operator catches exceptions from **upstream** only. It can log,
 emit a fallback value, or rethrow.
@@ -681,9 +691,9 @@ flow { ... }
 
 ## 18. Flow in Android: lifecycle-aware collection and repeatOnLifecycle
 
-Collecting a flow directly in `lifecycleScope.launch { }` keeps collecting even
-when the app is in the background, wasting resources and risking crashes from UI
-updates while stopped. The recommended pattern is `repeatOnLifecycle`, which
+**repeatOnLifecycle** means a lifecycle-aware utility that automatically collects flows when the UI is active and pauses collection when the UI is in the background.
+
+The recommended pattern is `repeatOnLifecycle`, which
 starts collection when the lifecycle reaches the given state and **cancels** it
 when it drops below — automatically restarting on the next entry.
 
@@ -736,7 +746,9 @@ fun Screen(viewModel: MyViewModel) {
 
 ## 19. Retrofit with Flow
 
-Retrofit supports `suspend` functions and can return a `Flow` directly. The flow
+**Retrofit Flow integration** means defining API service methods that return Flow instances to handle network streams reactively.
+
+The flow
 is cold — the network call fires on collection.
 
 ```kotlin
@@ -777,7 +789,9 @@ updates.
 
 ## 20. Room with Flow
 
-Room can return a `Flow` from a `@Query`. Such a flow is **observable**: Room
+**Room Flow integration** means defining DAO query methods that return Flow to observe database table changes reactively.
+
+Such a flow is **observable**: Room
 automatically re-runs the query and re-emits whenever the underlying tables
 change, making it perfect for a single source of truth.
 
@@ -818,8 +832,7 @@ the database changes, with the upstream query stopping when no one is watching.
 
 ## 21. Instant search using Flow operators
 
-Instant (type-ahead) search is the classic Flow interview question because it
-combines several operators to handle rapid user input efficiently.
+**Instant search implementation** means combining `debounce`, `filter`, `distinctUntilChanged`, and `flatMapLatest` operators to build responsive search-as-you-type flows.
 
 ```kotlin
 class SearchViewModel(private val repo: SearchRepository) : ViewModel() {

@@ -1,6 +1,6 @@
 # Android Performance, Memory, Threading, Storage & System Internals — Interview Guide
 
-A comprehensive question-and-answer guide for Android interviews covering long-running operations and threading, multimedia memory handling, data persistence, memory and battery optimization, screen-size support, permissions, native programming, and Android system internals. Answers include Kotlin snippets, concrete techniques, and trade-offs, and are accurate as of 2026.
+A comprehensive question-and-answer guide for Android interviews covering long-running operations and threading, multimedia memory handling, data persistence, memory and battery optimisation, screen-size support, permissions, native programming, and Android system internals. Answers include Kotlin snippets, concrete techniques, and trade-offs, and are accurate as of 2026.
 
 ---
 
@@ -30,13 +30,13 @@ A comprehensive question-and-answer guide for Android interviews covering long-r
 17. [How to encrypt data in Android](#17-how-to-encrypt-data-in-android)
 18. [SharedPreferences commit() vs apply()](#18-sharedpreferences-commit-vs-apply)
 
-### Memory Optimizations
+### Memory Optimisations
 19. [Improve Android app performance](#19-improve-android-app-performance)
 20. [The onTrimMemory() method](#20-the-ontrimmemory-method)
 21. [Identify and fix OutOfMemory issues](#21-identify-and-fix-outofmemory-issues)
 22. [Find memory leaks](#22-find-memory-leaks)
 
-### Battery Life Optimizations
+### Battery Life Optimisations
 23. [Adaptive Battery using ML](#23-adaptive-battery-using-ml)
 24. [Reduce battery usage](#24-reduce-battery-usage)
 25. [Doze and App Standby](#25-doze-and-app-standby)
@@ -66,7 +66,7 @@ A comprehensive question-and-answer guide for Android interviews covering long-r
 
 ## 1. Run parallel tasks and get a callback when all complete
 
-You want to launch several independent tasks concurrently and resume only once every one of them has finished.
+**Parallel task execution** means executing multiple independent asynchronous operations concurrently and waiting for all to complete before invoking a callback.
 
 **Coroutines with `async`/`awaitAll`** — the idiomatic approach. `async` starts a task and returns a `Deferred`; `awaitAll` suspends until all complete and collects results.
 
@@ -101,7 +101,9 @@ combine(flowA, flowB, flowC) { a, b, c -> Triple(a, b, c) }
 
 ## 2. What is ANR? How can it be prevented?
 
-**ANR (Application Not Responding)** is a system dialog shown when the app's main (UI) thread is blocked for too long. Triggers:
+**ANR (Application Not Responding)** means a system-triggered dialog shown to the user when the main thread of an application remains blocked for too long.
+
+Triggers:
 
 - **Input dispatching timeout:** no response to an input event within **5 seconds**.
 - **Service** `onCreate`/`onStartCommand`/`onBind` not finishing within **~20 s** (foreground) / 200 s (background).
@@ -138,7 +140,7 @@ Monitor production ANRs via **Android Vitals** in the Play Console; the Play Sto
 
 ## 3. ThreadPool advantages
 
-A **thread pool** reuses a fixed set of worker threads to execute many tasks, rather than creating a new thread per task.
+**ThreadPool** means a collection of reusable worker threads managed by a queue to execute multiple tasks efficiently without the overhead of creating new threads for each task.
 
 **Advantages:**
 - **Lower overhead:** thread creation/teardown is expensive (stack allocation, OS scheduling). A pool amortizes this cost.
@@ -162,7 +164,7 @@ For CPU-bound work, size the pool near the core count (`Runtime.getRuntime().ava
 
 ## 4. Daemon threads vs. user threads
 
-The JVM distinguishes two kinds of threads:
+**Daemon threads** means background support threads that are automatically terminated when all non-daemon user threads finish executing.
 
 - **User (non-daemon) threads:** the JVM stays alive as long as at least one user thread is running. The main thread is a user thread.
 - **Daemon threads:** background "service" threads (e.g., garbage collector). The JVM **does not wait** for daemon threads to finish; when all user threads exit, the JVM shuts down and daemon threads are abruptly terminated.
@@ -188,7 +190,7 @@ t.start()
 
 ## 5. Looper, Handler, and HandlerThread
 
-These form Android's **message-loop** infrastructure for thread communication.
+**Looper, Handler, and HandlerThread** means the components forming Android's message-loop infrastructure to handle inter-thread communication.
 
 - **Looper** — turns a normal thread into a loop that processes a `MessageQueue` indefinitely. Each thread has at most one Looper. The main thread already has one (set up by `ActivityThread`).
 - **MessageQueue** — the FIFO (priority by time) queue of `Message`/`Runnable` items the Looper drains.
@@ -226,7 +228,9 @@ class MyThread : Thread() {
 
 ## 6. Garbage Collection
 
-**Garbage Collection (GC)** automatically reclaims heap memory occupied by objects that are no longer reachable from **GC roots** (active threads' stacks, static fields, JNI references). The developer doesn't free memory manually; the runtime does.
+**Garbage Collection (GC)** means the automatic memory management process that identifies and reclaims heap memory occupied by unreachable objects.
+
+The developer doesn't free memory manually; the runtime does.
 
 **Reachability:** an object is *live* if a chain of references leads to it from a GC root. Anything unreachable is garbage and may be collected. ART uses a **generational** and **concurrent** collector — most objects die young, so the young generation is collected frequently and cheaply, while the old generation is collected less often.
 
@@ -243,7 +247,7 @@ class MyThread : Thread() {
 
 ## 7. Memory Leak vs Out of Memory (OOM)
 
-These are related but distinct.
+**Memory Leak vs Out of Memory (OOM)** means the difference between holding an unused object's reference preventing GC (leak), and the runtime error when the heap is fully exhausted (OOM).
 
 **Memory leak:** an object is no longer needed but is still **reachable** from a GC root, so GC cannot reclaim it. Memory usage grows over time. Common Android leaks:
 - Holding an `Activity`/`Context` in a static field, singleton, or long-lived object.
@@ -273,7 +277,7 @@ Detect leaks with **LeakCanary**; profile heap with **Android Studio Memory Prof
 
 ## 8. Runnable vs Thread
 
-Both relate to running code, but they are different abstractions:
+**Runnable vs Thread** means the distinction between an abstract task interface (`Runnable`) and an actual OS-backed execution thread (`Thread`).
 
 - **`Thread`** is an actual unit of execution — a class representing an OS-backed thread. You subclass it (or pass it work) and call `start()`.
 - **`Runnable`** is just a `@FunctionalInterface` describing a *task* (`run()`). It contains no threading logic; it must be handed to something that runs it (a `Thread`, an `Executor`, a `Handler`).
@@ -293,7 +297,7 @@ Worker().start()
 - The same `Runnable` can be reused across threads or submitted to a thread pool / executor.
 - Better separation of concerns; thread pools, `Handler.post`, and coroutines all consume `Runnable`/tasks.
 
-Subclassing `Thread` is only sensible when you genuinely need to customize thread behavior. In modern code, you rarely use either directly — coroutines and executors are preferred.
+Subclassing `Thread` is only sensible when you genuinely need to customize thread behaviour. In modern code, you rarely use either directly — coroutines and executors are preferred.
 
 **📚 Reference:** https://www.linkedin.com/posts/outcomeschool_softwareengineer-androiddev-android-activity-7279784055284420609-Xa8b
 
@@ -301,7 +305,9 @@ Subclassing `Thread` is only sensible when you genuinely need to customize threa
 
 ## 9. Handling bitmaps that take too much memory
 
-A bitmap's memory is `width × height × bytes-per-pixel`. A 4000×3000 photo in `ARGB_8888` (4 bytes/pixel) is ~48 MB — far larger than the JPEG on disk. Decoding several at full size quickly causes OOM.
+**Bitmap memory management** means techniques to downsample, cache, and reuse image allocations to prevent heap exhaustion.
+
+A 4000×3000 photo in `ARGB_8888` (4 bytes/pixel) is ~48 MB — far larger than the JPEG on disk. Decoding several at full size quickly causes OOM.
 
 **Techniques:**
 
@@ -347,7 +353,9 @@ val memCache = object : LruCache<String, Bitmap>(cacheSize) {
 
 ## 10. Bitmap pool
 
-A **bitmap pool** is a cache of reusable `Bitmap` objects. Instead of allocating a new bitmap (and garbaging the old one) every time you decode an image, you take a suitably-sized bitmap out of the pool and decode into it via `BitmapFactory.Options.inBitmap`.
+**Bitmap pool** means a cache of reusable `Bitmap` objects that avoids garbage collection churn by recycling pixel memory buffers.
+
+Instead of allocating a new bitmap (and garbaging the old one) every time you decode an image, you take a suitably-sized bitmap out of the pool and decode into it via `BitmapFactory.Options.inBitmap`.
 
 **Why:** bitmap allocation/deallocation is the biggest source of GC churn in image-heavy apps (lists, grids, carousels). Reusing memory means fewer allocations, fewer GCs, less jank.
 
@@ -375,7 +383,9 @@ From Android 4.4+, `inBitmap` only requires the reuse candidate to be **at least
 
 ## 11. Jetpack DataStore Preferences
 
-**DataStore** is the modern replacement for `SharedPreferences`. It stores key-value data **asynchronously and transactionally** using Kotlin coroutines and `Flow`, avoiding the main-thread I/O and the silent error swallowing of `SharedPreferences`.
+**Jetpack DataStore** means a modern, asynchronous key-value persistence library built on Kotlin coroutines and Flow to replace SharedPreferences.
+
+It stores key-value data **asynchronously and transactionally** using Kotlin coroutines and `Flow`, avoiding the main-thread I/O and the silent error swallowing of `SharedPreferences`.
 
 Two flavors:
 - **Preferences DataStore** — untyped key-value (like SharedPreferences, but async + Flow).
@@ -409,7 +419,9 @@ suspend fun setDarkMode(enabled: Boolean) {
 
 ## 12. Persisting data in an Android app
 
-"Persisting" means keeping data across process death / device reboot. Pick the mechanism by data shape and size:
+**Data persistence** means saving application state locally across process restarts and device reboots using files, databases, or key-value stores.
+
+Pick the mechanism by data shape and size:
 
 | Need | Use |
 |---|---|
@@ -431,7 +443,7 @@ suspend fun setDarkMode(enabled: Boolean) {
 
 ## 13. What is ORM? How does it work?
 
-**ORM (Object-Relational Mapping)** maps relational database tables to programming-language objects, so you work with classes and methods instead of writing raw SQL and manually marshalling `Cursor` rows.
+**ORM (Object-Relational Mapping)** means a database abstraction that maps database tables to object-oriented classes to eliminate manual SQL database queries.
 
 **How it works:**
 - **Entities** — classes annotated to map to tables; fields map to columns.
@@ -462,7 +474,9 @@ Room validates SQL **at compile time**, generates the boilerplate, supports `Flo
 
 ## 14. Preserve Activity state during screen rotation
 
-A configuration change (rotation) by default **destroys and recreates** the Activity, losing transient state. Approaches, simplest to most robust:
+**Activity state retention** means preserving transient user interface data across configuration changes like screen rotations using ViewModels or saved instance bundles.
+
+Approaches, simplest to most robust:
 
 **1. `onSaveInstanceState` / restore** — for small transient UI state (scroll position, text). Limited to a few hundred KB (it's a `Bundle` parcelled across process boundaries); not for large data.
 
@@ -494,6 +508,8 @@ val vm: CounterViewModel by viewModels()
 
 ## 15. Different ways to store data
 
+**Android storage options** means the various persistence mechanisms available including DataStore, Room/SQLite, internal/external files, and secure KeyStore.
+
 1. **SharedPreferences** — legacy key-value for small settings (being superseded by DataStore).
 2. **Jetpack DataStore** — modern async key-value (Preferences) or typed (Proto).
 3. **Room / SQLite** — structured, relational, queryable data.
@@ -511,7 +527,9 @@ Choose by: size, structure, sensitivity, whether it must survive uninstall, and 
 
 ## 16. Scoped Storage
 
-**Scoped Storage** is a privacy model (introduced in Android 10, **mandatory for apps targeting API 30+ on Android 11+**) that restricts an app's broad access to external storage. Instead of reading/writing anywhere with `READ/WRITE_EXTERNAL_STORAGE`, each app gets a sandboxed view.
+**Scoped Storage** means a privacy-focused storage model that restricts apps to sandboxed directories and requires media APIs or pickers for shared storage access.
+
+Instead of reading/writing anywhere with `READ/WRITE_EXTERNAL_STORAGE`, each app gets a sandboxed view.
 
 **Key rules:**
 - **App-specific directories** (`getExternalFilesDir()`) — full access, no permission, deleted on uninstall.
@@ -539,7 +557,9 @@ uri?.let { contentResolver.openOutputStream(it)?.use { os -> bitmap.compress(JPE
 
 ## 17. How to encrypt data in Android
 
-**1. Android Keystore** — the foundation. Keys are generated and stored in hardware-backed secure storage (TEE / StrongBox); the key material never leaves the secure hardware, and you can require user authentication to use a key.
+**Android cryptography** means securing sensitive data using hardware-backed keystores, master keys, and authenticated encryption algorithms.
+
+Android Keystore** — the foundation. Keys are generated and stored in hardware-backed secure storage (TEE / StrongBox); the key material never leaves the secure hardware, and you can require user authentication to use a key.
 
 ```kotlin
 val keyGen = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
@@ -577,7 +597,7 @@ val prefs = EncryptedSharedPreferences.create(
 
 ## 18. SharedPreferences commit() vs apply()
 
-Both persist edits made via `SharedPreferences.Editor`, but differently:
+**commit() vs apply()** means the choice between a synchronous, blocking write returning a status (commit), and an asynchronous, non-blocking disk write (apply) in SharedPreferences.
 
 - **`commit()`** — writes to disk **synchronously** on the calling thread and **returns a `Boolean`** indicating success/failure. Blocks; if called on the UI thread it can cause jank/ANR.
 - **`apply()`** — writes the in-memory change immediately and schedules the disk write **asynchronously**, returning `void`. No success result. Multiple `apply()`s are coalesced. If a `commit()` is issued while an `apply()` is still pending, the `commit()` blocks until the pending async write finishes.
@@ -593,7 +613,7 @@ val ok = prefs.edit().putBoolean("done", true).commit()  // sync, returns succes
 
 ## 19. Improve Android app performance
 
-A checklist across the main axes:
+**App performance optimisation** means a systematic approach to reducing startup time, layout hierarchies, memory churn, battery drain, and network latency.
 
 **Startup**
 - Reduce work in `Application.onCreate` and the first Activity; lazy-init libraries (App Startup library).
@@ -618,7 +638,7 @@ A checklist across the main axes:
 **App size**
 - R8 minification + resource shrinking, App Bundles, remove unused dependencies.
 
-**Measure first:** use **Macrobenchmark** + **JankStats** + **Perfetto/System Trace** + **Android Vitals**; optimize what the data shows, not guesses.
+**Measure first:** use **Macrobenchmark** + **JankStats** + **Perfetto/System Trace** + **Android Vitals**; optimise what the data shows, not guesses.
 
 **📚 Reference:** https://www.linkedin.com/posts/outcomeschool_outcomeschool-softwareengineer-tech-activity-7314877712815345664-iB7z
 
@@ -626,7 +646,9 @@ A checklist across the main axes:
 
 ## 20. The onTrimMemory() method
 
-`onTrimMemory(level)` is a callback (on `Application`, `Activity`, `Service`, `ComponentCallbacks2`) the system invokes to tell your app to **release memory** because the device is under memory pressure or your app's UI visibility changed. Responding well makes your process less likely to be killed.
+**onTrimMemory()** means a system callback that alerts application components to release non-essential resources when the device is under memory pressure.
+
+Responding well makes your process less likely to be killed.
 
 **Key levels:**
 - `TRIM_MEMORY_UI_HIDDEN` — your UI is no longer visible; release UI-only resources (caches tied to views).
@@ -653,11 +675,9 @@ override fun onTrimMemory(level: Int) {
 
 ## 21. Identify and fix OutOfMemory issues
 
-**Identify:**
-- **Reproduce & capture:** an `OutOfMemoryError` stack trace shows the allocation site (often bitmap decode or large collection).
-- **Memory Profiler (Android Studio):** watch the heap graph for a sawtooth that trends upward (leak) vs. a stable ceiling. Capture a **heap dump** and inspect retained sizes and dominators.
-- **LeakCanary:** auto-detects retained objects after they should have been collected and gives the reference chain.
-- **Allocation tracking:** find churn-heavy code paths.
+**OOM diagnosis and resolution** means locating memory leaks or giant allocations using profiles or heap dumps and replacing them with bounded collections or downsampled bitmaps.
+
+- **Memory Profiler (Android Studio):** watch the heap graph for a sawtooth that trends upward (leak) vs. a stable ceiling. Capture a **heap dump** and inspect retained sizes and dominators. - **LeakCanary:** auto-detects retained objects after they should have been collected and gives the reference chain. - **Allocation tracking:** find churn-heavy code paths.
 
 **Common causes & fixes:**
 - **Oversized bitmaps** → downsample with `inSampleSize`, use `RGB_565`/hardware bitmaps, bitmap pool, or Coil/Glide (Q9, Q10).
@@ -672,7 +692,7 @@ override fun onTrimMemory(level: Int) {
 
 ## 22. Find memory leaks
 
-**Primary tool: LeakCanary.** Add the dependency; on debug builds it watches destroyed Activities/Fragments/ViewModels, forces a GC, and if an object that should be gone is still retained, it dumps the heap and reports the **shortest strong reference chain** from a GC root to the leaked object — usually pointing straight at the bug.
+**Memory leak detection** means identifying retained references using LeakCanary or memory profiling tools to ensure objects are garbage collected.
 
 ```kotlin
 // build.gradle (debug only)
@@ -694,7 +714,9 @@ debugImplementation("com.squareup.leakcanary:leakcanary-android:<version>")
 
 ## 23. Adaptive Battery using ML
 
-**Adaptive Battery** (introduced in Android 9 "Pie", built with DeepMind) uses on-device **machine learning** to predict which apps you'll use in the next few hours and which you won't. It places rarely-/soon-not-used apps into restrictive **App Standby Buckets**, limiting their background work (jobs, alarms, network) to conserve battery.
+**Adaptive Battery** means a power-management system that uses machine learning to restrict background tasks of rarely-used apps into standby buckets.
+
+It places rarely-/soon-not-used apps into restrictive **App Standby Buckets**, limiting their background work (jobs, alarms, network) to conserve battery.
 
 **App Standby Buckets** (the mechanism the ML drives):
 - **Active** — app in use now; no restrictions.
@@ -717,7 +739,9 @@ The system continually re-buckets apps based on predicted usage. Your `JobSchedu
 
 ## 24. Reduce battery usage
 
-Battery drain comes mainly from **radio (network), wakeups, wakelocks, CPU, GPS, and screen**. Techniques:
+**Battery consumption optimisation** means minimising radio usage, CPU cycles, wakelocks, and GPS updates by batching tasks and using WorkManager.
+
+Techniques:
 
 **Network**
 - Batch and coalesce requests; avoid frequent polling — use FCM push instead.
@@ -742,7 +766,7 @@ Battery drain comes mainly from **radio (network), wakeups, wakelocks, CPU, GPS,
 
 ## 25. Doze and App Standby
 
-Both are **power-management** features that restrict background work to save battery.
+**Doze and App Standby** means system-level power-saving features that restrict network access and defer background jobs when the device is stationary or individual apps are idle.
 
 **Doze (device-level):** when the device is unplugged, stationary, and the screen is off for a while, the system enters Doze and **batches** deferred work into periodic **maintenance windows**, suspending most background activity in between:
 - Network access is suspended (except during maintenance windows).
@@ -754,7 +778,7 @@ High-priority FCM messages can still reach the app for urgent delivery.
 
 **App Standby (app-level):** the system deems an *individual* app idle if the user hasn't interacted with it and it has no foreground process/notification. Idle apps have their network access and jobs restricted, deferred to roughly once-a-day windows (and more granularly via the **App Standby Buckets** the Adaptive Battery ML manages — see Q23).
 
-**Developer guidance:** design for deferred execution; use WorkManager (Doze-aware), use FCM high-priority for time-critical messages, request battery-optimization exemption only when truly justified (Play restricts it), and test with `adb shell dumpsys deviceidle force-idle`.
+**Developer guidance:** design for deferred execution; use WorkManager (Doze-aware), use FCM high-priority for time-critical messages, request battery-optimisation exemption only when truly justified (Play restricts it), and test with `adb shell dumpsys deviceidle force-idle`.
 
 **📚 Reference:** https://www.linkedin.com/posts/outcomeschool_androiddev-activity-7319939901418795008-KRql
 
@@ -762,7 +786,9 @@ High-priority FCM messages can still reach the app for urgent delivery.
 
 ## 26. What is overdraw?
 
-**Overdraw** happens when the GPU paints the same pixel **multiple times in a single frame** — e.g., an opaque background drawn, then a card drawn on top, then a button on top of that. Each redundant layer wastes GPU fill-rate and can cause jank, especially on low-end devices.
+**Overdraw** means a rendering inefficiency where the GPU paints the same screen pixels multiple times within a single frame.
+
+Each redundant layer wastes GPU fill-rate and can cause jank, especially on low-end devices.
 
 **Visualize it:** Developer Options → **Debug GPU Overdraw**. The screen is tinted:
 - No color = no overdraw (1x)
@@ -783,7 +809,9 @@ High-priority FCM messages can still reach the app for urgent delivery.
 
 ## 27. Support different resolutions and screen sizes
 
-Android runs on phones, foldables, tablets, Chromebooks, and TVs with varied densities and sizes. Build adaptive, not pixel-perfect, layouts.
+**Responsive layout design** means building layouts using density-independent pixels (dp), scale-independent text (sp), vector graphics, and alternative resource qualifiers.
+
+Build adaptive, not pixel-perfect, layouts.
 
 **Density independence:**
 - Use **dp** for dimensions and **sp** for text (scales with user font setting), never raw px.
@@ -811,7 +839,7 @@ Android runs on phones, foldables, tablets, Chromebooks, and TVs with varied den
 
 ## 28. Permission protection levels
 
-A permission's **protection level** (declared in its `<permission>` definition) determines how the system grants it.
+**Permission protection levels** means the classification of permissions into normal, dangerous, signature, or special categories that dictate how the OS grants access.
 
 **Core levels:**
 - **`normal`** — low-risk permissions (e.g., `INTERNET`, `VIBRATE`, `ACCESS_NETWORK_STATE`). Granted automatically at install; no user prompt.
@@ -844,7 +872,9 @@ launcher.launch(Manifest.permission.CAMERA)
 
 ## 29. What is the NDK and why is it useful?
 
-The **NDK (Native Development Kit)** lets you write parts of your app in **C/C++** (and other native languages) and call them from Kotlin/Java via **JNI (Java Native Interface)**. The native code compiles to platform `.so` libraries packaged in the APK/AAB.
+**NDK (Native Development Kit)** means a set of tools allowing developers to implement parts of an Android app in C/C++ for performance or native library reuse.
+
+The native code compiles to platform `.so` libraries packaged in the APK/AAB.
 
 **Why it's useful:**
 - **Performance-critical code** — signal/image/audio/video processing, physics, math-heavy loops where native + SIMD beats JVM/ART.
@@ -873,7 +903,7 @@ Java_com_example_NativeLib_process(JNIEnv* env, jobject, jintArray input) { /* .
 
 ## 30. What is RenderScript?
 
-**RenderScript** was Android's framework for high-performance, data-parallel computation — useful for image processing, blur, blending, and other per-pixel work — that the runtime could distribute across CPU cores and (historically) GPU/DSP.
+**RenderScript** means a deprecated framework for high-performance, data-parallel computation on the CPU/GPU, replaced by Vulkan and GPU compute.
 
 **Status (important as of 2026): RenderScript is deprecated.** It was deprecated in **Android 12 (API 31)** and Google recommends migrating off it; support is expected to be removed in a future release.
 
@@ -896,7 +926,9 @@ myView.setRenderEffect(RenderEffect.createBlurEffect(20f, 20f, Shader.TileMode.C
 
 ## 31. What is Android Runtime?
 
-**Android Runtime (ART)** is the managed runtime environment that executes Android apps. App code is compiled to **DEX bytecode** (Dalvik Executable), and ART runs that bytecode — handling execution, memory management, and garbage collection. ART replaced the older **Dalvik** VM as the default from **Android 5.0 (Lollipop)**.
+**ART (Android Runtime)** means the managed execution environment on Android that runs DEX bytecode using hybrid AOT and JIT compilation.
+
+App code is compiled to **DEX bytecode** (Dalvik Executable), and ART runs that bytecode — handling execution, memory management, and garbage collection. ART replaced the older **Dalvik** VM as the default from **Android 5.0 (Lollipop)**.
 
 Key responsibilities:
 - Loading and executing DEX bytecode.
@@ -912,9 +944,9 @@ Each app runs in its own process with its own ART instance, isolated by the Linu
 
 ## 32. Dalvik, ART, JIT, and AOT
 
-**Compilation strategies:**
-- **JIT (Just-In-Time):** bytecode is compiled to native machine code **at runtime**, on demand, while the app runs. Fast install, smaller storage, but adds runtime compilation overhead and a warm-up cost.
-- **AOT (Ahead-Of-Time):** bytecode is compiled to native code **before execution** (e.g., at install). Faster execution and startup (no runtime compile), but slower/longer installs and larger storage footprint.
+**Compilation strategies** means the methods of translating bytecode into native machine instructions, including Just-In-Time (JIT) and Ahead-Of-Time (AOT) compilation.
+
+Fast install, smaller storage, but adds runtime compilation overhead and a warm-up cost. - **AOT (Ahead-Of-Time):** bytecode is compiled to native code **before execution** (e.g., at install). Faster execution and startup (no runtime compile), but slower/longer installs and larger storage footprint.
 
 **The runtimes:**
 - **Dalvik** (Android ≤ 4.4) — register-based VM using **JIT** only. Compiled hot code each run.
@@ -927,6 +959,8 @@ Each app runs in its own process with its own ART instance, isolated by the Linu
 ---
 
 ## 33. Differences between Dalvik and ART
+
+**Dalvik vs ART** means the comparison between the legacy Dalvik VM using JIT compilation, and the modern Android Runtime (ART) using a hybrid AOT/JIT model.
 
 | Aspect | Dalvik (≤ Android 4.4) | ART (Android 5.0+) |
 |---|---|---|
@@ -947,7 +981,9 @@ Each app runs in its own process with its own ART instance, isolated by the Linu
 
 ## 34. Baseline Profiles
 
-A **Baseline Profile** is a list of classes and methods (hot code paths — startup, critical user journeys, scrolling) shipped **with your app**. At install time, ART **AOT-compiles** exactly those paths instead of waiting to learn them from usage via JIT, so the app is fast from the very first run.
+**Baseline Profiles** means a pre-compiled list of hot classes and methods included in the APK to speed up app startup and reduce jank.
+
+At install time, ART **AOT-compiles** exactly those paths instead of waiting to learn them from usage via JIT, so the app is fast from the very first run.
 
 **Benefits:**
 - Faster **app startup** (often 20–40% improvement on cold start).
@@ -969,7 +1005,7 @@ class BaselineProfileGenerator {
 }
 ```
 
-Libraries can also ship their own Baseline Profiles, which get merged. Combine with **Startup Profiles** (R8 uses them to optimize DEX layout). Verify improvements with Macrobenchmark `StartupTimingMetric`.
+Libraries can also ship their own Baseline Profiles, which get merged. Combine with **Startup Profiles** (R8 uses them to optimise DEX layout). Verify improvements with Macrobenchmark `StartupTimingMetric`.
 
 **📚 Reference:** https://outcomeschool.substack.com/p/baseline-profiles-in-android
 
@@ -977,10 +1013,12 @@ Libraries can also ship their own Baseline Profiles, which get merged. Combine w
 
 ## 35. What is DEX?
 
-**DEX (Dalvik Executable)** is Android's bytecode format. The Kotlin/Java compiler produces `.class` JVM bytecode; the **D8** compiler (and **R8** for optimization/shrinking) converts that into a `classes.dex` file packaged in the APK/AAB. The Android runtime (Dalvik historically, ART now) executes DEX, not standard JVM `.class` files.
+**DEX (Dalvik Executable)** means the optimised bytecode format that compiles Kotlin/Java files to run on the Android Runtime.
+
+The Kotlin/Java compiler produces `.class` JVM bytecode; the **D8** compiler (and **R8** for optimisation/shrinking) converts that into a `classes.dex` file packaged in the APK/AAB. The Android runtime (Dalvik historically, ART now) executes DEX, not standard JVM `.class` files.
 
 **Why a separate format:**
-- DEX is optimized for **memory-constrained devices** — it uses a **register-based** instruction set (vs. the JVM's stack-based one), needing fewer instructions.
+- DEX is optimised for **memory-constrained devices** — it uses a **register-based** instruction set (vs. the JVM's stack-based one), needing fewer instructions.
 - Multiple classes are packed into a single `.dex` with **shared constant pools**, reducing duplication and size.
 
 **Build pipeline:** `.kt/.java` → `javac`/`kotlinc` → `.class` → **D8/R8** → `classes.dex` → APK/AAB. R8 additionally minifies, shrinks unused code/resources, and obfuscates.
@@ -993,7 +1031,9 @@ Libraries can also ship their own Baseline Profiles, which get merged. Combine w
 
 ## 36. What is Multidex?
 
-A single DEX file can reference a maximum of **65,536 methods** (the "64K reference limit"). Large apps (with many libraries) exceed this, causing a build error. **Multidex** splits the app's code across **multiple DEX files** (`classes.dex`, `classes2.dex`, …) so it can reference more than 64K methods.
+**Multidex** means a configuration that allows an application to build and load multiple DEX files to bypass the 65,536 method reference limit.
+
+Large apps (with many libraries) exceed this, causing a build error. **Multidex** splits the app's code across **multiple DEX files** (`classes.dex`, `classes2.dex`, …) so it can reference more than 64K methods.
 
 **Enabling it:**
 
@@ -1015,7 +1055,9 @@ dependencies { implementation("androidx.multidex:multidex:<version>") }
 
 ## 37. Can you manually call the Garbage Collector?
 
-You can **request** a GC, but you **cannot force** it. `System.gc()` (or `Runtime.getRuntime().gc()`) is only a **hint** to the JVM/ART; the runtime is free to ignore it or run it whenever it chooses.
+**Garbage Collector invocation** means requesting a memory cleanup using `System.gc()`, which acts only as a non-binding hint to the JVM.
+
+`System.gc()` (or `Runtime.getRuntime().gc()`) is only a **hint** to the JVM/ART; the runtime is free to ignore it or run it whenever it chooses.
 
 ```kotlin
 System.gc()   // a suggestion, not a guarantee
@@ -1034,9 +1076,11 @@ System.gc()   // a suggestion, not a guarantee
 
 ## 38. App starts: Hot, Warm & Cold
 
-App startup is classified by how much the system must do before the app is interactive. Faster startup is a key performance metric (tracked in Android Vitals).
+**App startup states** means the three launch categories (Cold, Warm, Hot) defined by whether the process must be created from scratch or resumed from memory.
 
-**Cold start (slowest):** the app process does **not** exist. The system must: fork/create the process, initialize the `Application` object (`onCreate`), then create and draw the first Activity. This is the most expensive and the case you optimize for.
+Faster startup is a key performance metric (tracked in Android Vitals).
+
+**Cold start (slowest):** the app process does **not** exist. The system must: fork/create the process, initialize the `Application` object (`onCreate`), then create and draw the first Activity. This is the most expensive and the case you optimise for.
 
 **Warm start (medium):** the process is **alive** but the Activity must be recreated — e.g., the user pressed Back then relaunched, or the Activity was destroyed (low memory) while the process lingered. Skips process and `Application` creation but still rebuilds the Activity and its UI (often restoring from `savedInstanceState`).
 
@@ -1053,7 +1097,7 @@ App startup is classified by how much the system must do before the app is inter
 - Ship **Baseline Profiles** (Q34).
 - Avoid heavy synchronous I/O / large dependency graphs at launch.
 - Use a proper themed launch (windowBackground) instead of a fake splash with work on the main thread; use the **SplashScreen API**.
-- Defer non-critical initialization until after first frame.
+- Defer non-critical initialisation until after first frame.
 - Measure with **Macrobenchmark** `StartupTimingMetric` and **Android Vitals**.
 
 **📚 Reference:** https://www.linkedin.com/posts/amit-shekhar-iitbhu_androiddev-activity-7374668708679462912-DPH3

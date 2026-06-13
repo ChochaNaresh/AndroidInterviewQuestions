@@ -53,7 +53,9 @@ A comprehensive, code-first reference for the most commonly used Android librari
 
 ## 1. What is an OkHttp Interceptor?
 
-An **Interceptor** is a powerful mechanism in OkHttp to observe, mutate, retry, and short-circuit requests and responses. It sits in the request/response pipeline and forms a chain — each interceptor can inspect the outgoing `Request`, call `chain.proceed(request)` to continue down the chain, and then inspect/transform the returned `Response`.
+**OkHttp Interceptor** means a mechanism in OkHttp that observes, mutates, retries, and short-circuits outgoing requests and incoming responses.
+
+It sits in the request/response pipeline and forms a chain where each interceptor can inspect the outgoing `Request`, call `chain.proceed(request)` to continue down the chain, and then inspect/transform the returned `Response`.
 
 There are two kinds:
 
@@ -88,7 +90,9 @@ val client = OkHttpClient.Builder()
 
 ## 2. HTTP caching with OkHttp
 
-OkHttp has a built-in HTTP response cache that follows the HTTP caching spec (`Cache-Control`, `ETag`, `Last-Modified`). You enable it by attaching a `Cache` to the client:
+**HTTP caching** means OkHttp's built-in mechanism to store and serve network responses locally based on standard HTTP cache headers.
+
+It follows the HTTP caching spec (`Cache-Control`, `ETag`, `Last-Modified`) and is enabled by attaching a `Cache` to the client:
 
 ```kotlin
 val cacheSize = 10L * 1024 * 1024 // 10 MB
@@ -140,7 +144,9 @@ Per-request control with Retrofit uses `@Headers`/`CacheControl`. Key directives
 
 ## 3. How to enable logging in OkHttp
 
-Use the official `logging-interceptor` artifact. It logs request/response lines, headers, and bodies depending on the level.
+**OkHttp Logging Interceptor** means a network tool that logs request and response lines, headers, and body payloads at configurable detail levels during development.
+
+It is provided by the official `logging-interceptor` artifact.
 
 ```kotlin
 // build.gradle: implementation("com.squareup.okhttp3:logging-interceptor:<version>")
@@ -170,7 +176,9 @@ Levels: `NONE`, `BASIC` (request/response line), `HEADERS` (line + headers), `BO
 
 ## 4. What is a Multipart request?
 
-A **multipart request** (`multipart/form-data`) lets you send several parts of different types in one HTTP body — typically file(s) plus form fields. It is the standard way to upload images/files alongside metadata.
+**Multipart request** means an HTTP request format that allows transmitting multiple payloads of different data types (such as files and form fields) in a single body.
+
+It is the standard way to upload images/files alongside metadata.
 
 With Retrofit:
 
@@ -212,7 +220,9 @@ Each part has its own headers and `Content-Type`, separated by a boundary string
 
 ## 5. Retrofit essentials and how it relates to OkHttp
 
-**Retrofit** is a type-safe HTTP client that turns a Kotlin/Java interface into a working API implementation. It handles URL building, serialization (via converters like Gson/Moshi/kotlinx-serialization), and adapting the call into `suspend` functions, `Call<T>`, RxJava types, or `Flow`. **OkHttp** is the underlying engine that actually performs the request (connection pooling, interceptors, caching, TLS). Retrofit delegates all network I/O to an `OkHttpClient`.
+**Retrofit** means a type-safe HTTP client libraries wrapper that turns a Kotlin or Java interface into a REST API client using dynamic proxies.
+
+It handles URL building, serialisation (via converters like Gson/Moshi/kotlinx-serialisation), and adapting the call into `suspend` functions, `Call<T>`, RxJava types, or `Flow`. **OkHttp** is the underlying engine that actually performs the request (connection pooling, interceptors, caching, TLS). Retrofit delegates all network I/O to an `OkHttpClient`.
 
 ```kotlin
 interface GithubApi {
@@ -237,7 +247,9 @@ Key annotations: `@GET/@POST/@PUT/@DELETE`, `@Path`, `@Query`, `@Body`, `@Header
 
 ## 6. Why use a DI framework like Dagger?
 
-**Dependency Injection** means a class receives its dependencies from the outside rather than constructing them itself. You can do DI by hand (constructor injection everywhere), but at app scale that means writing and maintaining a large amount of "wiring" code — factories, object graphs, lifecycle/scope management. A framework like Dagger automates this.
+**Dependency Injection (DI) framework** means a tool like Dagger that automates the creation, scoping, and wiring of dependencies in an object graph at compile time.
+
+While you can do DI by hand (constructor injection), at app scale that means writing and maintaining a large amount of "wiring" code — factories, object graphs, lifecycle/scope management. A framework like Dagger automates this.
 
 Benefits:
 - **Compile-time correctness** — Dagger generates code and validates the entire dependency graph at compile time. A missing or cyclic dependency is a build error, not a runtime crash. (Unlike reflection-based DI such as Guice or service-locator patterns.)
@@ -254,7 +266,9 @@ Benefits:
 
 ## 7. @Inject, @Module, @Provides, @Component explained
 
-These are the four core Dagger annotations:
+**Dagger core annotations** means `@Inject` to request or mark constructors for injection, `@Module` to declare dependency provider methods, `@Provides` to build dependency instances, and `@Component` to bridge providers and injection sites.
+
+These annotations comprise:
 
 **`@Inject`** — marks how Dagger can *create* or *populate* something.
 - On a constructor: tells Dagger it can construct that class (and what it needs).
@@ -311,7 +325,9 @@ component.inject(this) // fills @Inject fields in MainActivity
 
 ## 8. How does Dagger work?
 
-Dagger is an **annotation processor**. At compile time it:
+**Dagger internals** means Dagger's compile-time annotation processor that validates the dependency graph and generates boilerplate-free Java factories to resolve dependencies at runtime.
+
+At compile time it performs the following:
 
 1. **Scans** your annotations (`@Inject`, `@Module`, `@Provides`, `@Binds`, `@Component`, scopes, qualifiers).
 2. **Builds a dependency graph** — for each requested type it finds a provider (an `@Inject` constructor, a `@Provides`/`@Binds` method) and resolves that provider's own dependencies, recursively.
@@ -324,7 +340,9 @@ At **runtime** there is no reflection — your code simply calls the generated `
 
 ## 9. What is a Component in Dagger?
 
-A **Component** is the interface that ties the graph together — it knows about the modules (sources of dependencies) and exposes injection methods / provision methods to consumers. Dagger generates a concrete `Dagger<Name>` implementation.
+**Dagger Component** means the interface that defines the dependency graph and exposes injection or provision methods to connect modules with dependency consumers.
+
+Dagger generates a concrete `Dagger<Name>` implementation of this interface.
 
 ```kotlin
 @Singleton
@@ -350,7 +368,9 @@ Components can be related:
 
 ## 10. What is a Module in Dagger?
 
-A **Module** is a class (`@Module`) that contains the recipes (`@Provides`/`@Binds` methods) for objects that Dagger cannot create via an `@Inject` constructor. Typical cases: interfaces, third-party classes you don't own (Retrofit, Room, OkHttp), and objects requiring custom builder logic or configuration.
+**Dagger Module** means a class annotated with `@Module` that provides dependency recipes for classes Dagger cannot instantiate automatically.
+
+Typical use cases include interfaces, third-party classes you don't own (Retrofit, Room, OkHttp), and objects requiring custom builder logic or configuration.
 
 - **`@Provides`** — a method body that builds and returns the instance. Use when construction needs logic.
 - **`@Binds`** — an abstract method that maps an interface to an implementation; no body, generates less code. Must live in an abstract `@Module` (or use an `object`/companion for `@Provides` to make them static and faster).
@@ -376,7 +396,9 @@ Modules are attached to components via `@Component(modules = [...])`. In Hilt, m
 
 ## 11. How does a custom scope work in Dagger?
 
-A **scope** tells Dagger to keep a **single instance** of a binding for the lifetime of the component that carries that scope. `@Singleton` is just a built-in scope annotation; you can define your own.
+**Dagger Scope** means a custom annotation that instructs Dagger to retain a single instance of a dependency for the lifetime of the component instance holding that scope.
+
+`@Singleton` is just a built-in scope annotation; you can define your own.
 
 A scope is a custom annotation marked with `@Scope`:
 
@@ -405,7 +427,9 @@ How it works under the hood: a scoped binding is created once and cached (in a `
 
 ## 12. Dagger 2 vs Dagger-Hilt: how to choose
 
-**Hilt is built on top of Dagger 2.** It is Google's opinionated, Android-specific layer that removes most of Dagger's boilerplate by providing predefined components and scopes tied to the Android lifecycle.
+**Hilt** means Google's Android-specific dependency injection library built on top of Dagger 2 that provides predefined components, scopes, and lifecycle-integrated injection points.
+
+It removes most of Dagger's boilerplate by tying component and scope lifecycles to Android components.
 
 | Aspect | Dagger 2 (plain) | Hilt |
 |---|---|---|
@@ -450,7 +474,9 @@ class HomeViewModel @Inject constructor(private val repo: UserRepository) : View
 
 ## 13. Tell me about RxJava
 
-**RxJava** is a library for composing asynchronous and event-based programs using **observable sequences**. You model data/events as streams that emit items over time, and you transform/combine/observe them with a large set of operators, while declaratively controlling **on which thread** work happens.
+**RxJava** means a library for composing asynchronous and event-driven programs using observable sequences and reactive stream operators.
+
+You model data/events as streams that emit items over time, and transform/combine/observe them with operators, while declaratively controlling thread execution.
 
 Core building blocks:
 - **Observable / Flowable / Single / Maybe / Completable** — the producer types (see Q14).
@@ -477,6 +503,8 @@ Strengths: powerful composition of async work, threading, error handling. Trade-
 
 ## 14. Types of Observables in RxJava
 
+**RxJava Observables** means the reactive stream types—including Observable, Flowable, Single, Maybe, and Completable—that emit asynchronous data packets to observers.
+
 | Type | Emits | Terminal | Use case |
 |---|---|---|---|
 | **Observable\<T>** | 0..N items | `onComplete`/`onError` | Streams of events; **no** backpressure |
@@ -501,7 +529,9 @@ Flowable.range(1, 1_000_000)           // backpressure-aware
 
 ## 15. Error handling in RxJava
 
-An error sends `onError` and **terminates** the stream. RxJava offers operators to recover or transform errors:
+**RxJava error handling** means managing stream errors using operators like `onErrorReturn` or `retry` to prevent stream termination.
+
+RxJava offers operators to recover or transform errors:
 
 - **`onErrorReturn { fallbackValue }`** — emit a fallback item then complete.
 - **`onErrorReturnItem(item)`** — same, with a constant.
@@ -529,7 +559,9 @@ Best practices: always supply an `onError` handler; set a global `RxJavaPlugins.
 
 ## 16. Map vs FlatMap (and SwitchMap, ConcatMap)
 
-**`map`** transforms each item **synchronously** 1-to-1 (`T -> R`). The result is a plain value.
+**RxJava map vs flatMap** means the distinction between transforming emissions synchronously 1-to-1 (map), and transforming emissions into new Observables to merge them asynchronously (flatMap).
+
+The result is a plain value.
 
 ```
 source:  --1----2----3-->
@@ -573,7 +605,7 @@ queries.switchMap { q -> api.search(q).toObservable() } // only latest query's r
 
 ## 17. create vs fromCallable
 
-Both create a source, but they fit different needs.
+**RxJava create vs defer** means the choice between creating an Observable manually with an emitter block (create), and creating an Observable lazily for each subscriber (defer).
 
 **`create`** — full manual control of the emitter. You call `onNext`/`onError`/`onComplete` yourself, possibly many times, and you must handle disposal/backpressure. Use it to **bridge a callback-based API** into Rx.
 
@@ -600,7 +632,9 @@ Single.fromCallable { database.loadUser(id) } // runs lazily per subscriber
 
 ## 18. The defer operator
 
-**`defer`** does not create its Observable until a subscriber subscribes — and it creates a **fresh** one for **each** subscriber. This makes the source **lazy** and ensures it captures current state at subscription time, not at assembly time.
+**defer operator** means an RxJava operator that waits to instantiate the target Observable until subscription time.
+
+This makes the source **lazy** and ensures it captures current state at subscription time, not at assembly time.
 
 ```kotlin
 var token = "old"
@@ -624,7 +658,7 @@ Use `defer` when the source depends on mutable/external state that may change be
 
 ## 19. Timer, Delay and Interval
 
-These three are time-based but behave differently:
+**RxJava time operators** means time-shifting elements including shifting all emissions (delay), emitting a single item after a delay (timer), or emitting periodic items (interval).
 
 **`timer`** — emits a **single** item (0L) after a delay, then completes.
 ```
@@ -659,7 +693,9 @@ Summary: `timer` = one delayed emission; `interval` = repeating ticks (remember 
 
 ## 20. Parallel network calls with Zip
 
-**`zip`** combines the latest emissions of multiple sources **by index** and emits a combined result only when **all** sources have emitted. Run each source on `Schedulers.io()` so they execute **in parallel**, then zip the results.
+**zip operator** means an RxJava operator that combines emissions from multiple sources by index to produce a single merged emission.
+
+Run each source on `Schedulers.io()` so they execute **in parallel**, then zip the results.
 
 ```kotlin
 val user: Single<User> = api.getUser(id).subscribeOn(Schedulers.io())
@@ -684,7 +720,7 @@ Key points: both calls start concurrently (each `subscribeOn(io())`), so total l
 
 ## 21. Concat vs Merge
 
-Both combine multiple Observables into one, but differ in **ordering and concurrency**:
+**RxJava merge vs concat** means the choice between interleaving emissions from multiple sources concurrently (merge), and processing multiple sources sequentially (concat).
 
 **`concat`** — subscribes to sources **sequentially**; it fully consumes the first before starting the second. Order is preserved, no interleaving. A source that never completes blocks the rest.
 ```
@@ -713,12 +749,14 @@ Observable.merge(sensorA, sensorB)             // both streams together, interle
 
 ## 22. Subjects in RxJava
 
-A **Subject** is both an **Observable and an Observer** — it can subscribe to sources and you can also call `onNext`/`onError`/`onComplete` on it manually. It's a hot, multicast bridge often used to push events into an Rx pipeline (e.g. UI clicks). The four common types differ in what they replay to new subscribers:
+**Subject** means a reactive bridge class that acts as both an Observable and an Observer to multicast emissions.
 
-| Subject | Behavior on subscribe |
+It's a hot, multicast bridge often used to push events into an Rx pipeline (e.g. UI clicks). The four common types differ in what they replay to new subscribers:
+
+| Subject | Behaviour on subscribe |
 |---|---|
 | **PublishSubject** | Emits only items published **after** subscription |
-| **BehaviorSubject** | Emits the **most recent** item (or a default), then subsequent items |
+| **BehaviourSubject** | Emits the **most recent** item (or a default), then subsequent items |
 | **ReplaySubject** | Emits **all** previously published items (optionally a bounded buffer) |
 | **AsyncSubject** | Emits **only the last** item, and only when the source **completes** |
 
@@ -728,24 +766,24 @@ publish.onNext(1)                 // lost (no subscribers yet)
 publish.subscribe { println(it) }
 publish.onNext(2)                 // prints 2
 
-val behavior = BehaviorSubject.createDefault(0)
-behavior.onNext(1)
-behavior.subscribe { println(it) } // prints 1 (latest), then future items
+val behaviour = BehaviourSubject.createDefault(0)
+behaviour.onNext(1)
+behaviour.subscribe { println(it) } // prints 1 (latest), then future items
 
 val replay = ReplaySubject.create<Int>()
 replay.onNext(1); replay.onNext(2)
 replay.subscribe { println(it) }   // prints 1, 2
 ```
 
-Use cases: `BehaviorSubject` for current-state (like a simple state holder), `PublishSubject` for one-off events (clicks, navigation), `ReplaySubject` to cache an event log. Note: Subjects are not thread-safe for concurrent `onNext`; wrap with `.toSerialized()` if needed. In modern Kotlin code, `StateFlow`/`SharedFlow` are the idiomatic equivalents.
+Use cases: `BehaviourSubject` for current-state (like a simple state holder), `PublishSubject` for one-off events (clicks, navigation), `ReplaySubject` to cache an event log. Note: Subjects are not thread-safe for concurrent `onNext`; wrap with `.toSerialized()` if needed. In modern Kotlin code, `StateFlow`/`SharedFlow` are the idiomatic equivalents.
 
-**📚 Reference:** https://outcomeschool.com/blog/rxjava-subject-publish-replay-behavior-async
+**📚 Reference:** https://outcomeschool.com/blog/rxjava-subject-publish-replay-behaviour-async
 
 ---
 
 ## 23. dispose() vs clear() on CompositeDisposable
 
-A **`CompositeDisposable`** is a container that holds multiple `Disposable`s so you can cancel them together (typically in `onDestroy`/`onCleared` to avoid leaks).
+**CompositeDisposable** means a container that collects multiple RxJava subscriptions to dispose of them all at once in lifecycle tear-down callbacks.
 
 - **`clear()`** — disposes all currently held disposables **but keeps the container usable**. You can add new disposables afterward and they will work.
 - **`dispose()`** — disposes all held disposables **and marks the container as disposed**. Any disposable added afterward is **immediately disposed** (effectively ignored); the container is dead.
@@ -775,7 +813,7 @@ class MyViewModel : ViewModel() {
 
 ## 24. Schedulers.io() vs Schedulers.computation()
 
-Both move work off the main thread, but they're tuned for different workloads:
+**RxJava Schedulers** means thread execution coordinators, where `Schedulers.io()` handles blocking I/O tasks and `Schedulers.computation()` handles CPU-bound operations.
 
 **`Schedulers.io()`** — backed by an **unbounded, elastic** thread pool that grows as needed and reuses idle threads. Designed for **I/O-bound, often blocking** work that spends most time waiting: network calls, disk/database reads, file access.
 
@@ -796,7 +834,7 @@ api.download()                       // I/O
 
 ## 25. Instant search with RxJava
 
-A responsive search-as-you-type pipeline combines four operators on a stream of query strings (often fed by a `PublishSubject` from an `EditText`):
+**Search debounce implementation** means chaining `debounce`, `filter`, `distinctUntilChanged`, and `switchMap` operators to build responsive type-ahead inputs.
 
 - **`debounce`** — wait until the user stops typing (e.g. 300 ms) before reacting; avoids a request per keystroke.
 - **`filter`** — ignore too-short queries.
@@ -831,7 +869,7 @@ querySubject
 
 ## 26. Pagination in RecyclerView with RxJava
 
-The idea: turn "user scrolled near the bottom" into a stream of page-load events, throttle them, and load the next page sequentially.
+**Pagination stream design** means converting list scroll offsets into page request triggers, throttling emissions, and appending new page results.
 
 ```kotlin
 val loadMore = PublishSubject.create<Int>() // emits next page number
@@ -874,7 +912,7 @@ Key choices: a `PublishSubject` converts scroll callbacks into a stream; an `isL
 
 ## 27. How do Glide and Fresco work internally?
 
-Both solve the same hard problems — decoding images efficiently, avoiding `OutOfMemoryError`, smooth scrolling, and caching — but with different architectures.
+**Glide vs Fresco vs Coil** means the comparison between Glide (standard disk/memory caching), Fresco (low-end device memory handling), and Coil (lightweight Kotlin-first loading).
 
 **Glide:**
 - **Multi-layer caching:** an **active resources** cache (images currently in use, held via weak references), a **memory cache** (`LruCache` of decoded `Bitmap`s), and a **disk cache** (original or transformed images). A request first checks active → memory → disk → network.
@@ -890,11 +928,13 @@ Both solve the same hard problems — decoding images efficiently, avoiding `Out
 
 Shared techniques that make both fast and memory-safe: **decode to target size (downsampling)**, **reuse bitmaps (pool)**, **multi-tier caching (memory + disk)**, and **cancel/throttle requests** for off-screen views.
 
-**📚 Reference:** https://outcomeschool.com/blog/android-image-loading-library-optimize-memory-usage , https://outcomeschool.com/blog/android-image-loading-library-use-bitmap-pool-for-responsive-ui , https://outcomeschool.com/blog/android-image-loading-library-solve-the-slow-loading-issue
+**📚 Reference:** https://outcomeschool.com/blog/android-image-loading-library-optimise-memory-usage , https://outcomeschool.com/blog/android-image-loading-library-use-bitmap-pool-for-responsive-ui , https://outcomeschool.com/blog/android-image-loading-library-solve-the-slow-loading-issue
 
 ---
 
 ## 28. Glide vs Fresco vs Coil
+
+**Android image libraries** means the comparison between Glide (flexible caching), Fresco (low-end memory efficiency), and Coil (Kotlin-first lightweight loading).
 
 | | Glide | Fresco | Coil |
 |---|---|---|---|
@@ -928,7 +968,9 @@ draweeView.setImageURI(url)
 
 ## 29. What is Flow in Kotlin?
 
-**Flow** is Kotlin Coroutines' API for asynchronous **streams** of values — the coroutine-native equivalent of an RxJava `Observable`. A flow emits multiple values over time, is **cold** by default (the producer runs fresh for each collector, only when collected), and integrates with structured concurrency and `suspend` functions.
+**Kotlin Flow vs RxJava** means the choice between native coroutine-powered reactive streams (Flow), and the external Java-based reactive framework (RxJava).
+
+A flow emits multiple values over time, is **cold** by default (the producer runs fresh for each collector, only when collected), and integrates with structured concurrency and `suspend` functions.
 
 ```kotlin
 fun tickerFlow(): Flow<Int> = flow {       // cold producer
@@ -947,7 +989,7 @@ lifecycleScope.launch {
 ```
 
 Key points:
-- **Cold** flows (`flow { }`) vs **hot** flows: **`StateFlow`** (always has a current value; like `BehaviorSubject`/`LiveData`) and **`SharedFlow`** (multicast events; like `PublishSubject`).
+- **Cold** flows (`flow { }`) vs **hot** flows: **`StateFlow`** (always has a current value; like `BehaviourSubject`/`LiveData`) and **`SharedFlow`** (multicast events; like `PublishSubject`).
 - **`flowOn`** controls the dispatcher of upstream operators; `collect` runs on the collector's context — cleaner than Rx's `subscribeOn`/`observeOn`.
 - Rich operators: `map`, `filter`, `flatMapLatest` (≈ `switchMap`), `debounce`, `combine`, `zip`, `buffer`/`conflate` (backpressure via suspension).
 - Cancellation is automatic via the coroutine/lifecycle scope — no manual `Disposable`. Use `repeatOnLifecycle(STARTED)` / `flowWithLifecycle` to collect safely on Android.
@@ -960,7 +1002,9 @@ Key points:
 
 ## 30. What is the App Startup library?
 
-**App Startup** (`androidx.startup`) is a Jetpack library that provides a single, efficient way to **initialize components at app launch**. Without it, each library that needs init often adds its own `ContentProvider` (because content providers run before `Application.onCreate`), and many providers measurably slow cold start. App Startup replaces all of them with **one** shared `InitializationProvider`.
+**App Startup library** means a Jetpack library that provides a unified, efficient way to initialise component providers at application launch.
+
+Without it, each library that needs init often adds its own `ContentProvider` (because content providers run before `Application.onCreate`), and many providers measurably slow cold start. App Startup replaces all of them with **one** shared `InitializationProvider`.
 
 You define an `Initializer`:
 
@@ -1001,11 +1045,11 @@ Benefits:
 
 ## 31. Common Android libraries and ORMs
 
-Interviewers often open with a breadth question — "which libraries do you know, and do you build your own or use existing ones?" A practical answer: prefer well-maintained, widely-used libraries for solved problems (networking, DI, images), and only write custom utilities for app-specific logic — reinventing networking/caching is rarely worth the maintenance cost.
+**Third-party libraries** means standard frameworks for networking, caching, serialisation, and dependency injection chosen based on size, performance, and maintenance.
 
 **Frequently used libraries by category:**
 - **Networking:** Retrofit, OkHttp, Ktor Client
-- **Serialization:** Moshi, kotlinx.serialization, Gson (legacy)
+- **Serialization:** Moshi, kotlinx.serialisation, Gson (legacy)
 - **DI:** Hilt/Dagger, Koin
 - **Reactive/async:** Kotlin Coroutines + Flow, RxJava/RxAndroid
 - **Image loading:** Coil, Glide, Fresco, Picasso (legacy)

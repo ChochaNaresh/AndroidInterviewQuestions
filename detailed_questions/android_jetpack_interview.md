@@ -44,13 +44,15 @@ Each question includes detailed explanations, Kotlin code snippets, trade-offs, 
 
 ## 1. What is Android Jetpack and why use it?
 
-**Android Jetpack** is a suite of libraries, tools, and architectural guidance from Google that helps developers write high-quality apps more easily. It is the successor to the Android Support Library and is published under the `androidx.*` namespace.
+**Android Jetpack** means a suite of libraries, tools, and architectural guidance from Google designed to simplify Android development and ensure backward compatibility.
+
+It is the successor to the Android Support Library and is published under the `androidx.*` namespace.
 
 Jetpack components are grouped into four categories:
 
 - **Foundation** — `AppCompat`, `Android KTX` (Kotlin extensions), `Multidex`, `Test`.
 - **Architecture** — `ViewModel`, `LiveData`, `Room`, `WorkManager`, `Navigation`, `Paging`, `DataStore`, `Lifecycle`.
-- **Behavior** — `CameraX`, `Notifications`, `Permissions`, `Sharing`, `Media`.
+- **Behaviour** — `CameraX`, `Notifications`, `Permissions`, `Sharing`, `Media`.
 - **UI** — `Jetpack Compose`, `View Binding`, `Fragment`, `Animation & Transitions`, `Emoji`.
 
 **Why use it:**
@@ -67,7 +69,9 @@ Jetpack components are grouped into four categories:
 
 ## 2. What is a ViewModel and how is it useful?
 
-A **`ViewModel`** is a lifecycle-aware class designed to **store and manage UI-related state** in a way that survives configuration changes (rotation, language change, multi-window resize, dark-mode toggle, etc.).
+**ViewModel** means a lifecycle-aware state holder class designed to store and manage UI-related data so it survives configuration changes.
+
+It manages UI-related state in a way that survives configuration changes (rotation, language change, multi-window resize, dark-mode toggle, etc.).
 
 ```kotlin
 class UserViewModel(
@@ -119,7 +123,9 @@ class UserFragment : Fragment() {
 
 ## 3. How does ViewModel work internally?
 
-The key promise of a ViewModel is surviving configuration changes. Here is the mechanism:
+**ViewModel internals** means the mechanism where `ComponentActivity` or `Fragment` preserves a `ViewModelStore` (holding ViewModel instances) across configuration changes using `onRetainNonConfigurationInstance()`.
+
+Here is the internal mechanism:
 
 1. **`ViewModelStoreOwner`** — `ComponentActivity` and `Fragment` implement this interface, which exposes a `ViewModelStore`.
 2. **`ViewModelStore`** — a thin wrapper around a `HashMap<String, ViewModel>`. It is the actual container that holds your ViewModel instances keyed by a canonical class name (or a custom key).
@@ -132,7 +138,7 @@ When the system recreates an Activity due to a configuration change, the old ins
 - Before destruction, `ComponentActivity` returns its `ViewModelStore` inside a `NonConfigurationInstances` object from `onRetainNonConfigurationInstance()`.
 - The newly created Activity retrieves that same `ViewModelStore` via `getLastNonConfigurationInstance()`.
 
-Because the same `ViewModelStore` (and thus the same ViewModel instances) is handed to the new Activity, your data survives rotation **without** serialization. This is fundamentally different from `onSaveInstanceState`, which serializes a small `Bundle` to disk and survives process death.
+Because the same `ViewModelStore` (and thus the same ViewModel instances) is handed to the new Activity, your data survives rotation **without** serialisation. This is fundamentally different from `onSaveInstanceState`, which serializes a small `Bundle` to disk and survives process death.
 
 **Distinguishing a config change from a true finish:**
 
@@ -170,7 +176,9 @@ class SearchViewModel(
 
 ## 4. What are Android Architecture Components?
 
-**Architecture Components** are the subset of Jetpack libraries that help you design robust, testable, maintainable apps. They are the building blocks of Google's recommended app architecture.
+**Android Architecture Components** means a subset of Jetpack libraries (including ViewModel, LiveData, Room, and WorkManager) that provide a foundation for building robust, testable, and maintainable apps.
+
+They help you design robust, testable, and maintainable apps and form the building blocks of Google's recommended app architecture.
 
 | Component | Purpose |
 |-----------|---------|
@@ -198,7 +206,9 @@ Principles: **separation of concerns**, **drive UI from immutable state models**
 
 ## 5. How do you share a ViewModel between Fragments? (SharedViewModel)
 
-When multiple fragments hosted by the same Activity need to share data (e.g., a master/detail flow, or a multi-step form), you scope a single ViewModel to the **Activity** so both fragments get the **same instance**.
+**SharedViewModel** means scoping a single `ViewModel` instance to a shared host Activity or Navigation graph so multiple fragments can share state reactively.
+
+When multiple fragments hosted by the same Activity need to share data (e.g., a master/detail flow, or a multi-step form), you scope the ViewModel to the host Activity.
 
 Use the `by activityViewModels()` delegate (from `androidx.fragment:fragment-ktx`):
 
@@ -251,7 +261,9 @@ class DetailFragment : Fragment() {
 
 ## 6. What is LiveData?
 
-**`LiveData`** is a **lifecycle-aware**, observable data holder. Unlike a plain observable, it respects the lifecycle of its observers (Activities, Fragments) and only delivers updates to observers in an **active** state (`STARTED` or `RESUMED`).
+**LiveData** means a lifecycle-aware observable data holder class that only sends updates to active observers like started or resumed activities and fragments.
+
+Unlike a plain observable, it respects the lifecycle of its observers (Activities, Fragments) and only delivers updates to observers in an active state (`STARTED` or `RESUMED`).
 
 ```kotlin
 class CounterViewModel : ViewModel() {
@@ -283,7 +295,9 @@ viewModel.count.observe(viewLifecycleOwner) { value ->
 
 ## 7. StateFlow vs LiveData
 
-Both are observable state holders. **`StateFlow`** is a Kotlin coroutines `Flow` that always has a value and emits updates to collectors; **`LiveData`** is an Android lifecycle-aware holder. In modern apps, `StateFlow` is generally preferred for ViewModel state.
+**StateFlow** means a hot Kotlin coroutines flow that requires an initial value and emits state changes reactively, whereas **LiveData** is an Android-specific lifecycle-aware data holder.
+
+Both are observable state holders. In modern apps, `StateFlow` is generally preferred for ViewModel state.
 
 | Aspect | StateFlow | LiveData |
 |--------|-----------|----------|
@@ -319,6 +333,8 @@ For one-off events (navigation, snackbars), prefer a `Channel`/`SharedFlow` over
 
 ## 8. How is LiveData different from ObservableField?
 
+**ObservableField** means a non-lifecycle-aware observable field used in traditional XML Data Binding, whereas **LiveData** is a lifecycle-aware observable data holder designed to prevent memory leaks and crashes.
+
 Both can drive Data Binding, but they differ fundamentally:
 
 | Aspect | LiveData | ObservableField |
@@ -340,7 +356,9 @@ Both can drive Data Binding, but they differ fundamentally:
 
 ## 9. setValue vs postValue in LiveData
 
-Both update the value held by `MutableLiveData`, but they differ in threading and timing.
+**setValue()** means a synchronous method used to update LiveData immediately from the main thread, whereas **postValue()** is an asynchronous method that posts a task to the main thread to update the LiveData from a background thread.
+
+Both update the value held by `MutableLiveData`, but they differ in threading and timing:
 
 ```kotlin
 val data = MutableLiveData<Int>()
@@ -374,7 +392,9 @@ data.postValue("b")
 
 ## 10. Explain WorkManager and its use cases
 
-**`WorkManager`** is the recommended Jetpack solution for **persistent**, **deferrable** background work that must run reliably even if the app exits or the device restarts. It chooses the best underlying scheduler (`JobScheduler`, or its own internal mechanisms) based on the API level and device, so you write the logic once.
+**WorkManager** means a persistent Jetpack background processing library designed to schedule deferrable, guaranteed background work.
+
+It runs reliably even if the app exits or the device restarts, automatically choosing the best underlying scheduler (`JobScheduler`, or its own internal mechanisms) based on the API level and device.
 
 **Define a Worker:**
 
@@ -439,7 +459,9 @@ WorkManager.getInstance(context).enqueueUniquePeriodicWork(
 
 ## 11. Minimum repeat interval for a PeriodicWorkRequest
 
-The **minimum repeat interval for a `PeriodicWorkRequest` is 15 minutes** (`PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS = 900,000 ms`). This matches the `JobScheduler` constraint. If you request a smaller interval, WorkManager silently **clamps it up to 15 minutes**.
+**PeriodicWorkRequest minimum interval** means the system-enforced minimum repeat interval of 15 minutes for periodic background tasks in WorkManager.
+
+This matches the `JobScheduler` constraint. If you request a smaller interval, WorkManager silently clamps it up to 15 minutes.
 
 ```kotlin
 // Runs at most every 15 minutes (anything smaller is clamped to 15 min)
@@ -466,7 +488,9 @@ val request = PeriodicWorkRequestBuilder<SyncWorker>(
 
 ## 12. How does WorkManager guarantee task execution?
 
-WorkManager guarantees that enqueued work **will eventually run** even across app exits, process death, and device reboots — provided the work's constraints are met. It achieves this through **persistence + a reliable rescheduling mechanism**.
+**WorkManager execution guarantee** means persisting every work request in an internal Room database and using OS schedulers like JobScheduler to execute tasks even after app exits or device reboots.
+
+WorkManager guarantees that enqueued work will eventually run even across app exits, process death, and device reboots, provided the work's constraints are met.
 
 **How it works:**
 
@@ -481,7 +505,7 @@ WorkManager guarantees that enqueued work **will eventually run** even across ap
 5. **Constraint enforcement:** Work runs only when its constraints hold; otherwise it stays pending until they are met.
 
 **What the guarantee is NOT:**
-- It is **not** an *exact-time* guarantee. Doze mode, App Standby buckets, and battery optimizations can defer execution. For exact timing use `AlarmManager`.
+- It is **not** an *exact-time* guarantee. Doze mode, App Standby buckets, and battery optimisations can defer execution. For exact timing use `AlarmManager`.
 - It is scoped to the app being able to run; if the user force-stops the app or the OEM aggressively kills it, execution can be blocked until the app is launched again.
 
 In short: **persistence (survives process death & reboot) + OS-level scheduling + retry/backoff** is what makes WorkManager's execution *guaranteed* in the "eventually, when constraints allow" sense.
@@ -492,7 +516,9 @@ In short: **persistence (survives process death & reboot) + OS-level scheduling 
 
 ## 13. Serializable vs Parcelable — which is best?
 
-Both let you pass objects between Android components (e.g., through an `Intent` or `Bundle`), but they work very differently.
+**Parcelable** means an Android-specific serialisation interface optimised for fast inter-process communication without reflection, whereas **Serializable** is a standard Java interface that relies on slower reflection-based serialisation.
+
+Both let you pass objects between Android components (e.g., through an `Intent` or `Bundle`), but they work very differently:
 
 | | Serializable | Parcelable |
 |--|--------------|------------|
@@ -535,23 +561,27 @@ data class User(val id: String, val name: String) : Serializable
 
 ## 14. Why is Bundle used for passing data instead of a Map?
 
-A `Bundle` is a key-value container, so it looks similar to a `Map`, but it exists for reasons a plain `Map` cannot satisfy:
+**Bundle** means a key-value container designed for IPC that only accepts type-safe, parcelable values and supports lazy unmarshalling.
 
-1. **IPC / cross-process serialization.** When data crosses process boundaries (an `Intent` to another app, an Activity restart handled by `system_server`, a `Service` binding), it must be **flattened into a `Parcel`**. `Bundle` is built on the `Parcelable` machinery and knows how to marshal/unmarshal itself efficiently. A generic `Map` has no defined, efficient wire format for IPC.
+It exists for reasons a plain `Map` cannot satisfy:
+
+1. **IPC / cross-process serialisation.** When data crosses process boundaries (an `Intent` to another app, an Activity restart handled by `system_server`, a `Service` binding), it must be **flattened into a `Parcel`**. `Bundle` is built on the `Parcelable` machinery and knows how to marshal/unmarshal itself efficiently. A generic `Map` has no defined, efficient wire format for IPC.
 
 2. **Type safety constrained to parcelable/serializable values.** A `Bundle` only accepts types it knows how to serialize (primitives, `String`, `Parcelable`, `Serializable`, arrays, etc.). This restriction is what makes safe transport possible. A `Map<String, Any>` could hold arbitrary non-serializable objects (e.g., a live `View` or socket), which could not be transported and would fail or leak.
 
-3. **Lazy unmarshalling / performance.** `Bundle` can keep its contents in serialized (`Parcel`) form and only deserialize values when you read them — useful for performance and memory.
+3. **Lazy unmarshalling / performance.** `Bundle` can keep its contents in serialised (`Parcel`) form and only deserialize values when you read them — useful for performance and memory.
 
 4. **Framework contract.** The Android framework's APIs (`onSaveInstanceState(Bundle)`, `Intent` extras, `Fragment.arguments`, broadcast extras) are all defined in terms of `Bundle`. It is the standard, expected currency for component-to-component communication.
 
-In short: a `Bundle` is a **Parcelable-aware, IPC-safe, type-restricted** map. A plain `Map` is just in-memory data with no serialization guarantees, so it cannot reliably cross processes or survive process death.
+In short: a `Bundle` is a **Parcelable-aware, IPC-safe, type-restricted** map. A plain `Map` is just in-memory data with no serialisation guarantees, so it cannot reliably cross processes or survive process death.
 
 **📚 Reference:** [Parcelables and bundles](https://developer.android.com/guide/components/activities/parcelables-and-bundles)
 
 ---
 
 ## 15. How do you troubleshoot a crashing application?
+
+**Crash troubleshooting** means a systematic diagnostic process of capturing stack traces from Logcat or Crashlytics, locating the root cause in the stack trace, and resolving the underlying issue.
 
 A systematic approach:
 
@@ -586,7 +616,9 @@ A systematic approach:
 
 ## 16. Explain the Android push notification system
 
-Android push notifications are delivered through **Firebase Cloud Messaging (FCM)**, Google's messaging service that sits on top of a persistent connection between the device and Google's servers.
+**Push notification system** means a cloud-to-device messaging service where Firebase Cloud Messaging (FCM) routes payloads to a device over a persistent connection to display notifications.
+
+FCM is Google's messaging service that sits on top of a persistent connection between the device and Google's servers.
 
 **End-to-end flow:**
 
@@ -622,7 +654,9 @@ class MyMessagingService : FirebaseMessagingService() {
 
 ## 17. What is AAPT?
 
-**AAPT** stands for **Android Asset Packaging Tool**. It is a build tool (part of the Android SDK build tools) that **compiles and packages your app's resources**. The current version is **AAPT2** (a two-step compile + link tool that enables incremental, faster builds), invoked automatically by the Android Gradle Plugin.
+**AAPT (Android Asset Packaging Tool)** means an SDK build tool that compiles and links resources into binary files and generates the `R` class for referencing them in code.
+
+The current version is AAPT2 (a two-step compile + link tool that enables incremental, faster builds), invoked automatically by the Android Gradle Plugin.
 
 **What AAPT2 does:**
 
@@ -642,7 +676,9 @@ You rarely call AAPT2 directly — Gradle handles it — but interviewers ask to
 
 ## 18. FlatBuffers vs JSON
 
-Both are data-serialization formats, but they target different priorities. **JSON** is a human-readable text format; **FlatBuffers** is a high-performance binary format (from Google) designed for zero-copy access.
+**FlatBuffers** means a high-performance binary serialisation format from Google that allows reading data directly from a buffer without parsing or allocation, whereas **JSON** is a human-readable text format.
+
+Both target different priorities:
 
 | Aspect | JSON | FlatBuffers |
 |--------|------|-------------|
@@ -653,9 +689,9 @@ Both are data-serialization formats, but they target different priorities. **JSO
 | Schema | Schema-less (flexible) | Schema-defined (`.fbs` file → generated code) |
 | Size | Larger, verbose | Compact |
 | Debuggability | Easy to read/edit by hand | Not human-readable |
-| Setup | Trivial (built-in / Gson / Moshi / kotlinx.serialization) | Requires `flatc` compiler + generated classes |
+| Setup | Trivial (built-in / Gson / Moshi / kotlinx.serialisation) | Requires `flatc` compiler + generated classes |
 
-**Why FlatBuffers on Android:** Because you can access serialized data **without parsing or allocating**, it avoids GC churn — valuable for performance-critical paths, large datasets, game state, or frequently-read cached data on mobile. The trade-off is a rigid schema, a build step, and no human readability.
+**Why FlatBuffers on Android:** Because you can access serialised data **without parsing or allocating**, it avoids GC churn — valuable for performance-critical paths, large datasets, game state, or frequently-read cached data on mobile. The trade-off is a rigid schema, a build step, and no human readability.
 
 **When to use which:**
 - **JSON** — REST APIs, config, logging, anything that benefits from readability and flexibility, and where payloads are modest.
@@ -667,7 +703,9 @@ Both are data-serialization formats, but they target different priorities. **JSO
 
 ## 19. HashMap, ArrayMap and SparseArray
 
-All three are key-value containers, but `ArrayMap` and `SparseArray` (from `androidx.collection`) are **memory-optimized for Android's typically small collections**, trading some CPU for far less memory and fewer allocations.
+**ArrayMap** means a memory-optimised two-array map using binary search, and **SparseArray** is a memory-optimised map using parallel primitive arrays to map integers to objects without autoboxing.
+
+All three are key-value containers, but `ArrayMap` and `SparseArray` are memory-optimised for Android's typically small collections, trading some CPU for far less memory and fewer allocations.
 
 **`HashMap<K, V>`**
 - Standard Java map backed by an **array of bucket entries**; each entry is a heap object (`Node`) holding hash, key, value, next.
@@ -699,13 +737,15 @@ counts.put(1, 100)
 - Use **`ArrayMap`** for small object-keyed maps to save memory.
 - Use **`SparseArray`/`SparseIntArray`** when keys are `int`/`long` to avoid autoboxing and per-entry objects.
 
-**📚 Reference:** [Optimization using ArrayMap and SparseArray](https://outcomeschool.com/blog/optimization-using-arraymap-and-sparsearray)
+**📚 Reference:** [Optimisation using ArrayMap and SparseArray](https://outcomeschool.com/blog/optimisation-using-arraymap-and-sparsearray)
 
 ---
 
 ## 20. Advantages of SparseArray
 
-`SparseArray` (and its siblings `SparseIntArray`, `SparseBooleanArray`, `SparseLongArray`, `LongSparseArray`) is an Android-specific structure that maps **primitive integer keys to values**. Its advantages over `HashMap<Integer, V>`:
+**SparseArray advantages** means eliminating key autoboxing and per-entry object overhead on memory by storing integer keys in a primitive array.
+
+This Android-specific structure maps primitive integer keys to values. Its advantages over `HashMap<Integer, V>`:
 
 1. **No autoboxing of keys.** A `HashMap` with `Integer` keys boxes every `int` into an `Integer` object. `SparseArray` stores keys in a primitive `int[]`, eliminating that allocation and the associated GC pressure.
 
@@ -727,7 +767,9 @@ counts.put(1, 100)
 
 ## 21. What are Annotations?
 
-**Annotations** are a form of **metadata** attached to code (classes, methods, fields, parameters, etc.). They do not change program logic by themselves; instead they provide information that can be consumed by the **compiler**, **build-time tools (annotation processors)**, or read at **runtime via reflection**.
+**Annotations** means metadata attached to code elements that provide information to the compiler, lint tools, or annotation processors at build time or runtime.
+
+They do not change program logic by themselves; instead they provide information that can be consumed by the compiler, build-time tools (annotation processors), or read at runtime via reflection.
 
 **Built-in / common annotations:**
 - `@Override`, `@Deprecated`, `@SuppressWarnings` (standard Java/Kotlin).
@@ -754,12 +796,14 @@ fun updateUi() { /* lint warns if called off the main thread */ }
 
 ## 22. How to create a custom Annotation?
 
-You declare a custom annotation with the `annotation class` keyword in Kotlin and configure it with meta-annotations.
+**Custom annotation** means declaring an annotation class using the `annotation class` keyword and configuring it with targets and retention policies.
+
+You configure it with meta-annotations:
 
 **Meta-annotations:**
 - **`@Target`** — where the annotation may be applied (`CLASS`, `FUNCTION`, `PROPERTY`, `FIELD`, `VALUE_PARAMETER`, etc.).
 - **`@Retention`** — how long it is kept (`SOURCE`, `BINARY`, `RUNTIME`; default is `RUNTIME` in Kotlin).
-- **`@Repeatable`**, **`@MustBeDocumented`** — optional behaviors.
+- **`@Repeatable`**, **`@MustBeDocumented`** — optional behaviours.
 
 **Example — a simple runtime annotation read by reflection:**
 
@@ -799,7 +843,9 @@ A KSP/KAPT processor would scan for `@GenerateBuilder`-annotated classes at comp
 
 ## 23. What is the Android Support Library? Why was it introduced?
 
-The **Android Support Library** was a set of code libraries from Google that provided **backward-compatible versions** of newer framework APIs and added components not present in the platform framework, so apps could use modern features on older Android versions.
+**Android Support Library** means a legacy set of code libraries that provided backward-compatible versions of Android APIs and has now been replaced by AndroidX.
+
+It was a set of code libraries from Google that provided backward-compatible versions of newer framework APIs and added components not present in the platform framework, so apps could use modern features on older Android versions.
 
 **Why it was introduced:**
 - Android's framework APIs are tied to the OS version; a feature added in a new release isn't available on older devices.
@@ -818,7 +864,9 @@ So in interviews: the Support Library solved **backward compatibility and fragme
 
 ## 24. What is Android Data Binding?
 
-The **Data Binding Library** is a Jetpack support library that lets you bind UI components in **XML layouts** directly to data sources **declaratively**, reducing the glue code (`findViewById`, manual setters) you'd otherwise write.
+**Data Binding** means a Jetpack library that binds UI components in XML layouts directly to data sources declaratively, reducing glue code.
+
+It is a Jetpack support library that lets you bind UI components in XML layouts directly to data sources declaratively, reducing the glue code (`findViewById`, manual setters) you'd otherwise write.
 
 **Enable it:**
 
@@ -869,7 +917,9 @@ binding.lifecycleOwner = this // required so LiveData/StateFlow updates the UI
 
 ## 25. SavedStateHandle (surviving process death in a ViewModel)
 
-A `ViewModel` survives **configuration changes** (rotation) but **not process death** — if Android kills your app in the background to reclaim memory, the `ViewModel` is destroyed and recreated fresh when the user returns. `SavedStateHandle` is the bridge that lets a `ViewModel` persist small amounts of UI state across **both** cases, replacing the old `onSaveInstanceState(Bundle)` dance.
+**SavedStateHandle** means a key-value map injected into a ViewModel that persists state across both configuration changes and system-initiated process death.
+
+It replaces the old `onSaveInstanceState(Bundle)` dance.
 
 It's a key-value map backed by the saved-instance-state `Bundle`, injected automatically into the ViewModel constructor:
 
@@ -903,7 +953,9 @@ With Hilt, just add `@HiltViewModel` and inject it — Hilt supplies the `SavedS
 
 ## 26. Paging 3 (PagingSource, Pager, RemoteMediator)
 
-The **Paging 3** library (`androidx.paging`) loads large datasets **incrementally** — a page at a time as the user scrolls — instead of loading everything into memory. It handles in-flight request de-duplication, retry/refresh, loading/error UI state, and integrates with coroutines/Flow, RxJava, and both RecyclerView and Compose.
+**Paging 3** means a Jetpack library that loads large datasets incrementally from local databases or network sources as the user scrolls.
+
+It loads a page at a time as the user scrolls instead of loading everything into memory, handling in-flight request de-duplication, retry/refresh, loading/error UI state, and integrating with coroutines/Flow, RxJava, and both RecyclerView and Compose.
 
 Core pieces:
 - **`PagingSource<Key, Value>`** — defines *how* to load one page (e.g. a network page or a DB query). You implement `load()`.
@@ -940,11 +992,42 @@ class RepoViewModel(api: Api) : ViewModel() {
 
 **📚 Reference:** [Paging 3 overview](https://developer.android.com/topic/libraries/architecture/paging/v3-overview)
 
+## 27. How does WorkManager handle constraints and retries?
+
+**WorkManager constraints and retries** means the system that allows specifying execution conditions (such as network, battery, or charging state) and error-recovery policies (using linear or exponential backoff) for background tasks.
+
+### Constraints
+You can attach execution constraints to a `WorkRequest` using the `Constraints` class:
+- `setRequiredNetworkType(NetworkType)` (e.g., `CONNECTED`, `UNMETERED`)
+- `setRequiresCharging(boolean)`
+- `setRequiresDeviceIdle(boolean)`
+- `setRequiresBatteryNotLow(boolean)`
+- `setRequiresStorageNotLow(boolean)`
+
+If any constraint is not met, the work is paused or deferred. If a running worker's constraint is lost, the system stops the worker and retries it later.
+
+### Retries and Backoff Policy
+If a task fails due to a transient error (e.g., network timeout), you can return `Result.retry()` from `doWork()`. You configure retries using `setBackoffCriteria()` when building the request:
+- **Backoff Policy:** `BackoffPolicy.EXPONENTIAL` (doubles the delay each time) or `BackoffPolicy.LINEAR` (adds the delay linearly).
+- **Initial Delay:** The starting delay before the first retry (minimum is 10 seconds).
+
+```kotlin
+val request = OneTimeWorkRequestBuilder<MyWorker>()
+    .setConstraints(constraints)
+    .setBackoffCriteria(
+        BackoffPolicy.EXPONENTIAL,
+        15, TimeUnit.SECONDS
+    )
+    .build()
+```
+
 ---
 
 ## 28. DataStore vs SharedPreferences
 
-**DataStore** is Jetpack's modern data storage solution designed to replace **SharedPreferences**.
+**DataStore** means a modern, fully asynchronous key-value and typed data storage solution built on coroutines and Flow to replace the synchronous SharedPreferences.
+
+It is designed to replace SharedPreferences.
 
 | Aspect | SharedPreferences | DataStore (Preferences / Proto) |
 | --- | --- | --- |

@@ -43,7 +43,9 @@ A comprehensive, interview-ready reference covering Android application architec
 
 ## 1. Describe the architecture of your last app
 
-Interviewers ask this to see whether you can reason about layering, testability, and trade-offs — not to hear a buzzword. Structure the answer around **layers, data flow, and the libraries that enforce each boundary**.
+**Clean Architecture** means a software design philosophy that separates concerns into independent layers (entities, use cases, presenters/controllers, and UI/data) to achieve high testability and maintainability.
+
+Structure the answer around **layers, data flow, and the libraries that enforce each boundary**.
 
 A strong, modern answer:
 
@@ -62,7 +64,7 @@ Things to mention as trade-offs you consciously made: whether you used a domain 
 
 ## 2. Why use MVP / MVVM architectures?
 
-The point of any presentation-layer architecture is to keep logic *out* of Android framework classes (Activities/Fragments), which are hard to unit test and have a complex lifecycle.
+**MVP and MVVM architectures** means presentation-layer patterns designed to decouple business and presentation logic from Android framework classes like Activities and Fragments.
 
 - **Avoid "god" Activities/Fragments** stuffed with UI, business, and data logic.
 - **Reusable, testable code** — logic lives in plain classes you can test on the JVM without instrumentation/emulator.
@@ -76,7 +78,7 @@ In short: separation of concerns → decoupling from the framework → testabili
 
 ## 3. Describe MVVM
 
-**MVVM (Model-View-ViewModel)** separates the UI from business and presentation logic via a `ViewModel` that exposes observable state.
+**MVVM (Model-View-ViewModel)** means a presentation-layer architectural pattern that separates the UI (View) from business and presentation logic (ViewModel) using state observation.
 
 **Components**
 - **Model** — data and business logic (repositories, use cases, entities). Knows nothing about the UI.
@@ -141,7 +143,7 @@ fun NewsScreen(viewModel: NewsViewModel) {
 
 ## 4. MVC vs MVP vs MVVM
 
-All three split presentation from business logic; they differ in *how the View communicates with the logic* and *who depends on whom*.
+**MVC vs MVP vs MVVM** means the comparison of presentation patterns where MVC uses a Controller, MVP uses a Presenter interacting with a View interface, and MVVM uses a ViewModel with data binding.
 
 | Aspect | MVC | MVP | MVVM |
 |---|---|---|---|
@@ -181,6 +183,8 @@ class LoginPresenter(private val view: LoginView, private val repo: AuthReposito
 
 ## 5. Why should the View be an interface in MVP?
 
+**MVP View interface** means an abstraction layer that allows the Presenter to update the UI without depending directly on concrete Activity or Fragment classes.
+
 - **Decouple logic from the concrete view implementation** — the Presenter depends on an abstraction, not on an Activity/Fragment.
 - **Abstract away the Android framework** so the presentation layer has no direct dependency on framework classes, keeping it pure and portable.
 - **Swap implementations easily** — e.g. switch the View used in production for a fake/mock in tests.
@@ -190,7 +194,7 @@ class LoginPresenter(private val view: LoginView, private val repo: AuthReposito
 
 ## 6. What is the use of interfaces in a Presenter?
 
-Interfaces in the presenter (the View contract, and often a Presenter contract) exist to honour the **SOLID Dependency Inversion Principle**: depend on abstractions, not concretions.
+**Presenter interfaces** means abstraction boundaries that decouple the View from the Presenter, enabling independent development and testing of both components.
 
 Benefits:
 - The Presenter can be unit-tested against a **mock/fake View**.
@@ -202,7 +206,9 @@ Benefits:
 
 ## 7. MVI (Model-View-Intent)
 
-**MVI** is a unidirectional, state-driven evolution of MVVM. The UI is modelled as a **single immutable state** produced by reducing a stream of user **intents** (events).
+**MVI (Model-View-Intent)** means a unidirectional, state-driven presentation architectural pattern where user actions are represented as intents that emit new UI state models.
+
+The UI is modelled as a **single immutable state** produced by reducing a stream of user **intents** (events).
 
 **Components**
 - **Intent** — a user/system event expressed as a sealed type (e.g. `LoadData`, `Refresh`, `ItemClicked`). (Not the Android `Intent` class.)
@@ -256,7 +262,9 @@ class CounterViewModel : ViewModel() {
 
 ## 8. Clean Architecture and the dependency rule
 
-**Clean Architecture** (Robert C. Martin) organises code into concentric layers so that business rules are independent of frameworks, UI, and databases.
+**Clean Architecture** means a software design philosophy that organises code into concentric layers (entities, use cases, controllers, and UI) with dependency directions pointing strictly inward.
+
+Martin) organises code into concentric layers so that business rules are independent of frameworks, UI, and databases.
 
 **Layers (inner → outer)**
 1. **Entities** — enterprise-wide business rules / core domain models.
@@ -307,7 +315,7 @@ class UserRepositoryImpl(
 
 ## 9. Google's recommended layered architecture (UI / Domain / Data, UDF)
 
-Google's official guidance defines at least two layers, with an optional third:
+**Google's recommended layered architecture (UI / Domain / Data, UDF)** means an architectural style that structures applications into a mandatory UI layer, an optional Domain layer, and a mandatory Data layer governed by Unidirectional Data Flow.
 
 - **UI layer** — displays application data and reacts to user input. State holders (`ViewModel`) hold UI state, expose it to the UI, and handle UI logic. The UI is a function of state.
 - **Domain layer** (optional) — encapsulates complex or reusable business logic as **use cases / interactors**, each responsible for a single functionality. Add it when business logic is complex or shared across multiple ViewModels; skip it otherwise.
@@ -342,7 +350,7 @@ class TaskViewModel(getActive: GetActiveTasksUseCase) : ViewModel() {
 
 ## 10. Software Architecture vs Software Design
 
-Both concern *structure*, but at different altitudes.
+**Software architecture vs Software design** means the distinction between high-level, system-wide structures and boundaries (architecture), and low-level code-level implementation details and patterns (design).
 
 | | Software Architecture | Software Design |
 |---|---|---|
@@ -361,7 +369,9 @@ Analogy: architecture is the *blueprint of a building* (number of floors, load-b
 
 ## 11. Benefits of Multi-Module Architecture
 
-Splitting an app into multiple Gradle modules (e.g. `app`, `feature:*`, `core:network`, `core:database`, `core:ui`, `domain`, `data`) yields:
+**Multi-module architecture benefits** means the advantages of dividing a project into separate Gradle modules including faster build speeds, strict API boundaries, and modular test isolation.
+
+`app`, `feature:*`, `core:network`, `core:database`, `core:ui`, `domain`, `data`) yields:
 
 - **Faster builds** — Gradle builds modules in parallel and only recompiles changed modules (incremental/cached builds). The single biggest win on large projects.
 - **Strict encapsulation & boundaries** — `api`/`implementation` visibility prevents feature A from reaching into feature B's internals; the compiler enforces architecture.
@@ -380,7 +390,7 @@ Splitting an app into multiple Gradle modules (e.g. `app`, `feature:*`, `core:ne
 
 ## 12. Multi-Module Project: Why and When?
 
-**Why** — see Q11: build speed, encapsulation, reusability, parallel development, dynamic delivery, and enforced architectural boundaries.
+**Multi-module project structure** means dividing an application into separate Gradle modules to improve build speed, enforce boundaries, and enable code reuse.
 
 **When to adopt:**
 - The codebase/team is **growing** and build times or merge conflicts hurt.
@@ -403,7 +413,7 @@ Splitting an app into multiple Gradle modules (e.g. `app`, `feature:*`, `core:ne
 
 ## 13. Builder
 
-**Intent:** Construct a complex object step by step, separating construction from representation; lets you create different representations and avoid telescoping constructors.
+**Builder pattern** means a creational design pattern that allows constructing complex objects step-by-step.
 
 **Where in Android/libraries:**
 - `AlertDialog.Builder`, `Notification.Builder` / `NotificationCompat.Builder`
@@ -439,7 +449,7 @@ val request = HttpRequest.Builder("https://api.example.com")
 
 ## 14. Singleton
 
-**Intent:** Ensure a class has only one instance and provide a global access point to it.
+**Singleton pattern** means a creational design pattern that ensures a class has only one instance while providing a global access point to it.
 
 **Where in Android:** `Application` class, Room database instances, Retrofit/OkHttp clients, `LocalBroadcastManager`, repositories — typically scoped as singletons (often via Hilt `@Singleton`).
 
@@ -471,8 +481,8 @@ class Database private constructor(context: Context) {
 
 ## 15. Factory (and Abstract Factory)
 
-**Intent:**
-- **Factory Method** — define an interface for creating an object but let subclasses/implementations decide which class to instantiate; decouples client from concrete types.
+**Factory pattern** means a creational design pattern that defines an interface for creating objects, letting subclasses decide which concrete class to instantiate.
+
 - **Abstract Factory** — provide an interface for creating *families* of related objects without specifying concrete classes.
 
 **Where in Android/libraries:** `LayoutInflater.Factory`, `ViewModelProvider.Factory`, `Retrofit`'s `Converter.Factory` and `CallAdapter.Factory`, `BitmapFactory`, `ThreadFactory`, `SSLSocketFactory`.
@@ -509,7 +519,9 @@ class MyViewModelFactory(private val repo: Repo) : ViewModelProvider.Factory {
 
 ## 16. Observer
 
-**Intent:** Define a one-to-many dependency so that when one object (the *subject/observable*) changes state, all its dependents (*observers*) are notified automatically. The foundation of reactive UIs.
+**Observer pattern** means a behavioural design pattern where an object (subject) maintains a list of dependents (observers) and notifies them automatically of state changes.
+
+The foundation of reactive UIs.
 
 **Where in Android:** `LiveData`, `StateFlow`/`SharedFlow`, RxJava `Observable`, `Flow.collect`, `OnClickListener` and all listener callbacks, `ContentObserver`, `BroadcastReceiver`, Jetpack Compose `State` recomposition. (See Q24 for a fuller list.)
 
@@ -543,7 +555,9 @@ state.value = 1
 
 ## 17. Repository
 
-**Intent:** Mediate between the domain and data-mapping layers, providing a clean API for data access and acting as a **single source of truth**. Hides the details of *where* data comes from (network, DB, cache) from the rest of the app.
+**Repository pattern** means a structural design pattern that mediates between the domain and data-mapping layers, abstracting data sources behind a clean API.
+
+Hides the details of *where* data comes from (network, DB, cache) from the rest of the app.
 
 **Where in Android:** Core of Google's recommended architecture data layer; ubiquitous in MVVM/Clean apps.
 
@@ -574,7 +588,7 @@ class ArticleRepositoryImpl(
 
 ## 18. Adapter
 
-**Intent:** Convert the interface of a class into another interface clients expect; lets otherwise-incompatible classes work together (a "wrapper").
+**Adapter pattern** means a structural design pattern that converts the interface of a class into another interface that clients expect.
 
 **Where in Android:** `RecyclerView.Adapter` / `ListAdapter`, `ArrayAdapter`, `PagerAdapter` / `FragmentStateAdapter`, Retrofit's `CallAdapter` (adapts a `Call` to RxJava/coroutines/etc.). `RecyclerView.Adapter` adapts your data model into `ViewHolder`s the RecyclerView understands.
 
@@ -606,7 +620,7 @@ class UserAdapter : ListAdapter<User, UserAdapter.VH>(DiffCallback) {
 
 ## 19. Facade
 
-**Intent:** Provide a unified, simplified interface to a set of interfaces in a subsystem, making it easier to use and hiding complexity.
+**Facade pattern** means a structural design pattern that provides a unified, simplified interface to a complex subsystem of classes.
 
 **Where in Android:** `Retrofit` itself is a facade over OkHttp + converters + call adapters; `Glide.with(...)` hides decoding/caching/threading; `ContextCompat` / `NotificationCompat` simplify version-aware APIs; a `Repository` is often a facade over multiple data sources.
 
@@ -636,7 +650,7 @@ MediaCenterFacade().watchMovie("https://...")
 
 ## 20. Dependency Injection
 
-**Intent:** A class should not construct its own dependencies; they are supplied ("injected") from the outside — an application of **Inversion of Control** and the Dependency Inversion Principle.
+**Dependency Injection** means a design pattern where an object's dependencies are supplied by an external assembler rather than the object instantiating them itself.
 
 **Why use it:**
 - **Decoupling** — classes depend on abstractions, not concrete creations.
@@ -675,7 +689,9 @@ object DataModule {
 
 ## 21. Strategy
 
-**Intent:** Define a family of interchangeable algorithms, encapsulate each one, and make them swappable at runtime. Lets the algorithm vary independently from the clients that use it. Favours composition over inheritance and avoids large conditionals.
+**Strategy pattern** means a behavioural design pattern that defines a family of interchangeable algorithms and encapsulates each one to be swapped at runtime.
+
+Lets the algorithm vary independently from the clients that use it. Favours composition over inheritance and avoids large conditionals.
 
 **Where in Android/libraries:** `RecyclerView.LayoutManager` (Linear/Grid/Staggered are swappable layout strategies), `Interpolator`s in animations, Glide/OkHttp caching and transformation strategies, `Comparator` for sorting, pluggable image-transformation strategies.
 
@@ -705,7 +721,7 @@ In Kotlin, strategies are often just higher-order functions (`(Double) -> Double
 
 ## 22. Design patterns used in Android
 
-A quick map of where common patterns appear across the Android framework and Jetpack:
+**Android design patterns** means classic architectural and creational patterns (such as Observer, Singleton, Adapter, and Builder) integrated directly into the Android SDK.
 
 | Pattern | Android / Jetpack usage |
 |---|---|
@@ -732,7 +748,9 @@ A quick map of where common patterns appear across the Android framework and Jet
 
 ## 23. Kotlin Optional Parameters vs Builder Pattern
 
-The Builder pattern in Java largely exists to solve the **telescoping-constructor** problem (many overloaded constructors / lots of optional fields). Kotlin solves that at the language level with **default arguments** and **named arguments**, so a Builder is often unnecessary.
+**Kotlin optional parameters** means a language feature that provides default arguments for function parameters, eliminating the need for Java's verbose Builder pattern in most cases.
+
+Kotlin solves that at the language level with **default arguments** and **named arguments**, so a Builder is often unnecessary.
 
 ```kotlin
 // Kotlin: default + named arguments replace a Builder
@@ -769,7 +787,9 @@ val req = HttpRequest(
 
 ## 24. Examples of the Observer pattern in Android
 
-The Observer pattern is everywhere in Android because reactive UI is built on it. Concrete examples:
+**Observer pattern** means a behavioural design pattern where an object maintains a list of dependents and notifies them automatically of any state changes.
+
+Concrete examples:
 
 - **`LiveData`** — `observe(lifecycleOwner) { ... }`; lifecycle-aware, emits on the main thread.
 - **Kotlin Flow** — `StateFlow`/`SharedFlow` with `collect`; `collectAsStateWithLifecycle()` in Compose.
@@ -803,12 +823,12 @@ lifecycleScope.launch {
 
 ## 25. Design patterns in the Retrofit source code
 
-Retrofit is a textbook of design patterns:
+**Retrofit design patterns** means the combination of design patterns—including Dynamic Proxy, Facade, Builder, and Adapter—used to implement Retrofit's API client.
 
 - **Builder** — `Retrofit.Builder()` assembles base URL, converters, call adapters, and the OkHttp client.
 - **Facade** — `Retrofit` presents one simple entry point over OkHttp + converters + call adapters, hiding the HTTP machinery.
 - **Proxy (Dynamic Proxy)** — `retrofit.create(MyApi::class.java)` returns a `java.lang.reflect.Proxy`; calls to your interface methods are intercepted by an `InvocationHandler` that builds and executes the request. This is the core trick that turns an annotated interface into working network calls.
-- **Factory** — `Converter.Factory` (e.g. Gson/Moshi/kotlinx-serialization) and `CallAdapter.Factory` (coroutines/RxJava) create converters/adapters; Retrofit iterates registered factories to find one that handles a type.
+- **Factory** — `Converter.Factory` (e.g. Gson/Moshi/kotlinx-serialisation) and `CallAdapter.Factory` (coroutines/RxJava) create converters/adapters; Retrofit iterates registered factories to find one that handles a type.
 - **Adapter** — `CallAdapter` adapts the native `Call<T>` into other return types (`suspend`, RxJava `Observable`, etc.).
 - **Strategy** — pluggable converters and call adapters are interchangeable strategies selected at runtime.
 - **Decorator / Chain of Responsibility** — via the underlying OkHttp `Interceptor` chain.
@@ -828,7 +848,7 @@ val api = retrofit.create(ApiService::class.java)    // Dynamic Proxy
 
 ## 26. Design patterns in Glide
 
-Glide (image loading) demonstrates:
+**Glide design patterns** means the creational and structural patterns—such as Builder, Singleton, Resource Pool, and Active Resources—used by Glide for memory-efficient image loading.
 
 - **Builder / Fluent interface** — `Glide.with(context).load(url).placeholder(R.drawable.ph).into(imageView)` chains a `RequestBuilder`.
 - **Facade** — `Glide.with(...)` hides decoding, threading, transformations, and the multi-tier cache behind a simple API.
@@ -854,7 +874,7 @@ Glide.with(context)                 // Facade + Singleton engine
 
 ## 27. Design patterns used in AOSP
 
-The Android Open Source Project (the framework itself) relies heavily on classic patterns:
+**AOSP design patterns** means framework-level architectural patterns—such as Binder for IPC, Template Method for lifecycles, and Composite for view hierarchies—used in Android's operating system source code.
 
 - **Singleton** — system service accessors and global managers.
 - **Factory** — `BitmapFactory`, `LayoutInflater.Factory`, `ThreadFactory`.

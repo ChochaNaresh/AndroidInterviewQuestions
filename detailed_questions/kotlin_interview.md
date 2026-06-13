@@ -63,7 +63,9 @@ Every answer includes a clear explanation, idiomatic Kotlin code, trade-offs, an
 
 ## 1. How does Kotlin work on Android (and the JVM)?
 
-Kotlin source is compiled by the Kotlin compiler (`kotlinc`) into **Java bytecode** (`.class` files), which runs on the **JVM**. On Android, that bytecode is further compiled to DEX by D8/R8 and executed by the **ART** (Android Runtime). Because the output is ordinary bytecode, Kotlin is fully **interoperable** with Java — you can call Java from Kotlin and vice versa within the same project.
+**Kotlin compilation** means the process where Kotlin source code is compiled by `kotlinc` into Java bytecode, which on Android is compiled to DEX bytecode and executed by the Android Runtime (ART).
+
+On Android, that bytecode is further compiled to DEX by D8/R8 and executed by the **ART** (Android Runtime). Because the output is ordinary bytecode, Kotlin is fully **interoperable** with Java — you can call Java from Kotlin and vice versa within the same project.
 
 Kotlin also has other backends: **Kotlin/JS** (compiles to JavaScript) and **Kotlin/Native** (compiles to native binaries via LLVM, used for iOS in Kotlin Multiplatform). On Android specifically, the JVM path is what's used.
 
@@ -74,6 +76,8 @@ Kotlin also has other backends: **Kotlin/JS** (compiles to JavaScript) and **Kot
 ---
 
 ## 2. Why use Kotlin? Advantages over Java
+
+**Kotlin's advantages** means the benefit of using Kotlin over Java due to its conciseness, null safety, coroutine support, and 100% interoperability.
 
 - **Concise / boilerplate-free** — data classes, type inference, no semicolons, `when`, default arguments.
 - **Null-safe by design** — nullability is part of the type system (`String` vs `String?`), eliminating most `NullPointerException`s at compile time.
@@ -91,8 +95,10 @@ Kotlin also has other backends: **Kotlin/JS** (compiles to JavaScript) and **Kot
 
 ## 3. val vs var
 
+**var** means a keyword that declares a mutable variable, whereas **val** means a keyword that declares a read-only variable.
+
 - `var` declares a **mutable** variable — you can reassign it.
-- `val` declares a **read-only** (assign-once) reference — you cannot reassign it after initialization.
+- `val` declares a **read-only** (assign-once) reference — you cannot reassign it after initialisation.
 
 ```kotlin
 var counter = 0
@@ -117,7 +123,7 @@ list.add(3)          // OK — the reference is fixed, the object is mutable
 
 ## 4. val vs const (and the advantage of const)
 
-Both are immutable, but they differ in **when** the value is known:
+**val** means a read-only reference assigned at runtime, whereas **const val** means a compile-time constant.
 
 - `val` — value can be assigned at **runtime** (e.g., from a function call).
 - `const val` — a **compile-time constant**. Value must be known at compile time, must be a primitive or `String`, and must be a top-level declaration or a member of an `object`/`companion object`.
@@ -138,7 +144,9 @@ val currentTime = System.currentTimeMillis()  // runtime value, can't be const
 
 ## 5. Null safety in Kotlin
 
-Kotlin distinguishes **non-nullable** and **nullable** types at the type level. A plain `String` can never hold `null`; only `String?` can.
+**Null safety** means a compiler-enforced system that distinguishes nullable and non-nullable types to prevent NullPointerExceptions.
+
+A plain `String` can never hold `null`; only `String?` can.
 
 ```kotlin
 var a: String = "hi"
@@ -162,6 +170,8 @@ val len = b?.length          // Int? — null if b is null
 
 ## 6. Safe call (?.) vs not-null assertion (!!)
 
+**Safe call `?.`** means an operator that invokes a member only if the receiver is non-null, whereas **not-null assertion `!!`** means an operator that forcibly unwraps a value and throws a NullPointerException if it is null.
+
 - **Safe call `?.`** returns the property/result if the receiver is non-null, otherwise returns `null` — no crash.
 - **Not-null assertion `!!`** forcibly unwraps; if the value is `null` it throws a `NullPointerException`.
 
@@ -181,7 +191,7 @@ println(name!!.length)  // throws NullPointerException  (assertion)
 
 ## 7. Elvis operator (?:)
 
-The Elvis operator `?:` returns its left operand if it is **non-null**, otherwise it returns the right operand (a default/fallback).
+**Elvis operator `?:`** means a binary operator that returns its left-hand operand if non-null, and its right-hand operand otherwise.
 
 ```kotlin
 val name: String? = null
@@ -205,7 +215,9 @@ fun greet(user: User?) {
 
 ## 8. Is there a ternary operator in Kotlin?
 
-**No.** Kotlin has no `cond ? a : b`. Instead, `if`/`else` is an **expression** that returns a value, which fills the same role:
+**Ternary operator** means a conditional operator (`? :`) which does not exist in Kotlin because `if-else` is an expression that returns a value.
+
+Instead, `if`/`else` is an **expression** that returns a value, which fills the same role:
 
 ```kotlin
 val max = if (a > b) a else b
@@ -221,7 +233,9 @@ For null fallbacks, the Elvis operator `?:` is the idiomatic ternary-like form. 
 
 ## 9. Data classes
 
-A `data class` is a class whose main purpose is to hold data. The compiler auto-generates:
+**Data class** means a class designed to hold data for which the compiler automatically generates utility methods like `equals()`, `hashCode()`, `toString()`, and `copy()`.
+
+The compiler auto-generates:
 
 - `equals()` / `hashCode()` (based on properties in the primary constructor)
 - `toString()` (readable form)
@@ -247,7 +261,7 @@ println(e)                            // Employee(name=Asha, age=30)
 
 ## 10. @JvmStatic, @JvmField, and @JvmOverloads
 
-These annotations improve how Kotlin code is consumed from **Java**:
+**@JvmStatic, @JvmField, and @JvmOverloads** means annotations used to control how Kotlin declarations are generated and consumed in Java code.
 
 - **`@JvmStatic`** — emits a real Java `static` method for a function in a `companion object`/`object`, so Java can call `MyClass.foo()` instead of `MyClass.Companion.foo()`.
 - **`@JvmField`** — exposes a property as a public Java **field** (no getter/setter), so Java accesses it directly.
@@ -273,7 +287,9 @@ class Config {
 
 ## 11. Primitive types in Kotlin
 
-In Kotlin **everything is an object** at the language level — there are no primitive keywords; you use `Int`, `Double`, `Boolean`, etc. However, the compiler is smart: where possible it maps these to **JVM primitives** (`int`, `double`) in the generated bytecode for performance, and uses boxed wrappers (`Integer`) only when needed — e.g., when the type is nullable (`Int?`) or used as a generic type argument (`List<Int>`).
+**Primitive types** means basic data types represented as objects in Kotlin code but compiled to JVM primitives for performance where possible.
+
+However, the compiler is smart: where possible it maps these to **JVM primitives** (`int`, `double`) in the generated bytecode for performance, and uses boxed wrappers (`Integer`) only when needed — e.g., when the type is nullable (`Int?`) or used as a generic type argument (`List<Int>`).
 
 ```kotlin
 val x: Int = 5      // compiles to primitive int
@@ -288,7 +304,7 @@ val y: Int? = 5     // boxed (java.lang.Integer) because nullable
 
 ## 12. String interpolation
 
-String templates let you embed variables and expressions directly inside a string using `$`:
+**String interpolation** means embedding variables or expressions directly inside a string literal using the `$` symbol.
 
 ```kotlin
 val name = "Mohsen"
@@ -306,7 +322,9 @@ Use `$var` for a simple identifier and `${...}` for any expression or property a
 
 ## 13. Destructuring declarations
 
-Destructuring lets you unpack an object into multiple variables in one statement. It works by calling `component1()`, `component2()`, … which data classes generate automatically.
+**Destructuring declaration** means a syntax that unpacks an object into multiple variables by calling its component functions.
+
+It works by calling `component1()`, `component2()`, … which data classes generate automatically.
 
 ```kotlin
 data class Employee(val name: String, val age: Int)
@@ -331,7 +349,9 @@ val (_, second) = pair
 
 ## 14. lateinit keyword
 
-`lateinit` lets you declare a **non-null** `var` property without initializing it in the constructor, promising the compiler you'll assign it before first use. It's for cases where the value is set later — dependency injection, `onCreate`, test `@Before` setup.
+**lateinit** means a modifier that allows declaring a non-null mutable property without initialising it in the constructor.
+
+It's for cases where the value is set later — dependency injection, `onCreate`, test `@Before` setup.
 
 ```kotlin
 lateinit var repository: UserRepository
@@ -345,7 +365,7 @@ override fun onCreate(savedInstanceState: Bundle?) {
 if (::repository.isInitialized) repository.load()
 ```
 
-**Constraints:** only on `var`; only non-null types; not on primitives (`Int`, `Boolean`); not in the primary constructor. Accessing it before initialization throws `UninitializedPropertyAccessException`.
+**Constraints:** only on `var`; only non-null types; not on primitives (`Int`, `Boolean`); not in the primary constructor. Accessing it before initialisation throws `UninitializedPropertyAccessException`.
 
 **Why it matters:** Avoids making properties nullable just because they're set after construction — keeps call sites clean (no `?.`).
 
@@ -354,6 +374,8 @@ if (::repository.isInitialized) repository.load()
 ---
 
 ## 15. lateinit vs lazy
+
+**lateinit** means a property modifier for manual initialisation later, whereas **lazy** means a delegate that computes a read-only value on first access.
 
 | | `lateinit` | `lazy` |
 |---|---|---|
@@ -378,6 +400,8 @@ lateinit var presenter: Presenter        // injected later
 
 ## 16. == vs === (structural vs referential equality)
 
+**==** means structural equality that compares values using `equals()`, whereas **===** means referential equality that checks if two references point to the same object.
+
 - **`==`** checks **structural** equality — it calls `equals()`. (`a == b` translates to `a?.equals(b) ?: (b === null)`.)
 - **`===`** checks **referential** equality — whether two references point to the **same object** in memory.
 
@@ -398,7 +422,7 @@ For primitives represented as JVM primitives, `===` effectively compares values.
 
 ## 17. forEach
 
-`forEach` is a higher-order function on iterables/collections that runs a lambda for each element — the functional equivalent of a Java for-each loop.
+**forEach** means a higher-order function that executes a lambda block sequentially for each element in an iterable collection.
 
 ```kotlin
 val nums = listOf(1, 2, 3)
@@ -408,7 +432,7 @@ nums.forEachIndexed { i, v -> println("$i:$v") }
 
 Note: a plain `return` inside `forEach` returns from the enclosing function (non-local return, because the lambda is inlined). To skip an iteration, use `return@forEach`.
 
-**Why it matters:** Idiomatic iteration; but know the difference between `forEach` (side effects) and `map` (transformation), and the label-return behavior.
+**Why it matters:** Idiomatic iteration; but know the difference between `forEach` (side effects) and `map` (transformation), and the label-return behaviour.
 
 **📚 Reference:** https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/for-each.html
 
@@ -416,7 +440,9 @@ Note: a plain `return` inside `forEach` returns from the enclosing function (non
 
 ## 18. Companion objects
 
-A `companion object` is a singleton object tied to its enclosing class, letting you call members **without an instance** — Kotlin's closest equivalent to Java `static` members. There's one companion per class.
+**Companion object** means a singleton object declared inside a class that allows accessing its members using the class name.
+
+There's one companion per class.
 
 ```kotlin
 class User private constructor(val id: Int) {
@@ -439,7 +465,9 @@ Companions can implement interfaces and hold state, and their members can be ann
 
 ## 19. Equivalent of Java static methods
 
-Kotlin has no `static` keyword. To achieve static-like behavior, use:
+**Static equivalents** means alternatives to Java's static members in Kotlin including top-level functions, companion objects, or object declarations.
+
+To achieve static-like behaviour, use:
 
 - **Top-level (package-level) functions** — declared outside any class. Best for stateless utilities.
 - **`companion object`** — for "static" members associated with a specific class.
@@ -466,6 +494,8 @@ Add `@JvmStatic` if you need true Java `static` methods.
 
 ## 20. map vs flatMap
 
+**map** means a transformation operator that maps each element to a new value, whereas **flatMap** means an operator that maps each element to a collection and flattens the results.
+
 - **`map`** transforms each element into exactly one element → produces a collection of the same size.
 - **`flatMap`** transforms each element into a **collection**, then **flattens** all those collections into one.
 
@@ -486,6 +516,8 @@ words.flatMap { it.toList() } // [a, b, c, d]
 ---
 
 ## 21. List vs Array
+
+**Array** means a fixed-size, mutable JVM array structure, whereas **List** means a read-only or mutable collection interface.
 
 | Aspect | `Array<T>` | `List<T>` |
 |---|---|---|
@@ -511,7 +543,7 @@ val ml = mutableListOf(1, 2, 3)     // MutableList
 
 ## 22. Visibility modifiers
 
-Kotlin has four visibility modifiers (default is **public**):
+**Visibility modifiers** means keywords that restrict access to classes, interfaces, constructors, methods, and properties.
 
 - **`public`** (default) — visible everywhere.
 - **`private`** — visible inside the declaring class, or (for top-level declarations) inside the same **file**.
@@ -535,7 +567,9 @@ class Account {
 
 ## 23. init blocks
 
-An `init` block runs as part of object construction, **after** the primary constructor's parameters are available, executing **in declaration order** interleaved with property initializers. Since the primary constructor can't contain code, `init` is where primary-constructor logic goes.
+**init block** means an initializer block executed in sequence during class construction to perform initialisation logic.
+
+Since the primary constructor can't contain code, `init` is where primary-constructor logic goes.
 
 ```kotlin
 class User(name: String) {
@@ -558,7 +592,9 @@ A class can have multiple `init` blocks; they run top-to-bottom together with pr
 
 ## 24. Constructors (primary & secondary)
 
-- **Primary constructor** — part of the class header. It can declare properties directly (`val`/`var`) but cannot contain code; use `init` blocks for initialization logic.
+**Primary constructor** means the constructor declared in the class header, whereas **secondary constructor** means an additional constructor declared in the class body.
+
+- **Primary constructor** — part of the class header. It can declare properties directly (`val`/`var`) but cannot contain code; use `init` blocks for initialisation logic.
 - **Secondary constructor(s)** — declared in the body with the `constructor` keyword. Each must delegate to the primary constructor (directly or via another secondary) using `this(...)`. You can have multiple.
 
 ```kotlin
@@ -581,7 +617,9 @@ If a class has a primary constructor, every secondary constructor must chain to 
 
 ## 25. open keyword (and open vs public)
 
-By default, Kotlin classes and members are **`final`** — they cannot be subclassed or overridden. The **`open`** keyword opts in to inheritance/overriding.
+**open keyword** means a modifier that marks classes or members as inheritable or overridable since they are final by default.
+
+The **`open`** keyword opts in to inheritance/overriding.
 
 ```kotlin
 open class Animal {          // can be subclassed
@@ -609,7 +647,9 @@ A member can be `public` but `final` (visible everywhere, not overridable), or `
 
 ## 26. Lambda expressions
 
-A lambda is an **anonymous function** treated as a value — you can store it in a variable, pass it as an argument, or return it. Syntax: `{ params -> body }`. A single parameter is implicitly named `it`.
+**Lambda expression** means an anonymous function that can be passed as a value or argument.
+
+Syntax: `{ params -> body }`. A single parameter is implicitly named `it`.
 
 ```kotlin
 val sum = { a: Int, b: Int -> a + b }
@@ -631,7 +671,9 @@ The type of a lambda is a function type, e.g., `(Int, Int) -> Int`. If a lambda 
 
 ## 27. Higher-order functions (and returning a function)
 
-A **higher-order function** takes one or more functions as parameters and/or returns a function. This enables abstraction over behavior.
+**Higher-order function** means a function that accepts one or more functions as parameters or returns a function.
+
+This enables abstraction over behaviour.
 
 ```kotlin
 // Takes a function:
@@ -658,7 +700,7 @@ val triple = multiplier(3)
 println(triple(5))                // 15
 ```
 
-**Why it matters:** Higher-order functions power the standard library (`map`, `filter`, scope functions), callbacks, and reusable behavior (e.g., a `retry(times) { block() }` utility).
+**Why it matters:** Higher-order functions power the standard library (`map`, `filter`, scope functions), callbacks, and reusable behaviour (e.g., a `retry(times) { block() }` utility).
 
 **📚 Reference:** https://outcomeschool.com/blog/higher-order-functions-and-lambdas-in-kotlin · https://x.com/amitiitbhu/status/1862721662208155800
 
@@ -666,7 +708,9 @@ println(triple(5))                // 15
 
 ## 28. Extension functions
 
-Extension functions let you add a function to an existing class **without inheriting or modifying it**. You declare the receiver type before the function name; inside, `this` refers to the receiver.
+**Extension function** means a mechanism to add new functions to an existing class without inheriting from it.
+
+You declare the receiver type before the function name; inside, `this` refers to the receiver.
 
 ```kotlin
 fun View.show() { visibility = View.VISIBLE }
@@ -688,7 +732,7 @@ How it works: extensions are resolved **statically** (compiled to static methods
 
 ## 29. Infix functions
 
-The `infix` modifier lets you call a single-parameter member or extension function **without the dot and parentheses**, reading like an operator.
+**Infix function** means a single-parameter member or extension function called without using dots or parentheses.
 
 ```kotlin
 class Operations {
@@ -711,7 +755,9 @@ Requirements: must be a member or extension function, have exactly **one** param
 
 ## 30. Inline functions
 
-`inline` tells the compiler to **copy the function's body (and its lambda arguments' bodies) directly into the call site** instead of making a real function call. This is primarily an optimization for **higher-order functions**: without inlining, each lambda becomes a `Function` object allocation; inlining removes that overhead.
+**Inline function** means a function whose body and lambda arguments are copied directly into the call site by the compiler to eliminate allocation overhead.
+
+This is primarily an optimisation for **higher-order functions**: without inlining, each lambda becomes a `Function` object allocation; inlining removes that overhead.
 
 ```kotlin
 inline fun measure(block: () -> Unit) {
@@ -726,7 +772,7 @@ Benefits:
 - Enables **non-local returns** from the lambda (a `return` inside the lambda returns from the caller).
 - Required to support **`reified`** type parameters.
 
-Trade-offs: increases bytecode size if the function is large or called in many places; best for small functions taking lambdas. Use `noinline`/`crossinline` to fine-tune lambda behavior.
+Trade-offs: increases bytecode size if the function is large or called in many places; best for small functions taking lambdas. Use `noinline`/`crossinline` to fine-tune lambda behaviour.
 
 **Why it matters:** Understanding inlining explains why stdlib functions like `let`, `forEach`, `filter` are cheap, and why `reified` requires `inline`.
 
@@ -736,7 +782,9 @@ Trade-offs: increases bytecode size if the function is large or called in many p
 
 ## 31. noinline
 
-In an `inline` function with multiple lambda parameters, `noinline` marks a specific lambda that should **not** be inlined. You need this when you want to treat that lambda as a real object — e.g., store it, pass it to another (non-inline) function, or return it.
+**noinline** means a modifier used on inline function lambda parameters to prevent them from being inlined.
+
+You need this when you want to treat that lambda as a real object — e.g., store it, pass it to another (non-inline) function, or return it.
 
 ```kotlin
 inline fun doSomething(abc: () -> Unit, noinline xyz: () -> Unit) {
@@ -753,7 +801,9 @@ inline fun doSomething(abc: () -> Unit, noinline xyz: () -> Unit) {
 
 ## 32. crossinline
 
-`crossinline` marks an inlined lambda that must **not allow non-local returns**, while still being inlined. You need it when the lambda is invoked from a different execution context inside the inline function — e.g., inside another lambda, an object, or a `Runnable` — where a non-local `return` would be illegal.
+**crossinline** means a modifier on inline function lambda parameters that forbids non-local returns when called from another context.
+
+You need it when the lambda is invoked from a different execution context inside the inline function — e.g., inside another lambda, an object, or a `Runnable` — where a non-local `return` would be illegal.
 
 ```kotlin
 inline fun runOnUi(crossinline block: () -> Unit) {
@@ -776,7 +826,9 @@ Contrast:
 
 ## 33. Reified type parameters
 
-Due to JVM **type erasure**, a generic type argument `T` isn't available at runtime — you normally can't do `T::class` or `is T`. Marking a type parameter **`reified`** on an **`inline`** function preserves the actual type at the call site (because the body is inlined, the concrete type is known there).
+**Reified type parameter** means a type parameter in an inline function whose actual class type is preserved at runtime.
+
+Marking a type parameter **`reified`** on an **`inline`** function preserves the actual type at the call site (because the body is inlined, the concrete type is known there).
 
 ```kotlin
 inline fun <reified T> Gson.fromJson(json: String): T =
@@ -798,7 +850,9 @@ Requirements: only works on `inline` functions. With reified you can call `T::cl
 
 ## 34. Scope functions: let, run, with, also, apply
 
-Scope functions execute a block in the context of an object. They differ in two ways: how the object is **referenced** (`it` vs `this`) and what they **return** (the object vs the lambda result).
+**Scope function** means standard library functions (`let`, `run`, `with`, `also`, `apply`) that execute a code block within the context of an object.
+
+They differ in two ways: how the object is **referenced** (`it` vs `this`) and what they **return** (the object vs the lambda result).
 
 | Function | Object as | Returns | Typical use |
 |---|---|---|---|
@@ -835,7 +889,7 @@ val person = Person().apply { name = "John"; age = 25 }
 
 ## 35. apply vs with
 
-Both reference the object as **`this`**, but:
+**apply** means an extension function returning the receiver object, whereas **with** means a non-extension function returning the lambda result.
 
 - **`apply`** is an **extension** function and **returns the receiver object** — ideal for configuring and returning an object (builder style).
 - **`with`** is a **regular** (non-extension) function that takes the object as an argument and **returns the lambda result** — ideal when you want to operate on an object and get a computed value, and when the object is non-null.
@@ -863,7 +917,9 @@ Practical guidance: use `apply` when the final value you want **is the object** 
 
 ## 36. Pair and Triple
 
-`Pair` and `Triple` are simple generic data holders for returning **two** or **three** values from a function without defining a dedicated class. Members are accessed via `.first`, `.second`, `.third` and they support destructuring.
+**Pair and Triple** means simple generic data holders used to return two or three values from a function.
+
+Members are accessed via `.first`, `.second`, `.third` and they support destructuring.
 
 ```kotlin
 fun minMax(list: List<Int>): Pair<Int, Int> = list.min() to list.max()
@@ -883,7 +939,7 @@ println(triple.second)            // 1
 
 ## 37. Labels
 
-A label is an identifier followed by `@` (e.g., `loop@`, `outer@`) that names an expression — most often a loop or a lambda — so you can target it with `break`, `continue`, or `return`.
+**Label** means an identifier followed by `@` used to target specific loops, lambdas, or outer class instances.
 
 ```kotlin
 loop@ for (i in 1..3) {
@@ -908,7 +964,9 @@ Labels also enable qualified `this` (`this@OuterClass`) and qualified returns fr
 
 ## 38. Sealed classes (and vs enum)
 
-A **sealed class** (or `sealed interface`) defines a **restricted, closed set of subtypes** known at compile time — all direct subclasses must be in the same module/package. They model "this can be exactly one of these known shapes."
+**Sealed class** means a class that restricts its inheritance hierarchy to a closed set of subclasses known at compile time.
+
+They model "this can be exactly one of these known shapes."
 
 ```kotlin
 sealed class Result<out T> {
@@ -942,7 +1000,7 @@ Sealed classes are "power enums": when an enum's cases would need different data
 
 ## 39. Collections overview
 
-Kotlin's collections come in **read-only** and **mutable** flavors (the read-only interfaces don't expose mutators; they're not deeply immutable, just a read-only view).
+**Kotlin collections** means interfaces representing lists, sets, and maps that come in read-only and mutable variants.
 
 - **List** — ordered, indexed, allows duplicates. `listOf` / `mutableListOf`.
 - **Set** — unordered, unique elements. `setOf` / `mutableSetOf`.
@@ -970,7 +1028,9 @@ The standard library provides a rich functional API: `map`, `filter`, `groupBy`,
 
 ## 40. Inline (value) classes
 
-An inline/value class wraps a single value to add **type safety with zero (or minimal) runtime overhead** — at runtime the wrapper is usually erased and the underlying value is used directly. Declared with `@JvmInline value class`.
+**Inline value class** means a class wrapping a single value that the compiler optimises to avoid runtime allocations.
+
+Declared with `@JvmInline value class`.
 
 ```kotlin
 @JvmInline
@@ -994,7 +1054,9 @@ Rules: exactly **one** property in the primary constructor (`val`), no backing f
 
 ## 41. Delegates (delegated properties & class delegation)
 
-Kotlin's `by` keyword delegates work to another object. Two forms:
+**Delegation** means a pattern where property access or class implementation is forwarded to another object using the `by` keyword.
+
+Two forms:
 
 **1. Delegated properties** — a property's `get`/`set` is handled by a delegate object that implements `getValue`/`setValue`. Built-in delegates:
 
@@ -1026,7 +1088,7 @@ class LoggingRepo(repo: Repository) : Repository by repo {  // forwards to repo
 }
 ```
 
-**Why it matters:** Delegation enables the favor-composition-over-inheritance pattern, reusable property behaviors (`lazy`, `observable`, `vetoable`), and powers libraries (Compose `remember`, `viewModels()`, preferences).
+**Why it matters:** Delegation enables the favor-composition-over-inheritance pattern, reusable property behaviours (`lazy`, `observable`, `vetoable`), and powers libraries (Compose `remember`, `viewModels()`, preferences).
 
 **📚 Reference:** https://kotlinlang.org/docs/delegated-properties.html · https://kotlinlang.org/docs/delegation.html
 
@@ -1034,7 +1096,9 @@ class LoggingRepo(repo: Repository) : Repository by repo {  // forwards to repo
 
 ## 42. Singleton in Kotlin
 
-Kotlin has a built-in singleton: the **`object` declaration**. It's instantiated lazily and thread-safely on first access — no need for the double-checked-locking boilerplate Java requires.
+**Singleton** means a design pattern that restricts a class to a single instance, implemented natively in Kotlin using the `object` keyword.
+
+It's instantiated lazily and thread-safely on first access — no need for the double-checked-locking boilerplate Java requires.
 
 ```kotlin
 object AnalyticsTracker {
@@ -1067,6 +1131,8 @@ class Database private constructor(context: Context) {
 
 ## 43. String vs StringBuffer vs StringBuilder
 
+**String** means an immutable character sequence, **StringBuilder** means a mutable non-thread-safe sequence, and **StringBuffer** means a mutable thread-safe sequence.
+
 - **`String`** — **immutable**. Every modification creates a new object; concatenating in a loop is costly (many temporary objects).
 - **`StringBuilder`** — **mutable**, **not** thread-safe. Fast for building/modifying strings in a single thread.
 - **`StringBuffer`** — **mutable**, **thread-safe** (methods are `synchronized`), so slightly slower due to locking.
@@ -1093,7 +1159,7 @@ In Kotlin, simple concatenation/templates are fine for a few values; use `String
 
 ## 44. partition
 
-`partition` is a filtering function that splits a collection into **two lists** based on a predicate: a `Pair` where `first` holds elements that satisfy the predicate and `second` holds those that don't.
+**partition** means a collection function that splits elements into a Pair of two lists based on a predicate.
 
 ```kotlin
 val numbers = listOf(1, 2, 3, 4, 5, 6)
@@ -1112,7 +1178,9 @@ It's more efficient and readable than calling `filter` twice (one pass instead o
 
 ## 45. associateBy (List to Map)
 
-`associateBy` converts a list into a **Map**, using a selector to choose the key (and optionally a value transform). It's the idiomatic way to build a lookup table from a list.
+**associateBy** means a collection transformation that builds a Map using a key selector function.
+
+It's the idiomatic way to build a lookup table from a list.
 
 ```kotlin
 data class User(val id: Int, val name: String)
@@ -1135,7 +1203,9 @@ If two elements produce the same key, the **last one wins**. Related: `associate
 
 ## 46. Remove duplicates from an array/list
 
-The simplest idiomatic way is `distinct()`, which returns a list of unique elements (preserving order). Converting to a `Set` also removes duplicates.
+**Deduplication** means removing duplicate elements from a collection using functions like `distinct()` or `toSet()`.
+
+Converting to a `Set` also removes duplicates.
 
 ```kotlin
 val nums = listOf(1, 2, 2, 3, 3, 3)
@@ -1160,7 +1230,9 @@ val arr = arrayOf(1, 1, 2).distinct()      // works on arrays too
 
 ## 47. Kotlin Multiplatform (KMP)
 
-Kotlin Multiplatform lets you write **shared code once** and compile it for multiple targets — Android (JVM), iOS (Native), desktop, web (JS/Wasm), and server. You share business logic (networking, data, domain, view models) while keeping platform-specific UI and APIs native.
+**Kotlin Multiplatform (KMP)** means a framework that allows sharing Kotlin code across multiple platforms while keeping native UIs.
+
+You share business logic (networking, data, domain, view models) while keeping platform-specific UI and APIs native.
 
 Key mechanics:
 - **`commonMain`** holds shared, platform-agnostic code; platform source sets (`androidMain`, `iosMain`) hold platform-specific implementations.
@@ -1187,7 +1259,9 @@ Each target compiles via its backend: Android → JVM bytecode, iOS → native (
 
 ## 48. Generics & variance (in / out / star projection)
 
-Generics let you write type-safe code that works over many types (`List<T>`, `Box<T>`). The hard interview question is **variance**: if `Dog` is a subtype of `Animal`, is `Box<Dog>` a subtype of `Box<Animal>`? By default in Kotlin, **no** — generics are *invariant*. Variance annotations relax this safely.
+**Generics** means type parameterisation that provides type safety, where **variance** (`in`/`out`) defines how subtyping of template arguments affects the subtyping of the outer class.
+
+The hard interview question is **variance**: if `Dog` is a subtype of `Animal`, is `Box<Dog>` a subtype of `Box<Animal>`? By default in Kotlin, **no** — generics are *invariant*. Variance annotations relax this safely.
 
 **Declaration-site variance** — annotate the type parameter where the class is declared:
 
@@ -1235,7 +1309,9 @@ fun printSize(list: List<*>) = println(list.size)   // can read as Any?, cannot 
 
 ## 49. typealias
 
-A `typealias` introduces an alternative name for an existing type. It does **not** create a new type — it's pure source-level sugar, erased by the compiler — so it's fully interchangeable with the original and adds no runtime overhead.
+**typealias** means a declaration that provides an alternative name for an existing type without creating a new type.
+
+It does **not** create a new type — it's pure source-level sugar, erased by the compiler — so it's fully interchangeable with the original and adds no runtime overhead.
 
 ```kotlin
 // Tame long generic / functional types:
@@ -1259,7 +1335,9 @@ Contrast with an **inline (value) class**: a value class *is* a distinct type (g
 
 ## 50. Operator overloading
 
-Kotlin maps operators (`+`, `[]`, `in`, `==`, `()`, etc.) to functions with reserved names marked `operator`. You can provide these on your own types (or via extension functions) to make them read naturally.
+**Operator overloading** means defining custom implementations for predefined operators by implementing functions with reserved names.
+
+You can provide these on your own types (or via extension functions) to make them read naturally.
 
 ```kotlin
 data class Vec(val x: Int, val y: Int) {

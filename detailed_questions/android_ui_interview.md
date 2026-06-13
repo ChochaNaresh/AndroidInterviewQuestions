@@ -16,7 +16,7 @@ A comprehensive interview-prep guide for the **classic Android UI / View system*
 5. [What is a `Canvas`?](#5-what-is-a-canvas)
 6. [What is a `SurfaceView`?](#6-what-is-a-surfaceview)
 7. [`RelativeLayout` vs `LinearLayout`](#7-relativelayout-vs-linearlayout)
-8. [`ConstraintLayout` optimization (the Cassowary solver)](#8-constraintlayout-optimization-the-cassowary-solver)
+8. [`ConstraintLayout` optimisation (the Cassowary solver)](#8-constraintlayout-optimisation-the-cassowary-solver)
 9. [The view tree and optimizing layouts / hierarchy depth](#9-the-view-tree-and-optimizing-layouts--hierarchy-depth)
 10. [Drawable state lists & 9-patch images](#10-drawable-state-lists--9-patch-images)
 
@@ -30,7 +30,7 @@ A comprehensive interview-prep guide for the **classic Android UI / View system*
 17. [`DiffUtil` and `ListAdapter`](#17-diffutil-and-listadapter)
 18. [`setHasFixedSize(true)`](#18-sethasfixedsizetrue)
 19. [Updating a specific item](#19-updating-a-specific-item)
-20. [`RecyclerView` scrolling-performance optimization](#20-recyclerview-scrolling-performance-optimization)
+20. [`RecyclerView` scrolling-performance optimisation](#20-recyclerview-scrolling-performance-optimisation)
 21. [Optimizing nested `RecyclerView`s (shared `RecycledViewPool`)](#21-optimizing-nested-recyclerviews-shared-recycledviewpool)
 22. [What is a `SnapHelper`?](#22-what-is-a-snaphelper)
 
@@ -48,7 +48,9 @@ A comprehensive interview-prep guide for the **classic Android UI / View system*
 
 ## 1. What is a `View` in Android?
 
-A `View` (`android.view.View`) is the **basic building block of the UI**. It occupies a rectangular area on the screen and is responsible for **drawing itself** and **handling events** (touches, key presses, focus). Every widget you see — `TextView`, `Button`, `ImageView`, `EditText`, `CheckBox` — extends `View`.
+**View** means a rectangular widget class (`android.view.View`) that occupies a screen area, draws itself, and handles user input events.
+
+It occupies a rectangular area on the screen and is responsible for **drawing itself** and **handling events** (touches, key presses, focus). Every widget you see — `TextView`, `Button`, `ImageView`, `EditText`, `CheckBox` — extends `View`.
 
 Each `View` is responsible for three core phases driven by its parent:
 
@@ -71,7 +73,9 @@ val button = Button(context).apply {
 
 ## 2. What are `ViewGroup`s and how do they differ from `View`s?
 
-A `ViewGroup` (`android.view.ViewGroup`) is a **special `View` that contains other `View`s** (children), which may themselves be `ViewGroup`s. It is the **base class for layouts and view containers** — `LinearLayout`, `FrameLayout`, `ConstraintLayout`, `RelativeLayout`, `RecyclerView`, `ScrollView`, etc.
+**ViewGroup** means a container class (`android.view.ViewGroup`) that hosts, measures, and positions a collection of child View objects.
+
+It is the **base class for layouts and view containers** — `LinearLayout`, `FrameLayout`, `ConstraintLayout`, `RelativeLayout`, `RecyclerView`, `ScrollView`, etc.
 
 | Aspect | `View` | `ViewGroup` |
 |---|---|---|
@@ -97,7 +101,7 @@ A `ViewGroup` adds responsibilities a leaf `View` doesn't have: it measures and 
 
 ## 3. Difference between `View.GONE` and `View.INVISIBLE`
 
-A `View`'s `visibility` has three states:
+**View.GONE vs View.INVISIBLE** means the difference between hiding a view and removing its space from the layout (GONE), and hiding a view while keeping its space allocated (INVISIBLE).
 
 | Constant | Visible? | Takes up layout space? | Typical use |
 |---|---|---|---|
@@ -121,7 +125,7 @@ Performance note: toggling between `GONE` and `VISIBLE` triggers a **re-layout**
 
 ## 4. The View lifecycle and how to create a custom `View`
 
-### When do you need a custom view?
+**View lifecycle** means the sequence of callbacks (like `onMeasure`, `onLayout`, and `onDraw`) that govern how a view is measured, positioned, and rendered on the screen.
 
 When no stock widget gives you the look/behaviour you need, or when you reuse a styled compound widget (e.g. a custom "login field") across many screens. There are two common approaches:
 
@@ -202,7 +206,9 @@ class CircleProgressView @JvmOverloads constructor(
 
 ## 5. What is a `Canvas`?
 
-A `Canvas` is the **2D drawing surface** handed to you (most often in `View.onDraw(Canvas)`). It holds the draw calls; a **`Paint`** object describes *how* to draw (color, stroke width, anti-aliasing, text size, shaders); and the underlying **`Bitmap`** holds the pixels.
+**Canvas** means a drawing surface class (`android.graphics.Canvas`) that holds the actual 2D drawing calls to render shapes, text, or bitmaps.
+
+It holds the draw calls; a **`Paint`** object describes *how* to draw (color, stroke width, anti-aliasing, text size, shaders); and the underlying **`Bitmap`** holds the pixels.
 
 You draw primitives directly:
 
@@ -231,7 +237,9 @@ By default the `View` system renders with **hardware acceleration** (GPU). A han
 
 ## 6. What is a `SurfaceView`?
 
-A `SurfaceView` provides a **dedicated drawing surface embedded inside the view hierarchy** that can be **rendered on a separate (non-UI) thread**. Unlike a normal `View` (drawn on the main thread during the view tree's draw pass), a `SurfaceView` has its own surface that can be updated independently, which is ideal for **frequent, high-throughput rendering**: video playback, camera previews, games, and OpenGL content.
+**SurfaceView** means a specialized view that embeds a dedicated drawing surface inside the view hierarchy to perform background-thread rendering.
+
+Unlike a normal `View` (drawn on the main thread during the view tree's draw pass), a `SurfaceView` has its own surface that can be updated independently, which is ideal for **frequent, high-throughput rendering**: video playback, camera previews, games, and OpenGL content.
 
 Key points:
 
@@ -273,7 +281,9 @@ class GameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback 
 
 > Both predate `ConstraintLayout`. For new layouts, prefer **`ConstraintLayout`**, which supersedes both. `RelativeLayout` in particular is now legacy.
 
-**`LinearLayout`** arranges children in a **single row or column** (`orientation="horizontal"|"vertical"`). It supports `layout_weight` to distribute leftover space proportionally.
+**RelativeLayout vs LinearLayout** means the choice between arranging child views relative to each other or parent boundaries (RelativeLayout), and arranging child views in a single vertical or horizontal row (LinearLayout).
+
+It supports `layout_weight` to distribute leftover space proportionally.
 
 **`RelativeLayout`** positions children **relative to each other or to the parent** (`layout_toRightOf`, `layout_below`, `alignParentBottom`, etc.), letting you build moderately complex layouts without nesting.
 
@@ -297,9 +307,9 @@ class GameView(context: Context) : SurfaceView(context), SurfaceHolder.Callback 
 
 ---
 
-## 8. `ConstraintLayout` optimization (the Cassowary solver)
+## 8. `ConstraintLayout` optimisation (the Cassowary solver)
 
-`ConstraintLayout` lets you build **large, complex, responsive layouts with a flat (non-nested) view hierarchy** by declaring constraints between view anchors.
+**ConstraintLayout** means a flexible, flat layout container that uses constraint equations and the Cassowary solver to align views without nested view groups.
 
 ### How it works internally — Cassowary
 
@@ -313,14 +323,14 @@ Internally, `ConstraintLayout` translates each constraint into a **system of lin
 - **Flat hierarchy** — replacing nested `LinearLayout`/`RelativeLayout` trees with a single flat container reduces the number of measure/layout/draw recursions.
 - Avoids the double measure passes that weighted `LinearLayout`s incur (it can resolve sizes with the solver).
 
-### Optimization features
+### Optimisation features
 
 - **Chains** (`layout_constraintHorizontal_chainStyle`: spread / spread_inside / packed) — distribute a group of views like weights, but flat.
 - **Guidelines** — invisible anchors at a fixed dp/percent for aligning multiple views.
 - **Barriers** — a virtual edge that moves with the largest of a set of views (great for variable-length text).
 - **Groups** — toggle visibility of many views at once.
 - **`Layer` / `Flow`** — virtual helpers to arrange/transform groups without extra `ViewGroup`s.
-- **`layout_optimizationLevel`** — the solver can skip computing certain constraints (e.g. `direct`, `barrier`) for additional speed.
+- **`layout_optimisationLevel`** — the solver can skip computing certain constraints (e.g. `direct`, `barrier`) for additional speed.
 - **`0dp` (`MATCH_CONSTRAINT`)** with `..._percent`, `..._min`/`_max`, and **dimension ratios** instead of weights.
 
 ```xml
@@ -348,7 +358,9 @@ Internally, `ConstraintLayout` translates each constraint into a **system of lin
 
 ## 9. The view tree and optimizing layouts / hierarchy depth
 
-The **view tree (view hierarchy)** is the tree of `ViewGroup`s and `View`s starting at the window's root (`DecorView`). Rendering walks this tree three times per frame: **measure → layout → draw**. **The deeper and wider the tree, the more work per frame**, and a layout in a frequently re-laid-out spot (e.g. inside a list row) multiplies the cost.
+**View tree optimisation** means reducing layout nesting to avoid deep recursion during measure and layout phases which can cause dropped frames.
+
+Rendering walks this tree three times per frame: **measure → layout → draw**. **The deeper and wider the tree, the more work per frame**, and a layout in a frequently re-laid-out spot (e.g. inside a list row) multiplies the cost.
 
 ### `ViewTreeObserver`
 
@@ -365,7 +377,7 @@ view.viewTreeObserver.addOnGlobalLayoutListener(
 )
 ```
 
-### How to optimize layouts / reduce depth
+### How to optimise layouts / reduce depth
 
 - **Flatten the hierarchy** — replace nested `LinearLayout`/`RelativeLayout` with one `ConstraintLayout`.
 - **`<merge>`** — when a custom compound view's root would be redundant with its parent, use `<merge>` to avoid an extra `ViewGroup` level.
@@ -381,7 +393,7 @@ view.viewTreeObserver.addOnGlobalLayoutListener(
 
 ## 10. Drawable state lists & 9-patch images
 
-### State list drawables — different appearance per button state
+**StateListDrawable** means an XML-defined drawable resource that changes its background graphic dynamically based on the target view's state (like pressed or selected).
 
 Use a **`<selector>`** drawable to present different drawables/colors depending on `View` state (pressed, selected, focused, enabled). Set it as the `android:background` (or `android:src`). **Order matters** — the first matching item wins, so put `state_pressed` before the default.
 
@@ -411,6 +423,8 @@ A **9-patch** (`*.9.png`) is a **stretchable bitmap** with 1-px guide borders: t
 
 > `ListView` is **legacy**. For all new lists/grids use `RecyclerView` (or `LazyColumn`/`LazyRow` in Compose).
 
+**ListView vs RecyclerView** means the choice between a simple, legacy list widget that recreates views frequently (ListView), and a highly extensible, modular list container that recycles views (RecyclerView).
+
 | Aspect | `ListView` | `RecyclerView` |
 |---|---|---|
 | View recycling | Optional — only if you implement the ViewHolder pattern manually | **Enforced** via `ViewHolder` |
@@ -429,7 +443,7 @@ A **9-patch** (`*.9.png`) is a **stretchable bitmap** with 1-px guide borders: t
 
 ## 12. How does `RecyclerView` work?
 
-`RecyclerView` displays a large data set within a small, scrollable window by **recycling a small pool of item views** instead of inflating one per data item.
+**RecyclerView layout flow** means displaying data by reusing a small pool of views cached in scrap, recycle, and cache pools to avoid allocations during scrolling.
 
 The flow:
 
@@ -446,6 +460,8 @@ This is why a list of 10,000 rows only ever keeps ~a dozen view instances alive.
 
 ## 13. Components of a `RecyclerView`
 
+**RecyclerView architecture** means the collaboration of Adapter, ViewHolder, LayoutManager, Recycler, ItemAnimator, and ItemDecoration to render lists.
+
 | Component | Responsibility |
 |---|---|
 | **`Adapter`** | Creates `ViewHolder`s, binds data to them, reports item count and view types |
@@ -459,6 +475,8 @@ This is why a list of 10,000 rows only ever keeps ~a dozen view instances alive.
 ---
 
 ## 14. `RecyclerView.Adapter` and `RecyclerView.ViewHolder`
+
+**Adapter vs ViewHolder** means the distinction between a class that binds data items to views (Adapter), and a class that caches view references to avoid `findViewById` calls (ViewHolder).
 
 - **`RecyclerView.ViewHolder`** wraps a single item's view and **holds references to its child views**, so view lookups happen only once (in the holder's constructor) rather than on every bind — a key performance gain.
 - **`RecyclerView.Adapter`** is the bridge between data and views. It implements three core callbacks:
@@ -496,7 +514,9 @@ class UserAdapter(private var items: List<User>) :
 
 ## 15. What is a `LayoutManager`?
 
-A `LayoutManager` is responsible for **measuring and positioning item views** within the `RecyclerView` and for **deciding when to recycle** views that are no longer visible. Swapping the `LayoutManager` changes the list's arrangement without touching the adapter.
+**LayoutManager** means a RecyclerView component responsible for measuring, positioning, and determining when to recycle item views.
+
+Swapping the `LayoutManager` changes the list's arrangement without touching the adapter.
 
 Built-in managers:
 
@@ -516,7 +536,9 @@ recyclerView.layoutManager = LinearLayoutManager(
 
 ## 16. Handling multiple view types
 
-Override **`getItemViewType(position)`** to return a type constant, then branch on `viewType` in `onCreateViewHolder` to inflate the right layout. The recycler keeps a **separate pool per view type**, so types never get mixed up.
+**Multiple view types** means configuring a RecyclerView adapter to inflate different XML layouts for different data items based on position-based type constants.
+
+The recycler keeps a **separate pool per view type**, so types never get mixed up.
 
 ```kotlin
 class FeedAdapter(private val items: List<FeedItem>) :
@@ -555,7 +577,7 @@ For many heterogeneous types, libraries like **`ConcatAdapter`** (combine multip
 
 ## 17. `DiffUtil` and `ListAdapter`
 
-**`DiffUtil`** computes the **minimal set of changes** between two lists (using an Eugene Myers diff) and dispatches granular `notifyItem*` calls — so only the rows that actually changed are rebound/animated, instead of `notifyDataSetChanged()` redrawing everything.
+**DiffUtil** means an algorithm utility class that calculates the minimum difference between two lists and dispatches granular updates to the RecyclerView.
 
 You implement a `DiffUtil.ItemCallback`:
 
@@ -595,9 +617,11 @@ adapter.submitList(newUsers)
 
 ## 18. `setHasFixedSize(true)`
 
-Call `recyclerView.setHasFixedSize(true)` when **the size of the `RecyclerView` itself does not change** as a result of adapter content changes (i.e. its width/height are `match_parent` or fixed dp, not `wrap_content`).
+**setHasFixedSize(true)** means optimizing RecyclerView by telling it that its width and height do not depend on adapter item contents, preventing full layout invalidation.
 
-When true, the `RecyclerView` can **skip requesting a full re-layout of itself** every time items are inserted/removed/changed — it knows its own bounds are stable, so adapter updates only relayout children, not the whole `RecyclerView` and its parents. This is a measurable scroll/update optimization.
+its width/height are `match_parent` or fixed dp, not `wrap_content`).
+
+When true, the `RecyclerView` can **skip requesting a full re-layout of itself** every time items are inserted/removed/changed — it knows its own bounds are stable, so adapter updates only relayout children, not the whole `RecyclerView` and its parents. This is a measurable scroll/update optimisation.
 
 **Do not** set it true if the `RecyclerView` uses `wrap_content` (its size genuinely depends on content) — that would produce incorrect sizing.
 
@@ -611,7 +635,9 @@ recyclerView.setHasFixedSize(true)  // RV dimensions are independent of content
 
 ## 19. Updating a specific item
 
-Avoid `notifyDataSetChanged()` (rebinds everything, no animations). Use **granular notifications** so only affected rows update:
+**Granular updates** means calling specific adapter notify methods (like `notifyItemChanged`) to animate and update only affected items instead of calling `notifyDataSetChanged()`. 
+
+Use **granular notifications** so only affected rows update:
 
 ```kotlin
 // after mutating your backing list:
@@ -640,9 +666,9 @@ The cleanest modern approach is **`ListAdapter` + `DiffUtil`**: just call `submi
 
 ---
 
-## 20. `RecyclerView` scrolling-performance optimization
+## 20. `RecyclerView` scrolling-performance optimisation
 
-Common techniques to keep scrolling at 60/90/120 fps:
+**RecyclerView scroll optimisation** means techniques like using image libraries, avoiding complex layouts, prefetching items, and keeping bind methods fast to avoid dropped frames.
 
 - **Keep `onBindViewHolder` light** — no allocations, no parsing, no formatting in a loop. Pre-compute in the data model.
 - **Use the ViewHolder pattern correctly** — look up child views once in the holder; never call `findViewById` in `onBind`.
@@ -656,13 +682,15 @@ Common techniques to keep scrolling at 60/90/120 fps:
 - **Shared `RecycledViewPool`** for nested lists (see next question).
 - **Profile** with Macrobenchmark / FrameTimeline / GPU rendering profiler to find jank.
 
-**📚 Reference:** https://outcomeschool.com/blog/recyclerview-optimization
+**📚 Reference:** https://outcomeschool.com/blog/recyclerview-optimisation
 
 ---
 
 ## 21. Optimizing nested `RecyclerView`s (shared `RecycledViewPool`)
 
-A common UI is a **vertical `RecyclerView` whose rows are themselves horizontal `RecyclerView`s** (e.g. a "carousels" home screen). By default **each inner RecyclerView keeps its own recycled-view pool**, so views are inflated redundantly across rows — causing jank.
+**Nested RecyclerView optimisation** means sharing a single `RecycledViewPool` between outer and inner RecyclerViews to prevent redundant view holder creation.
+
+a "carousels" home screen). By default **each inner RecyclerView keeps its own recycled-view pool**, so views are inflated redundantly across rows — causing jank.
 
 **Fix:** create **one shared `RecyclerView.RecycledViewPool`** and assign it to every inner RecyclerView, so they all draw from the same set of recycled views.
 
@@ -708,7 +736,7 @@ Key requirements for it to actually help:
 
 ## 22. What is a `SnapHelper`?
 
-`SnapHelper` attaches to a `RecyclerView` and **snaps scrolling so an item aligns to a target position** when the fling/scroll settles — used for carousels, paging galleries, and "centered card" UIs.
+**SnapHelper** means a helper utility that snaps RecyclerView item scroll offsets to align elements to specific coordinates.
 
 Built-in implementations:
 
@@ -720,7 +748,7 @@ val snapHelper = PagerSnapHelper()   // or LinearSnapHelper()
 snapHelper.attachToRecyclerView(recyclerView)
 ```
 
-You can subclass `SnapHelper` (or `LinearSnapHelper`) and override `calculateDistanceToFinalSnap`, `findSnapView`, and `findTargetSnapPosition` for custom behavior (e.g. snap to start instead of center).
+You can subclass `SnapHelper` (or `LinearSnapHelper`) and override `calculateDistanceToFinalSnap`, `findSnapView`, and `findTargetSnapPosition` for custom behaviour (e.g. snap to start instead of center).
 
 **📚 Reference:** https://outcomeschool.com/blog/snaphelper
 
@@ -728,7 +756,9 @@ You can subclass `SnapHelper` (or `LinearSnapHelper`) and override `calculateDis
 
 ## 23. What is a `Dialog`?
 
-A `Dialog` is a **small window that prompts the user** to make a decision or enter information, without filling the screen — typically used for confirmations, alerts, single-choice/multi-choice selections, and short inputs. The base class is `android.app.Dialog`; common subclasses include **`AlertDialog`**, `DatePickerDialog`, `TimePickerDialog`, and (Material) `BottomSheetDialog`.
+**Dialog** means a floating window component that prompts users for input or choices without filling the full screen.
+
+The base class is `android.app.Dialog`; common subclasses include **`AlertDialog`**, `DatePickerDialog`, `TimePickerDialog`, and (Material) `BottomSheetDialog`.
 
 ```kotlin
 MaterialAlertDialogBuilder(context)
@@ -747,7 +777,9 @@ MaterialAlertDialogBuilder(context)
 
 ## 24. What is a `Toast`? (and Snackbar)
 
-A `Toast` is a **small, transient, non-modal message** that appears for a short time and **does not take focus** — used for brief, non-critical feedback ("Message sent"). It cannot contain actions and the user can't interact with it.
+**Toast vs Snackbar** means the choice between a system-controlled, transient modal message (Toast), and an app-contained message that can host action callbacks and support swipes (Snackbar).
+
+It cannot contain actions and the user can't interact with it.
 
 ```kotlin
 Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show()  // or LENGTH_LONG
@@ -769,6 +801,8 @@ Snackbar.make(rootView, "Item deleted", Snackbar.LENGTH_LONG)
 ---
 
 ## 25. `Dialog` vs `DialogFragment`
+
+**Dialog vs DialogFragment** means the choice between a raw floating window that is dismissed or leaked on configuration change (Dialog), and a lifecycle-aware fragment wrapper (DialogFragment).
 
 | Aspect | `Dialog` | `DialogFragment` |
 |---|---|---|
@@ -800,7 +834,9 @@ ConfirmDialog().show(supportFragmentManager, "confirm")
 
 ## 26. `Spannable` and `SpannableString`
 
-**Spans** are **ranges of styling applied to portions of text** — color, bold/italic, size, click handlers, images, etc. — letting you style *parts* of a string differently in a single `TextView`.
+**Spannable** means a text container interface that allows applying different styling ranges (like bold, size, or click actions) to specific character ranges.
+
+— letting you style *parts* of a string differently in a single `TextView`.
 
 The text/span class hierarchy:
 
@@ -842,6 +878,8 @@ The `androidx.core` KTX `buildSpannedString { }` / `SpannableStringBuilder` DSL 
 
 ## 27. Best practices for text in Android
 
+**Text resource best practices** means externalising UI text in `strings.xml` to support localization and using pre-computed text layouts to avoid UI thread lag.
+
 - **Externalize strings** into `res/values/strings.xml`; never hardcode. Use `getString()`/`@string/...`. This enables **localization (l10n)**.
 - **Support translations** with locale-specific `values-<lang>/strings.xml`, and **plurals** via `<plurals>` + `getQuantityString()`.
 - **Use `sp` for text size** (scales with the user's font-size accessibility setting) and `dp` for other dimensions.
@@ -857,7 +895,7 @@ The `androidx.core` KTX `buildSpannedString { }` / `SpannableStringBuilder` DSL 
 
 ## 28. Implementing Dark Mode
 
-Dark mode is implemented via **`DayNight` theming and resource qualifiers** so the system swaps resources automatically based on the night mode.
+**Dark mode implementation** means using `DayNight` themes and alternative resource qualifiers (`values-night`) to automatically swap resources based on system preferences.
 
 **1. Use a DayNight theme** (Material 3 themes already extend it):
 

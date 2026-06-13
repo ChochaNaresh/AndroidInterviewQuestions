@@ -6,41 +6,67 @@
 
 ## 1. What is Android Jetpack and why use it?
 
-A suite of `androidx.*` libraries, tools, and architecture guidance (successor to the Support Library), grouped into Foundation, Architecture, Behavior, and UI. Used because it provides backward compatibility (unbundled from the OS), eliminates boilerplate, prevents lifecycle bugs/leaks, and underpins Google's recommended app architecture.
+**Android Jetpack** means a suite of libraries, tools, and architectural guidance from Google designed to simplify Android development and ensure backward compatibility.
+
+A suite of `androidx.*` libraries, tools, and architecture guidance (successor to the Support Library), grouped into Foundation, Architecture, Behaviour, and UI. Used because it provides backward compatibility (unbundled from the OS), eliminates boilerplate, prevents lifecycle bugs/leaks, and underpins Google's recommended app architecture.
 
 ---
 
+
+
 ## 2. What is a ViewModel and how is it useful?
+
+**ViewModel** means a lifecycle-aware state holder class designed to store and manage UI-related data so it survives configuration changes.
 
 A lifecycle-aware class that stores and manages UI state, surviving configuration changes (rotation, etc.). Useful for separation of concerns, avoiding re-fetching data, testability, and `viewModelScope` for auto-cancelled coroutines. Never hold a reference to a View/Activity/Fragment context.
 
 ---
 
+
+
 ## 3. How does ViewModel work internally?
+
+**ViewModel internals** means the mechanism where `ComponentActivity` or `Fragment` preserves a `ViewModelStore` (holding ViewModel instances) across configuration changes using `onRetainNonConfigurationInstance()`.
 
 `ComponentActivity`/`Fragment` are `ViewModelStoreOwner`s holding a `ViewModelStore` (a `HashMap` of ViewModels). On a config change the store is retained via `onRetainNonConfigurationInstance()`/`getLastNonConfigurationInstance()`, so the same instances are handed to the new Activity. `onCleared()` is only called on permanent destruction (checked via `isChangingConfigurations()`). It does NOT survive process death — use `SavedStateHandle` for that.
 
 ---
 
+
+
 ## 4. What are Android Architecture Components?
+
+**Android Architecture Components** means a subset of Jetpack libraries (including ViewModel, LiveData, Room, and WorkManager) that provide a foundation for building robust, testable, and maintainable apps.
 
 The Jetpack subset for robust, testable apps: ViewModel, LiveData, Lifecycle, Room, WorkManager, Navigation, Paging, DataStore, SavedState. They form the layered recommended architecture (UI → domain → data) with separation of concerns and a single source of truth.
 
 ---
 
+
+
 ## 5. How do you share a ViewModel between Fragments? (SharedViewModel)
+
+**SharedViewModel** means scoping a single `ViewModel` instance to a shared host Activity or Navigation graph so multiple fragments can share state reactively.
 
 Scope a single ViewModel to the host Activity with `by activityViewModels()`, so both fragments get the same instance. Other options: `by navGraphViewModels(graphId)` for nav-graph scope, or `viewModels(ownerProducer = { requireParentFragment() })`. Benefits: loose coupling, survives config changes, single source of truth.
 
 ---
 
+
+
 ## 6. What is LiveData?
+
+**LiveData** means a lifecycle-aware observable data holder class that only sends updates to active observers like started or resumed activities and fragments.
 
 A lifecycle-aware observable data holder that only delivers updates to observers in an active (`STARTED`/`RESUMED`) state. Benefits: no leaks (auto-removes on `DESTROYED`), no crashes from stopped activities, always up to date, sticky. Limitations (why teams moved to StateFlow): main-thread-only `setValue`, limited operators, Android-only dependency.
 
 ---
 
+
+
 ## 7. StateFlow vs LiveData
+
+**StateFlow** means a hot Kotlin coroutines flow that requires an initial value and emits state changes reactively, whereas **LiveData** is an Android-specific lifecycle-aware data holder.
 
 - **StateFlow**: Kotlin coroutines, KMP-friendly, full Flow operators, any dispatcher, requires an initial value, conflates on `equals`. Lifecycle safety needs `repeatOnLifecycle`/`collectAsStateWithLifecycle`.
 - **LiveData**: Android-only, built-in lifecycle awareness, limited operators, `setValue` main-thread only, optional initial value.
@@ -48,13 +74,21 @@ A lifecycle-aware observable data holder that only delivers updates to observers
 
 ---
 
+
+
 ## 8. How is LiveData different from ObservableField?
+
+**ObservableField** means a non-lifecycle-aware observable field used in traditional XML Data Binding, whereas **LiveData** is a lifecycle-aware observable data holder designed to prevent memory leaks and crashes.
 
 LiveData is lifecycle-aware and leak-safe (observers tied to a `LifecycleOwner`); `ObservableField` (Data Binding) is not lifecycle-aware and requires manual callback removal. Use LiveData/StateFlow for UI state; `ObservableField` is mostly legacy Data Binding code.
 
 ---
 
+
+
 ## 9. setValue vs postValue in LiveData
+
+**setValue()** means a synchronous method used to update LiveData immediately from the main thread, whereas **postValue()** is an asynchronous method that posts a task to the main thread to update the LiveData from a background thread.
 
 - `setValue()`: main thread only, synchronous, applies immediately.
 - `postValue()`: any thread, asynchronous (posts to main thread); if called rapidly, only the last value is delivered (conflation).
@@ -62,37 +96,61 @@ Use `setValue` on the main thread, `postValue` from background. StateFlow's `.va
 
 ---
 
+
+
 ## 10. Explain WorkManager and its use cases
+
+**WorkManager** means a persistent Jetpack background processing library designed to schedule deferrable, guaranteed background work.
 
 The recommended Jetpack solution for persistent, deferrable, guaranteed background work that survives app exit and reboot. Supports constraints, retry/backoff, chaining, unique/periodic work, and expedited/foreground work. Use cases: uploading logs/media, periodic sync, downloading for offline. Not for immediate in-process work or exact timing.
 
 ---
 
+
+
 ## 11. Minimum repeat interval for a PeriodicWorkRequest
+
+**PeriodicWorkRequest minimum interval** means the system-enforced minimum repeat interval of 15 minutes for periodic background tasks in WorkManager.
 
 **15 minutes** (`MIN_PERIODIC_INTERVAL_MILLIS = 900,000 ms`); smaller values are clamped up. Minimum flex interval is 5 minutes. For more frequent work, self-re-enqueue a `OneTimeWorkRequest` or use `AlarmManager` (both less battery-friendly).
 
 ---
 
+
+
 ## 12. How does WorkManager guarantee task execution?
+
+**WorkManager execution guarantee** means persisting every work request in an internal Room database and using OS schedulers like JobScheduler to execute tasks even after app exits or device reboots.
 
 Through persistence (requests stored in an internal Room DB, surviving process death) plus reliable rescheduling: it delegates to `JobScheduler`, reschedules after reboot via a `BOOT_COMPLETED` receiver, retries with backoff on `Result.retry()`, and enforces constraints. It is "eventually, when constraints allow" — NOT exact-time (Doze/standby can defer it).
 
 ---
 
+
+
 ## 13. Serializable vs Parcelable — which is best?
+
+**Parcelable** means an Android-specific serialisation interface optimised for fast inter-process communication without reflection, whereas **Serializable** is a standard Java interface that relies on slower reflection-based serialisation.
 
 **Parcelable** is recommended on Android: it's far faster (no reflection) and produces less garbage, designed for IPC. With `kotlin-parcelize` (`@Parcelize`) the boilerplate is gone. Use `Serializable` only for simple pure-Java/Kotlin modules or rare, non-performance-critical persistence.
 
 ---
 
+
+
 ## 14. Why is Bundle used for passing data instead of a Map?
+
+**Bundle** means a key-value container designed for IPC that only accepts type-safe, parcelable values and supports lazy unmarshalling.
 
 A Bundle is a Parcelable-aware, IPC-safe, type-restricted map: it can marshal itself into a `Parcel` for cross-process transport, only accepts serializable types, supports lazy unmarshalling, and is the framework's standard contract (`onSaveInstanceState`, Intent extras, `Fragment.arguments`). A plain Map has no wire format and can't reliably cross processes.
 
 ---
 
+
+
 ## 15. How do you troubleshoot a crashing application?
+
+**Crash troubleshooting** means a systematic diagnostic process of capturing stack traces from Logcat or Crashlytics, locating the root cause in the stack trace, and resolving the underlying issue.
 
 - Reproduce and read the stack trace in Logcat (`FATAL EXCEPTION`, top-down, follow `Caused by:`).
 - Use production crash tools: Android Vitals, Firebase Crashlytics.
@@ -102,26 +160,42 @@ A Bundle is a Parcelable-aware, IPC-safe, type-restricted map: it can marshal it
 
 ---
 
+
+
 ## 16. Explain the Android push notification system
+
+**Push notification system** means a cloud-to-device messaging service where Firebase Cloud Messaging (FCM) routes payloads to a device over a persistent connection to display notifications.
 
 Delivered via **Firebase Cloud Messaging (FCM)**: app gets a registration token → uploads it to your server → server sends a message (notification/data payload) to FCM over HTTP v1 → FCM routes it over Google Play services' persistent socket → device displays it or wakes `FirebaseMessagingService.onMessageReceived()`. Notification messages auto-display when backgrounded; data messages always hit `onMessageReceived`. Requires a `NotificationChannel` (8.0+) and `POST_NOTIFICATIONS` permission (13+).
 
 ---
 
+
+
 ## 17. What is AAPT?
+
+**AAPT (Android Asset Packaging Tool)** means an SDK build tool that compiles and links resources into binary files and generates the `R` class for referencing them in code.
 
 **Android Asset Packaging Tool** — compiles and packages app resources. AAPT2 works in two phases: compile (each resource → binary `.flat`, enabling incremental builds) and link (merges resources, generates the `R` class and binary `resources.arsc`). Run automatically by the Android Gradle Plugin.
 
 ---
 
+
+
 ## 18. FlatBuffers vs JSON
+
+**FlatBuffers** means a high-performance binary serialisation format from Google that allows reading data directly from a buffer without parsing or allocation, whereas **JSON** is a human-readable text format.
 
 - **JSON**: text, human-readable, schema-less, must fully parse/allocate; best for REST APIs, config, modest payloads.
 - **FlatBuffers**: compact binary, schema-defined (`.fbs` + `flatc`), zero-copy access (no parsing/allocation); best for performance-critical, large, frequently-read local data. Trade-off: rigid schema, build step, not human-readable.
 
 ---
 
+
+
 ## 19. HashMap, ArrayMap and SparseArray
+
+**ArrayMap** means a memory-optimised two-array map using binary search, and **SparseArray** is a memory-optimised map using parallel primitive arrays to map integers to objects without autoboxing.
 
 - **HashMap**: standard, O(1) average, but heavy memory (boxes primitive keys, per-entry node objects). Best for large/general maps.
 - **ArrayMap**: two arrays + binary search (O(log n)), much less memory; best for small object-keyed maps.
@@ -129,19 +203,31 @@ Delivered via **Firebase Cloud Messaging (FCM)**: app gets a registration token 
 
 ---
 
+
+
 ## 20. Advantages of SparseArray
+
+**SparseArray advantages** means eliminating key autoboxing and per-entry object overhead on memory by storing integer keys in a primitive array.
 
 Over `HashMap<Integer, V>`: no autoboxing of keys, no per-entry node objects, better memory locality/smaller footprint, and typed variants (`SparseIntArray`, etc.) avoid boxing values too. Trade-off: O(log n) lookup and keys must be int/long. Best for small-to-medium int-keyed maps (view IDs, positions).
 
 ---
 
+
+
 ## 21. What are Annotations?
+
+**Annotations** means metadata attached to code elements that provide information to the compiler, lint tools, or annotation processors at build time or runtime.
 
 Metadata attached to code, consumed by the compiler, build-time annotation processors, or runtime reflection. Examples: `@Override`, `@JvmStatic`, AndroidX `@Nullable`/`@StringRes`/`@MainThread`. Retention: `SOURCE` (lint/processors), `BINARY`/CLASS, `RUNTIME` (reflection). Libraries like Room, Hilt, Retrofit use them with processors (KAPT/KSP) to generate code.
 
 ---
 
+
+
 ## 22. How to create a custom Annotation?
+
+**Custom annotation** means declaring an annotation class using the `annotation class` keyword and configuring it with targets and retention policies.
 
 Declare with `annotation class` and configure with meta-annotations `@Target` (where) and `@Retention` (how long). Parameters allow primitives, `String`, enums, `KClass`, annotations, and arrays.
 
@@ -155,36 +241,61 @@ A `RUNTIME` annotation is read via reflection; a `SOURCE` one is consumed by a K
 
 ---
 
+
+
 ## 23. What is the Android Support Library? Why was it introduced?
+
+**Android Support Library** means a legacy set of code libraries that provided backward-compatible versions of Android APIs and has now been replaced by AndroidX.
 
 A set of libraries providing backward-compatible versions of newer APIs (e.g. `AppCompatActivity`, `RecyclerView`) so apps could use modern features on older versions, solving fragmentation. In 2018 it was refactored/rebranded into **AndroidX** (`androidx.*`) with independent semantic versioning; the old Support Library is deprecated.
 
 ---
 
+
+
 ## 24. What is Android Data Binding?
+
+**Data Binding** means a Jetpack library that binds UI components in XML layouts directly to data sources declaratively, reducing glue code.
 
 A Jetpack library that binds XML UI components directly to data declaratively (via a `<layout>`/`<data>` block and `@{...}` expressions), reducing `findViewById` glue. Supports two-way binding (`@={...}`) and binding adapters. **View Binding** is lighter (only type-safe view references); Data Binding adds expressions/adapters. For new code, prefer Compose or View Binding.
 
 ---
 
+
+
 ## 25. SavedStateHandle (surviving process death in a ViewModel)
+
+**SavedStateHandle** means a key-value map injected into a ViewModel that persists state across both configuration changes and system-initiated process death.
 
 A key-value map (backed by the saved-instance `Bundle`) injected into a ViewModel constructor that persists small UI state across both config changes AND process death. Use `state["key"]` or `state.getStateFlow("key", default)`. It also receives navigation arguments automatically. Store only small serializable state (~KBs); large data belongs in a repository.
 
 ---
 
+
+
 ## 26. Paging 3 (PagingSource, Pager, RemoteMediator)
+
+**Paging 3** means a Jetpack library that loads large datasets incrementally from local databases or network sources as the user scrolls.
 
 Loads large datasets incrementally as the user scrolls. Core pieces: `PagingSource` (implements `load()`), `Pager` + `PagingConfig` (exposes `Flow<PagingData<T>>`), `PagingDataAdapter`/`collectAsLazyPagingItems()` (consumes + surfaces `LoadState`), and `RemoteMediator` for offline-first with Room as source of truth. `cachedIn(scope)` keeps pages alive across config changes. The recommended answer for "infinite scrolling."
 
 ---
 
+
+
 ## 27. How does WorkManager handle constraints and retries?
+
+**WorkManager constraints and retries** means the system that allows specifying execution conditions (such as network, battery, or charging state) and error-recovery policies (using linear or exponential backoff) for background tasks.
 
 WorkManager only runs when constraints (e.g., `NetworkType.CONNECTED`, battery not low, device idle) are met. If a constraint fails during execution, the worker is stopped and rescheduled. For retries, returning `Result.retry()` uses the configured `BackoffPolicy` (exponential or linear) and delay to reschedule the work automatically.
 
 ---
 
+
+
 ## 28. DataStore vs SharedPreferences
 
+**DataStore** means a modern, fully asynchronous key-value and typed data storage solution built on coroutines and Flow to replace the synchronous SharedPreferences.
+
 **DataStore** is fully asynchronous (Coroutines/Flow), safe to call on the UI thread, and offers type safety via Proto DataStore. **SharedPreferences** is synchronous, lacks type safety, and its asynchronous `apply()` can still block the UI thread during lifecycle transitions, leading to ANRs. Always use DataStore for new projects to prevent ANRs.
+

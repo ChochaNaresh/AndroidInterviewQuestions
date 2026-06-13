@@ -42,7 +42,9 @@ A comprehensive, code-first reference for Kotlin Coroutines interview preparatio
 
 ## 1. What is a coroutine?
 
-A **coroutine** is an instance of a suspendable computation. It is a block of code that can **suspend** (pause) without blocking the underlying thread, and later **resume** — possibly on a different thread. Coroutines let you write asynchronous code in a sequential, top-to-bottom style, instead of nesting callbacks.
+**Coroutine** means a lightweight, cooperative thread of execution that can be suspended and resumed without blocking the underlying thread.
+
+It is a block of code that can **suspend** (pause) without blocking the underlying thread, and later **resume** — possibly on a different thread. Coroutines let you write asynchronous code in a sequential, top-to-bottom style, instead of nesting callbacks.
 
 Key properties:
 
@@ -80,7 +82,9 @@ runBlocking {
 
 ## 2. What is a suspend function? Suspending vs blocking
 
-A **`suspend` function** is a function that can suspend the execution of a coroutine without blocking the thread. It can only be called from another `suspend` function or from inside a coroutine builder (`launch`, `async`, `runBlocking`, etc.).
+**Coroutine vs Thread** means the distinction between a managed user-space execution task (coroutine) and an OS-level execution thread.
+
+It can only be called from another `suspend` function or from inside a coroutine builder (`launch`, `async`, `runBlocking`, etc.).
 
 ```kotlin
 suspend fun fetchUser(): User {
@@ -121,7 +125,9 @@ suspend fun readFile(path: String): String = withContext(Dispatchers.IO) {
 
 ## 3. How does suspend work under the hood (CPS / state machine)?
 
-The compiler transforms a `suspend` function using **Continuation-Passing Style (CPS)**. It adds a hidden `Continuation` parameter and rewrites the body into a **state machine**, where each suspension point is a state. When a coroutine suspends, it saves its state (local variables + which state it's in) in the continuation object and returns the special marker `COROUTINE_SUSPENDED`. When the awaited result is ready, `continuation.resumeWith(result)` is called, re-entering the function at the saved state.
+**Continuation-Passing Style (CPS)** means the compiler transformation that converts suspending functions into state machines to handle execution resume states.
+
+It adds a hidden `Continuation` parameter and rewrites the body into a **state machine**, where each suspension point is a state. When a coroutine suspends, it saves its state (local variables + which state it's in) in the continuation object and returns the special marker `COROUTINE_SUSPENDED`. When the awaited result is ready, `continuation.resumeWith(result)` is called, re-entering the function at the saved state.
 
 Conceptually:
 
@@ -150,7 +156,7 @@ This is why coroutines do not need an extra OS thread per suspension — state i
 
 ## 4. launch vs async-await
 
-Both `launch` and `async` are coroutine builders, but they differ in return type and intent.
+**launch vs async** means the choice between a fire-and-forget coroutine builder returning a `Job` (launch), and a builder returning a `Deferred` value that must be awaited (async).
 
 - **`launch`** — fire-and-forget. Returns a `Job`. Use when you do **not** need a result. An exception is propagated immediately to the parent.
 - **`async`** — concurrent computation that returns a value. Returns a `Deferred<T>` (a `Job` with a result). Call `await()` to get the result. An exception is held inside the `Deferred` and re-thrown when you call `await()`.
@@ -189,7 +195,7 @@ suspend fun loadDashboard() = coroutineScope {
 
 ## 5. withContext vs async-await
 
-Both can switch context, but they serve different purposes.
+**withContext** means a suspending function that switches context and returns the result, whereas **async** means a coroutine builder that starts a concurrent task and returns a `Deferred` object.
 
 - **`withContext(ctx) { }`** — switches the coroutine context (commonly the dispatcher), runs the block, and **returns its result directly**. It is **sequential** — the caller suspends until the block finishes. Use it to move a single piece of work to another dispatcher (the idiomatic main-safety pattern).
 - **`async { }.await()`** — designed for **concurrency**: start multiple computations that run in parallel, then await them.
@@ -210,7 +216,7 @@ suspend fun load() = coroutineScope {
 
 Rule of thumb: **single call → `withContext`; multiple parallel calls → `async`.** Using `async { }.await()` for a single sequential call works but creates an unnecessary `Deferred` and child job, so `withContext` is preferred there.
 
-**Exception behavior differs too:** `withContext` throws directly at the call site (catch with normal `try/catch`). `async` defers the throw to `await()`.
+**Exception behaviour differs too:** `withContext` throws directly at the call site (catch with normal `try/catch`). `async` defers the throw to `await()`.
 
 **📚 Reference:** https://outcomeschool.com/blog/kotlin-withcontext-vs-async-await
 
@@ -218,7 +224,9 @@ Rule of thumb: **single call → `withContext`; multiple parallel calls → `asy
 
 ## 6. Dispatchers (Main, IO, Default, Unconfined)
 
-A **`CoroutineDispatcher`** determines which thread(s) a coroutine runs on. It is part of the `CoroutineContext`.
+**Coroutine dispatcher** means an execution coordinator that determines which thread or thread pool runs the coroutine.
+
+It is part of the `CoroutineContext`.
 
 | Dispatcher | Backing | Use for |
 |---|---|---|
@@ -236,7 +244,7 @@ viewModelScope.launch {                 // starts on Main
 ```
 
 Key facts:
-- `Dispatchers.IO` and `Dispatchers.Default` **share threads**; switching between them with `withContext` may reuse the same thread without an actual thread switch (optimized).
+- `Dispatchers.IO` and `Dispatchers.Default` **share threads**; switching between them with `withContext` may reuse the same thread without an actual thread switch (optimised).
 - `Dispatchers.Main.immediate` runs synchronously if already on the main thread, avoiding an unnecessary re-dispatch.
 - Inject dispatchers (don't hard-code) so you can substitute test dispatchers — pass a `CoroutineDispatcher` into your repositories/use cases.
 
@@ -252,7 +260,9 @@ class Repo(private val io: CoroutineDispatcher = Dispatchers.IO) {
 
 ## 7. CoroutineScope
 
-A **`CoroutineScope`** defines the lifecycle and context for coroutines launched inside it. Every coroutine belongs to a scope; this is the backbone of structured concurrency. A scope is essentially a holder for a `CoroutineContext` (which always includes a `Job`).
+**Coroutine dispatchers (Main, IO, Default, Unconfined)** means the standard dispatchers used for UI operations, disk/network I/O, CPU-bound tasks, and thread-agnostic execution respectively.
+
+Every coroutine belongs to a scope; this is the backbone of structured concurrency. A scope is essentially a holder for a `CoroutineContext` (which always includes a `Job`).
 
 ```kotlin
 class MyController {
@@ -276,7 +286,9 @@ When you cancel a scope, all coroutines launched in it are cancelled. This preve
 
 ## 8. CoroutineContext
 
-A **`CoroutineContext`** is an indexed set of elements that configures a coroutine. The main elements are:
+**Suspending function** means a function marked with `suspend` that can pause execution without blocking the host thread and resume later.
+
+The main elements are:
 
 - **`Job`** — controls lifecycle/cancellation.
 - **`CoroutineDispatcher`** — the thread/threads.
@@ -301,7 +313,9 @@ scope.launch(Dispatchers.Default + CoroutineName("worker")) {
 
 ## 9. What is a Job?
 
-A **`Job`** is a cancellable handle to a coroutine's lifecycle. `launch` returns a `Job`; `async` returns a `Deferred<T>`, which is a `Job` that also carries a result.
+**CoroutineContext** means a persistent map of key-value elements that configure a coroutine's behaviour, including its Job, Dispatcher, and ExceptionHandler.
+
+`launch` returns a `Job`; `async` returns a `Deferred<T>`, which is a `Job` that also carries a result.
 
 A Job has states: **New → Active → Completing → Completed**, with **Cancelling → Cancelled** on cancellation.
 
@@ -330,7 +344,7 @@ job.invokeOnCompletion { cause -> /* cleanup */ }
 
 ## 10. Structured concurrency
 
-**Structured concurrency** means coroutines are organized into a parent–child hierarchy bound to a scope, giving three guarantees:
+**CoroutineScope** means an interface that provides and manages the lifecycle boundaries of coroutines to enforce structured concurrency.
 
 1. **No leaks** — a parent waits for all children to finish before it completes; nothing is "forgotten."
 2. **Cancellation propagates** — cancelling a scope/parent cancels all children.
@@ -353,7 +367,7 @@ The opposite — launching into `GlobalScope` — breaks structure: such corouti
 
 ## 11. Scopes used in Android: lifecycleScope, viewModelScope, GlobalScope
 
-Android (AndroidX Lifecycle KTX) provides lifecycle-aware scopes so you don't manage cancellation manually.
+**Android coroutine scopes** means lifecycle-aware scopes including `viewModelScope` and `lifecycleScope` that automatically cancel active jobs when components are destroyed.
 
 **`viewModelScope`** — bound to a `ViewModel`; cancelled automatically when `onCleared()` is called. Uses `Dispatchers.Main.immediate`. Use for most business logic.
 
@@ -397,7 +411,7 @@ class AppScope @Inject constructor() :
 
 ## 12. job.cancel() vs scope.cancel()
 
-Both cancel coroutines, but the scope of effect differs.
+**job.cancel() vs scope.cancel()** means the choice between cancelling a single coroutine and its children (job.cancel), and cancelling all coroutines started in a scope permanently (scope.cancel).
 
 - **`job.cancel()`** — cancels **that one coroutine** (the Job returned by `launch`/`async`) and its children. Other coroutines in the same scope keep running.
 - **`scope.cancel()`** — cancels the scope's `Job`, which cancels **all** coroutines launched in that scope.
@@ -419,7 +433,9 @@ scope.cancel()   // cancels everything in the scope (taskB too)
 
 ## 13. Cancellation cooperativeness
 
-Coroutine cancellation is **cooperative**: cancelling a coroutine only sets its state to "cancelling" — the code must actually check for cancellation and stop. All suspending functions in `kotlinx.coroutines` (`delay`, `withContext`, `yield`, etc.) are cancellable and throw `CancellationException` at their suspension points. But a tight CPU loop that never suspends will **not** stop on its own.
+**Cooperative cancellation** means checking active cancellation flags (like `isActive` or `ensureActive()`) during long-running tasks to respond to cancellation.
+
+All suspending functions in `kotlinx.coroutines` (`delay`, `withContext`, `yield`, etc.) are cancellable and throw `CancellationException` at their suspension points. But a tight CPU loop that never suspends will **not** stop on its own.
 
 ```kotlin
 // NOT cancellable — ignores cancellation, runs to completion:
@@ -462,7 +478,9 @@ Use `NonCancellable` only for short, essential cleanup — overusing it defeats 
 
 ## 14. yield() in coroutines
 
-**`yield()`** is a suspending function that gives the dispatcher a chance to run other pending coroutines, and also acts as a **cancellation check point**. It does two things: (1) checks for cancellation (throws `CancellationException` if cancelled), and (2) if there are other coroutines waiting on the same dispatcher, lets them run before resuming.
+**yield()** means a suspending function that yields execution to allow other pending tasks to run on the same dispatcher while checking cancellation status.
+
+It does two things: (1) checks for cancellation (throws `CancellationException` if cancelled), and (2) if there are other coroutines waiting on the same dispatcher, lets them run before resuming.
 
 ```kotlin
 scope.launch(Dispatchers.Default) {
@@ -481,6 +499,8 @@ Use it inside long CPU-bound loops so the coroutine stays cancellable and doesn'
 ---
 
 ## 15. Thread.sleep() vs delay()
+
+**Thread.sleep() vs delay()** means the difference between blocking the current OS thread (sleep), and suspending the coroutine execution without blocking the thread (delay).
 
 | | `Thread.sleep(ms)` | `delay(ms)` |
 |---|---|---|
@@ -504,7 +524,9 @@ In a single-threaded dispatcher, `Thread.sleep` inside one coroutine blocks the 
 
 ## 16. runBlocking
 
-**`runBlocking { }`** is a bridge between the regular blocking world and the suspending world. It **blocks** the current thread until the coroutine inside it (and all its children) complete. It runs the block on the calling thread.
+**runBlocking** means a coroutine builder that blocks the current thread until its code block and all children finish executing.
+
+It **blocks** the current thread until the coroutine inside it (and all its children) complete. It runs the block on the calling thread.
 
 ```kotlin
 fun main() = runBlocking {     // blocks main thread until done
@@ -528,7 +550,9 @@ When **not** to use:
 
 ## 17. coroutineScope vs supervisorScope
 
-Both are suspending functions that create a new structured sub-scope, run a block, and return when all children complete. The difference is **how child failures are handled**.
+**coroutineScope vs supervisorScope** means the difference between a scope that propagates any child failure to cancel all siblings (coroutineScope), and a scope that isolates child failures (supervisorScope).
+
+The difference is **how child failures are handled**.
 
 - **`coroutineScope`** — failure of **any** child cancels the whole scope (all other children) and rethrows the exception. "All or nothing."
 - **`supervisorScope`** — children fail **independently**; one child's failure does not cancel its siblings or the scope. Each child's failure must be handled on its own.
@@ -560,7 +584,7 @@ Note: with `supervisorScope` + `async`, exceptions are still delivered through `
 
 ## 18. Exception handling: try/catch, CoroutineExceptionHandler, SupervisorJob
 
-There are three complementary tools.
+**Coroutine exception handling** means managing errors using try-catch blocks, CoroutineExceptionHandler, or SupervisorJob to prevent app crashes.
 
 **(1) try/catch** — for exceptions at a specific suspending call. Works for `withContext` and `await()` results.
 
@@ -604,7 +628,7 @@ scope.launch { taskB() }   // ...this keeps running
 
 ## 19. Exception in async without await()
 
-**Question:** *What happens if an exception is thrown inside an `async` coroutine, but `await()` is never called?*
+**Exception propagation in async** means that uncaught exceptions inside `async` are immediately propagated to the parent coroutine, regardless of whether `await()` is called.
 
 The exception is stored inside the resulting `Deferred`. Whether it surfaces depends on the scope's Job:
 
@@ -638,7 +662,9 @@ suspend fun demo() = supervisorScope {
 
 ## 20. Running coroutines in series vs parallel
 
-**Series (sequential):** suspend at each call before starting the next. Total time ≈ sum of durations.
+**Sequential vs parallel execution** means the difference between suspending at each task call (sequential), and launching multiple concurrent tasks using `async` to run them together (parallel).
+
+Total time ≈ sum of durations.
 
 ```kotlin
 suspend fun series() = coroutineScope {
@@ -658,7 +684,7 @@ suspend fun parallel() = coroutineScope {
 }   // total ≈ max(timeA, timeB)
 ```
 
-**Pitfall — accidental serialization:** `async { fetchA() }.await() + async { fetchB() }.await()` is sequential because you `await()` A before constructing B's `async`. Start all `async` blocks first, then await.
+**Pitfall — accidental serialisation:** `async { fetchA() }.await() + async { fetchB() }.await()` is sequential because you `await()` A before constructing B's `async`. Start all `async` blocks first, then await.
 
 ```kotlin
 // WRONG (sequential despite async):
@@ -677,7 +703,7 @@ a.await() + b.await()
 
 ## 21. Combining multiple coroutine results
 
-Use `async` for each task and combine after awaiting, inside a `coroutineScope` so failures are handled by structured concurrency.
+**Result aggregation** means combining outcomes from multiple parallel coroutines using `awaitAll` or `zip` inside structured scopes.
 
 ```kotlin
 data class Dashboard(val user: User, val posts: List<Post>, val notifs: Int)
@@ -713,6 +739,8 @@ suspend fun loadAllTolerant(ids: List<Int>): List<Result<Item>> = supervisorScop
 
 ## 22. Timeouts (withTimeout / withTimeoutOrNull)
 
+**withTimeout** means a suspending function that cancels the execution block and throws a `TimeoutCancellationException` if the execution exceeds the specified limit.
+
 - **`withTimeout(ms)`** — runs a block; if it doesn't finish in time, cancels it and throws `TimeoutCancellationException`.
 - **`withTimeoutOrNull(ms)`** — same, but returns `null` instead of throwing on timeout.
 
@@ -745,7 +773,9 @@ val result = try {
 
 ## 23. Debounce using coroutines
 
-**Debounce** = wait until input stops for a quiet period before acting (e.g., search-as-you-type). With coroutines, cancel the previous pending job whenever a new event arrives and `delay` before doing the work.
+**Debouncing** means waiting for a specified quiet period of inactivity before executing a task, commonly used in search queries.
+
+With coroutines, cancel the previous pending job whenever a new event arrives and `delay` before doing the work.
 
 ```kotlin
 class SearchController(private val scope: CoroutineScope) {
@@ -783,7 +813,9 @@ scope.launch {
 
 ## 24. suspendCoroutine vs suspendCancellableCoroutine (callback bridging)
 
-These convert **callback-based** APIs into suspend functions. They give you a `Continuation` you resume when the callback fires.
+**suspendCoroutine vs suspendCancellableCoroutine** means the choice between wrapping callbacks into suspend functions, and using the cancellable version to handle job cancellation.
+
+They give you a `Continuation` you resume when the callback fires.
 
 - **`suspendCoroutine`** — basic bridge; the resulting suspend call is **not cancellable**.
 - **`suspendCancellableCoroutine`** — cancellable; lets you register `invokeOnCancellation` to release resources / cancel the underlying operation when the coroutine is cancelled. **Prefer this** for any real async work.
@@ -814,7 +846,7 @@ Rules:
 
 ## 25. Coroutines with Retrofit and Room
 
-**Retrofit** supports `suspend` functions natively — declare the API method as `suspend` and Retrofit handles the background dispatch:
+**Jetpack coroutine integration** means using native `suspend` keyword declarations in Room DAOs and Retrofit services to offload database and network operations.
 
 ```kotlin
 interface ApiService {
@@ -859,7 +891,9 @@ Room runs `suspend` DAO calls on its own background executor, so they are main-s
 
 ## 26. Testing coroutines
 
-Use `kotlinx-coroutines-test`. The entry point is **`runTest`**, which provides a `TestScope` with a virtual-time `TestDispatcher` — `delay` is skipped (auto-advanced), so tests are fast and deterministic.
+**Coroutine testing** means controlling asynchronous execution using `runTest` and `TestDispatcher` to skip delays and ensure deterministic test assertions.
+
+The entry point is **`runTest`**, which provides a `TestScope` with a virtual-time `TestDispatcher` — `delay` is skipped (auto-advanced), so tests are fast and deterministic.
 
 ```kotlin
 @Test
@@ -899,7 +933,9 @@ class MyViewModelTest {
 
 ## 27. Channels (and produce / fan-out / fan-in)
 
-A **`Channel`** is a coroutine-friendly, concurrency-safe queue for *communicating* between coroutines — conceptually `BlockingQueue` but with **suspending** `send` and `receive` instead of blocking calls. Where a `Flow` is a *cold stream* (each collector re-runs the producer), a `Channel` is a *hot, one-shot pipe*: each element is received by exactly **one** consumer.
+**Flow vs Coroutines** means the distinction between a stream producing multiple sequential values asynchronously (Flow), and a single asynchronous execution task (Coroutine).
+
+Where a `Flow` is a *cold stream* (each collector re-runs the producer), a `Channel` is a *hot, one-shot pipe*: each element is received by exactly **one** consumer.
 
 ```kotlin
 val channel = Channel<Int>()
@@ -940,7 +976,9 @@ fun CoroutineScope.numbers() = produce {
 
 ## 28. The select expression
 
-`select { }` lets a coroutine **await multiple suspending sources simultaneously** and proceed with whichever becomes available **first** — like a coroutine-aware `switch` over awaitable events. It's the building block for racing operations, timeouts against multiple channels, and "first response wins" patterns.
+**Flow vs RxJava** means the comparison between Kotlin's native, coroutine-powered reactive streams (Flow), and the external, complex Java-based reactive framework (RxJava).
+
+It's the building block for racing operations, timeouts against multiple channels, and "first response wins" patterns.
 
 ```kotlin
 suspend fun fastest(a: Deferred<String>, b: Deferred<String>): String =
@@ -967,7 +1005,9 @@ Clauses include `onAwait` (Deferred), `onReceive`/`onReceiveCatching` (channels)
 
 ## 29. Shared mutable state: Mutex and Semaphore
 
-Coroutines are concurrent, so shared mutable state still needs protection — but you should **not** use blocking `synchronized`/`ReentrantLock` (they block the thread, defeating the point of suspension). `kotlinx.coroutines` provides **suspending** primitives:
+**Mutex** means a mutual exclusion lock that suspends coroutines instead of blocking threads to protect shared mutable state.
+
+`kotlinx.coroutines` provides **suspending** primitives:
 
 **`Mutex`** — mutual exclusion; `withLock` suspends (doesn't block) if the lock is held. Unlike a reentrant lock, `Mutex` is **non-reentrant** (locking twice from the same coroutine deadlocks).
 

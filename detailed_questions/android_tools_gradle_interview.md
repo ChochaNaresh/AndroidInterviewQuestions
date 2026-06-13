@@ -1,6 +1,6 @@
 # Android Build Tools, Gradle & Tooling — Interview Prep Guide
 
-A comprehensive, code-first reference for Android build and tooling interview questions. Covers the Gradle build system (with Kotlin DSL), code shrinking with R8/ProGuard, annotation processing (annotationProcessor/kapt/KSP), APK size and build-speed optimization, developer tooling (ADB, Lint, StrictMode, Profiler, on-device DB debugging), CI/CD and release, plus assorted topics (WAL, Remote Config, 16 KB page size).
+A comprehensive, code-first reference for Android build and tooling interview questions. Covers the Gradle build system (with Kotlin DSL), code shrinking with R8/ProGuard, annotation processing (annotationProcessor/kapt/KSP), APK size and build-speed optimisation, developer tooling (ADB, Lint, StrictMode, Profiler, on-device DB debugging), CI/CD and release, plus assorted topics (WAL, Remote Config, 16 KB page size).
 
 Accurate as of 2026: **R8 is the default code shrinker**, **KSP (KSP2) is the recommended annotation processor and kapt is on the deprecation path**, and Google Play's **16 KB page size requirement** is in force.
 
@@ -60,7 +60,9 @@ Accurate as of 2026: **R8 is the default code shrinker**, **KSP (KSP2) is the re
 
 ## 1. What is Gradle?
 
-Gradle is the **build automation system** used by Android. It compiles your source code, processes resources, runs annotation processors, merges manifests, packages everything into an APK or AAB, runs tests, and manages dependencies. The **Android Gradle Plugin (AGP)** sits on top of Gradle and teaches it everything Android-specific (variants, manifests, resources, R8, etc.).
+**Gradle** means an advanced build automation system used by Android to compile code, process resources, and generate executable APK/AAB packages.
+
+It compiles your source code, processes resources, runs annotation processors, merges manifests, packages everything into an APK or AAB, runs tests, and manages dependencies. The **Android Gradle Plugin (AGP)** sits on top of Gradle and teaches it everything Android-specific (variants, manifests, resources, R8, etc.).
 
 Key concepts:
 
@@ -85,17 +87,17 @@ Gradle is incremental (only re-runs work whose inputs changed), supports a build
 
 ## 2. The Gradle build system in Android
 
-The Android build maps high-level config to a fully packaged artifact:
+**Android build pipeline** means the process where Gradle compiles code, merges resources, runs R8/ProGuard, and packages them into signed packages.
 
 1. **Compilers** turn Kotlin/Java source and resources into `.class`/DEX and compiled resources.
 2. **AGP** merges all manifests, processes and merges resources, runs annotation processors/KSP, and generates `R` and `BuildConfig`.
-3. **R8** shrinks, optimizes, obfuscates, and dexes (in release builds).
+3. **R8** shrinks, optimises, obfuscates, and dexes (in release builds).
 4. The **packager** zips DEX, resources, native libs, and assets into an APK/AAB, then signs and aligns it.
 
 Output formats:
 
 - **APK (Android Package Kit)** — installable package, used for sideloading and testing.
-- **AAB (Android App Bundle)** — the publishing format for Google Play. You upload the AAB; Play generates optimized, device-specific APKs (split by ABI, density, language) via the bundletool mechanism.
+- **AAB (Android App Bundle)** — the publishing format for Google Play. You upload the AAB; Play generates optimised, device-specific APKs (split by ABI, density, language) via the bundletool mechanism.
 
 ```bash
 ./gradlew bundleRelease   # produces an .aab for Play upload
@@ -109,6 +111,8 @@ The build is driven entirely by the Gradle scripts described next.
 ---
 
 ## 3. Gradle-related files in an Android project
+
+**Gradle configuration files** means the project setup files including `settings.gradle` for module registry, root `build.gradle` for plugin registry, and module `build.gradle` for dependencies.
 
 | File | Purpose |
 |------|---------|
@@ -149,7 +153,9 @@ dependencies {
 
 ## 4. What is the Kotlin DSL for Gradle?
 
-The **Kotlin DSL** lets you write build scripts in Kotlin (`build.gradle.kts`) instead of Groovy (`build.gradle`). It is the default for new Android projects.
+**Kotlin DSL for Gradle** means writing build configuration scripts in Kotlin (`build.gradle.kts`) instead of Groovy (`build.gradle`) to gain autocompletion and compile-time checks.
+
+It is the default for new Android projects.
 
 Advantages:
 
@@ -185,7 +191,7 @@ android {
 
 ## 5. implementation vs api in Gradle
 
-Both add a dependency to a module, but they differ in **transitivity** — whether downstream modules can also see that dependency.
+**implementation vs api** means the choice between hiding dependency classes from downstream consumers to accelerate compilation (implementation), and exposing dependencies to downstream consumers (api).
 
 - **`implementation`** — the dependency is an *internal* detail. Consumers of your module do **not** get it on their compile classpath. Changing this dependency does not force recompilation of dependent modules.
 - **`api`** — the dependency is **exposed** as part of your module's public API. Consumers transitively get it on their compile classpath.
@@ -210,7 +216,9 @@ dependencies {
 
 ## 6. How do you create a custom Gradle task?
 
-A task is a named unit of work. You can register tasks ad hoc or, for reusable logic, define a typed task class.
+**Custom Gradle task** means a developer-defined unit of build work registered in Gradle build files to automate processes.
+
+You can register tasks ad hoc or, for reusable logic, define a typed task class.
 
 ```kotlin
 // Simple ad-hoc task (lazy registration — preferred over create)
@@ -254,7 +262,7 @@ Declaring `@Input`/`@OutputFile` lets Gradle skip the task when inputs are uncha
 
 ## 7. Build variants, build types, and product flavors
 
-A **build variant** is the cross-product of a **build type** and a **product flavor**.
+**Build variants** means the unique combinations of build types (like Debug/Release) and product flavors (like Free/Paid) used to package different app versions.
 
 - **Build types** describe *how* you build: usually `debug` (debuggable, no shrinking) and `release` (shrunk, signed). You define R8/signing config here.
 - **Product flavors** describe *different versions* of the app: e.g., `free` vs `paid`, or `dev`/`staging`/`prod`. Flavors live in **dimensions**.
@@ -270,7 +278,7 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
+                getDefaultProguardFile("proguard-android-optimise.txt"),
                 "proguard-rules.pro"
             )
         }
@@ -296,7 +304,9 @@ This produces variants like `freeDebug`, `freeRelease`, `paidDebug`, `paidReleas
 
 ## 8. Multiple APKs for Android apps
 
-Historically apps shipped a single "fat" APK containing every ABI, density, and language, which bloated download size. **Multiple APKs** address this by splitting the binary so each device downloads only what it needs.
+**Multiple APK configuration** means packaging separate binaries for specific screen densities or CPU architectures to reduce download size.
+
+**Multiple APKs** address this by splitting the binary so each device downloads only what it needs.
 
 Two approaches:
 
@@ -328,10 +338,12 @@ When generating multiple APKs you must assign distinct `versionCode`s per ABI so
 
 ## 9. What is ProGuard used for?
 
-ProGuard is a tool that processes the compiled bytecode of a release build to make the app smaller and harder to reverse-engineer. It does four things:
+**ProGuard** means a static analysis tool that shrinks, obfuscates, and optimises compiled Java/Kotlin bytecode for release builds.
+
+It does four things:
 
 1. **Shrinking** — removes unused classes, methods, and fields (dead-code elimination / tree-shaking).
-2. **Optimization** — rewrites/inlines bytecode for efficiency.
+2. **Optimisation** — rewrites/inlines bytecode for efficiency.
 3. **Obfuscation** — renames classes/methods/fields to short, meaningless names (`a`, `b`, `c`).
 4. **Preverification** — adds verification metadata (legacy JVM concern).
 
@@ -353,7 +365,9 @@ android {
 
 ## 10. What is the proguard-rules.pro file used for?
 
-`proguard-rules.pro` holds your project's **keep rules** — instructions that tell R8/ProGuard what it must **not** remove or rename. You need it because static analysis cannot see code accessed only via **reflection, JNI, serialization, or from the manifest/XML**.
+**proguard-rules.pro** means a configuration file containing directives that instruct R8/ProGuard on which classes, fields, or methods to keep from shrinking or obfuscation.
+
+You need it because static analysis cannot see code accessed only via **reflection, JNI, serialisation, or from the manifest/XML**.
 
 Common rules:
 
@@ -388,16 +402,18 @@ Libraries usually ship their own *consumer* rules (`consumer-rules.pro`) that ge
 
 ## 11. ProGuard vs R8
 
+**ProGuard vs R8** means the choice between the legacy multi-step shrinker tool (ProGuard), and the modern, single-step compiler/shrinker integrated into Android Gradle Plugin (R8).
+
 | Aspect | ProGuard | R8 |
 |--------|----------|----|
 | Role | Legacy shrinker/obfuscator | **Default** shrinker in modern AGP |
-| Pipeline | Separate shrink → then dexing (D8) | **Single step**: shrink + optimize + obfuscate + dex |
+| Pipeline | Separate shrink → then dexing (D8) | **Single step**: shrink + optimise + obfuscate + dex |
 | Config | `.pro` keep rules | **Same** `.pro` keep rules (drop-in compatible) |
 | Speed | Slower (extra pass) | Faster (one pass) |
-| Optimizations | Good | More aggressive (inlining, class merging, enum-to-int, kotlin-aware) |
+| Optimisations | Good | More aggressive (inlining, class merging, enum-to-int, kotlin-aware) |
 | Maintenance | Third-party | Maintained by Google, integrated with AGP |
 
-R8 is Google's replacement for ProGuard and is enabled automatically whenever `isMinifyEnabled = true`. Because it consumes ProGuard-format rules, migrating is essentially free — you keep your `proguard-rules.pro`. R8 has two modes: **compat mode** (default, mirrors ProGuard behavior) and **full mode** (`android.enableR8.fullMode=true`), which optimizes more aggressively and may require additional keep rules.
+R8 is Google's replacement for ProGuard and is enabled automatically whenever `isMinifyEnabled = true`. Because it consumes ProGuard-format rules, migrating is essentially free — you keep your `proguard-rules.pro`. R8 has two modes: **compat mode** (default, mirrors ProGuard behaviour) and **full mode** (`android.enableR8.fullMode=true`), which optimises more aggressively and may require additional keep rules.
 
 ```properties
 # gradle.properties
@@ -412,21 +428,21 @@ Bottom line for interviews: *"R8 is the default; it merges ProGuard's shrinking/
 
 ## 12. Obfuscation vs minification (and shrinking)
 
-These overlapping terms are often confused:
+**Code shrinking techniques** means the processes of renaming identifiers to obscure code (obfuscation), removing unused classes/methods (minification), and deleting unused resources.
 
 - **Shrinking (code shrinking / tree-shaking)** — *removing* unused classes, methods, and fields. Reduces size and method count.
 - **Resource shrinking** — removing unused resources (`isShrinkResources = true`); must be paired with code shrinking.
 - **Obfuscation** — *renaming* the surviving classes/methods/fields to short, meaningless names. Does **not** remove code; it makes decompiled output hard to understand and slightly smaller. Produces a `mapping.txt` you must keep to de-obfuscate crash stack traces.
-- **Optimization** — rewriting bytecode (inlining, dead-branch removal) for speed/size.
+- **Optimisation** — rewriting bytecode (inlining, dead-branch removal) for speed/size.
 
-"**Minification**" in the Android/`isMinifyEnabled` sense is an umbrella for shrinking + obfuscation + optimization performed by R8 — note it is *not* the same as JavaScript-style whitespace minification.
+"**Minification**" in the Android/`isMinifyEnabled` sense is an umbrella for shrinking + obfuscation + optimisation performed by R8 — note it is *not* the same as JavaScript-style whitespace minification.
 
 Obfuscation is **not** a security boundary (it deters casual reverse engineering but does not encrypt logic). Keep secrets server-side.
 
 ```kotlin
 buildTypes {
     release {
-        isMinifyEnabled = true      // shrink + obfuscate + optimize (R8)
+        isMinifyEnabled = true      // shrink + obfuscate + optimise (R8)
         isShrinkResources = true    // remove unused resources
     }
 }
@@ -443,7 +459,9 @@ retrace mapping.txt obfuscated_stacktrace.txt
 
 ## 13. Things to take care of while using ProGuard/R8
 
-- **Reflection / serialization** — Gson, Moshi, Retrofit models, and anything loaded by name must be kept (see Q10). Otherwise fields go null or you get runtime crashes.
+**R8/ProGuard compatibility rules** means adding keep rules for classes accessed via reflection, serialisation models (Gson/Moshi), and JNI native bindings to prevent runtime crashes.
+
+- **Reflection / serialisation** — Gson, Moshi, Retrofit models, and anything loaded by name must be kept (see Q10). Otherwise fields go null or you get runtime crashes.
 - **Native / JNI** — keep classes and method names referenced from C/C++ (`native <methods>`).
 - **Components in the manifest/XML** — Activities, Services, custom Views referenced from XML are usually kept by default consumer rules, but verify.
 - **Keep the `mapping.txt`** for every release build and upload it to Play / your crash reporter, or stack traces are unreadable.
@@ -461,7 +479,9 @@ retrace mapping.txt obfuscated_stacktrace.txt
 
 ## 14. Desugaring in Android
 
-**Desugaring** lets you use newer Java language features and APIs on older Android versions whose runtime doesn't support them. The toolchain rewrites ("de-sugars") the new constructs into bytecode the lower API levels can run.
+**Desugaring** means a compile-time process that enables older Android versions to run modern Java APIs and language features by rewriting bytecode.
+
+The toolchain rewrites ("de-sugars") the new constructs into bytecode the lower API levels can run.
 
 Two layers:
 
@@ -489,7 +509,7 @@ Trade-offs: a small APK size increase and a minor build-time cost, in exchange f
 
 ## 15. annotationProcessor vs kapt vs KSP in Gradle
 
-All three feed **annotation-based code generation** (Room, Dagger/Hilt, Moshi codegen, etc.), but they differ by language and mechanism.
+**Kotlin symbol processing** means the mechanisms of annotation-based code generation, ranging from legacy Java processors to Kotlin Annotation Processing Tool (kapt) and the modern, faster Kotlin Symbol Processing (KSP).
 
 | Tool | For | How it works | Status (2026) |
 |------|-----|--------------|---------------|
@@ -522,7 +542,7 @@ dependencies {
 
 ## 16. APK size reduction
 
-Concrete levers, roughly in order of impact:
+**APK size reduction** means techniques like R8 shrinking, converting assets to WebP/SVG, using Android App Bundles (AAB), and removing unused dependencies.
 
 - **Ship an AAB** so Play delivers per-device splits (ABI/density/language) instead of a fat APK — often the single biggest win.
 - **Enable R8** (`isMinifyEnabled = true`) to shrink and obfuscate, and **`isShrinkResources = true`** to drop unused resources.
@@ -558,7 +578,7 @@ bundletool get-size total --apks=app.apks
 
 ## 17. How can you speed up the Gradle build?
 
-Configuration and infrastructure:
+**Gradle build acceleration** means techniques like enabling configuration cache, build cache, parallel execution, offline builds, and dynamic dependencies.
 
 ```properties
 # gradle.properties
@@ -586,13 +606,15 @@ Project structure & habits:
 ./gradlew assembleDebug --profile   # local HTML timing report
 ```
 
-**📚 Reference:** <https://developer.android.com/build/optimize-your-build>
+**📚 Reference:** <https://developer.android.com/build/optimise-your-build>
 
 ---
 
 ## 18. What is ADB?
 
-**ADB (Android Debug Bridge)** is a command-line tool that lets your computer communicate with a device or emulator. It has three parts: a **client** (the `adb` command), a **server** (a background process on your machine routing commands), and a **daemon (`adbd`)** running on the device.
+**ADB (Android Debug Bridge)** means a client-server command-line utility used to communicate, debug, install apps, and run shell commands on a connected device.
+
+It has three parts: a **client** (the `adb` command), a **server** (a background process on your machine routing commands), and a **daemon (`adbd`)** running on the device.
 
 Common commands:
 
@@ -620,7 +642,9 @@ ADB is the backbone of testing, debugging, profiling, and CI device automation.
 
 ## 19. What is Lint and what is it used for?
 
-**Android Lint** is a **static analysis** tool that scans your source, resources, manifest, and Gradle files for problems **without running the app**. It flags issues across categories: **correctness** (likely bugs), **security** (e.g., insecure flags), **performance** (overdraw, unused resources), **accessibility** (missing `contentDescription`), **usability**, **internationalization**, and **API compatibility** (using an API above `minSdk`).
+**Android Lint** means a static code analysis tool that scans source code and resources to flag security, performance, correctness, and accessibility issues.
+
+It flags issues across categories: **correctness** (likely bugs), **security** (e.g., insecure flags), **performance** (overdraw, unused resources), **accessibility** (missing `contentDescription`), **usability**, **internationalization**, and **API compatibility** (using an API above `minSdk`).
 
 ```bash
 ./gradlew lint                # run lint, produces HTML/XML reports
@@ -647,7 +671,7 @@ You can suppress per-site with `@SuppressLint("...")` / `tools:ignore`, define a
 
 ## 20. What is StrictMode?
 
-**StrictMode** is a developer tool that detects accidental violations of good practice on the main thread and other policies — most notably **disk/network I/O on the UI thread** (which causes jank/ANRs) and **resource leaks** (unclosed `Closeable`s, leaked SQLite cursors, leaked Activities).
+**StrictMode** means a developer tool that monitors the application's main thread to detect accidental disk read/write or network calls.
 
 It has two policy groups:
 
@@ -682,7 +706,7 @@ It surfaces problems early; you never ship it enabled in release.
 
 ## 21. How to use the Android Studio Memory Profiler?
 
-The **Memory Profiler** (under Android Studio's **Profiler** / Profileable runs) visualizes your app's memory usage in real time to find leaks and churn.
+**Memory Profiler** means an Android Studio tool that provides real-time visualization of heap allocation, garbage collection, and memory leaks.
 
 Workflow:
 
@@ -700,7 +724,7 @@ Complementary tools: **LeakCanary** (a library that auto-detects leaked Activiti
 
 ## 22. How to measure method execution time in Android?
 
-Several approaches, from quick-and-dirty to rigorous:
+**Method tracing and profiling** means techniques to capture execution time using CPU Profiler, microbenchmarking libraries, or manual time measurements.
 
 ```kotlin
 // 1) System.nanoTime — precise wall-clock for a code block
@@ -731,7 +755,9 @@ For deeper analysis use the **Android Studio CPU Profiler / System Trace** (meth
 
 ## 23. Can you access your SQLite database for debugging?
 
-Yes. Options:
+**SQLite database debugging** means accessing local DB tables using App Inspector, running adb sqlite3 shell, or exporting database files.
+
+Options:
 
 - **Android Studio Database Inspector** (built in) — run a debuggable app on API 26+, open **View > Tool Windows > App Inspection > Database Inspector**, browse tables, and run live SQL queries against the running app's DB.
 - **Android-Debug-Database** library — adds a small server in your debug build; open a URL in your browser (printed in Logcat) to view/edit tables, run queries, and inspect SharedPreferences over the same network. Useful when you want a browser UI or to test on a physical device.
@@ -752,7 +778,7 @@ Database Inspector is the default modern choice; the library shines for physical
 
 ## 24. CI/CD pipeline for Android
 
-A typical pipeline (GitHub Actions, GitLab CI, Bitrise, Jenkins) on every push/PR:
+**Android CI/CD pipeline** means an automated workflow that checks out code, runs static linting, executes tests, builds release binaries, and uploads them to the Play Store.
 
 1. **Checkout** + set up JDK and the Android SDK.
 2. **Cache** Gradle dependencies and the build cache.
@@ -786,6 +812,8 @@ Keep signing keys and API credentials in CI secrets, never in the repo. Gate mer
 
 ## 25. Android app release checklist for production launch
 
+**App release checklist** means the steps including incrementing version codes, signing packages, configuring proguard, and preparing store assets before publication.
+
 - **Versioning** — bump `versionCode` (must increase) and `versionName`.
 - **Build** — `release` build type with `isMinifyEnabled = true`, `isShrinkResources = true`, **debuggable off**, logging stripped/disabled.
 - **Signing** — sign with the upload key; enroll in **Play App Signing**; keep the keystore backed up securely.
@@ -805,7 +833,9 @@ Keep signing keys and API credentials in CI secrets, never in the repo. Gate mer
 
 ## 26. Git
 
-**Git** is the distributed version control system used to track changes, collaborate, and manage branches. Interview-relevant essentials:
+**Git** means a distributed version control system used to track changes, manage branches, and coordinate collaboration across development teams.
+
+Interview-relevant essentials:
 
 ```bash
 git checkout -b feature/login     # branch
@@ -828,7 +858,9 @@ Concepts to know: **branching strategies** (trunk-based, Git Flow, GitHub Flow),
 
 ## 27. Firebase
 
-**Firebase** is Google's mobile/web backend platform — a suite of managed services you integrate via the Firebase BoM and Gradle plugins. Commonly used modules:
+**Firebase** means Google's mobile and web application development platform that provides managed services like databases, crash reporting, analytics, and authentication.
+
+Commonly used modules:
 
 - **Authentication** — sign-in (email, Google, phone, etc.).
 - **Cloud Firestore / Realtime Database** — NoSQL cloud data with offline sync.
@@ -836,7 +868,7 @@ Concepts to know: **branching strategies** (trunk-based, Git Flow, GitHub Flow),
 - **Cloud Messaging (FCM)** — push notifications.
 - **Crashlytics** — crash reporting (upload `mapping.txt` for symbolicated traces).
 - **Analytics** — event/usage tracking.
-- **Remote Config** — change behavior/values without an app update (Q28).
+- **Remote Config** — change behaviour/values without an app update (Q28).
 - **App Distribution** — distribute pre-release builds to testers.
 - **Test Lab** — run instrumented tests on real/virtual devices in the cloud.
 
@@ -858,7 +890,9 @@ dependencies {
 
 ## 28. How to change parameters in an app without an app update?
 
-Use **Firebase Remote Config** (or any server-driven config / feature-flag service). You define key/value parameters in the Firebase console; the app fetches and activates them at runtime, overriding bundled defaults — so you can change values, toggle features, and run A/B tests **without shipping a new build**.
+**Dynamic app configuration** means altering application variables at runtime without publishing a Play Store update using Firebase Remote Config.
+
+You define key/value parameters in the Firebase console; the app fetches and activates them at runtime, overriding bundled defaults — so you can change values, toggle features, and run A/B tests **without shipping a new build**.
 
 ```kotlin
 val remoteConfig = Firebase.remoteConfig
@@ -882,7 +916,9 @@ Use cases: **feature flags / kill switches**, gradual feature rollout, tuning th
 
 ## 29. What is Write-Ahead Logging (WAL)?
 
-**WAL** is a SQLite journaling mode (used by Room/SQLite on Android) that changes *how* durability is achieved. Instead of writing changes directly into the main database file and keeping a rollback journal, WAL **appends changes to a separate `-wal` log file first**; the main DB file is updated later during a **checkpoint**.
+**Write-Ahead Logging (WAL)** means a SQLite logging mode that improves write performance by writing transactions to a separate WAL file before merging them with the main database.
+
+Instead of writing changes directly into the main database file and keeping a rollback journal, WAL **appends changes to a separate `-wal` log file first**; the main DB file is updated later during a **checkpoint**.
 
 Why it's used:
 
@@ -898,7 +934,9 @@ Trade-offs: extra files (`-wal`, `-shm`), periodic **checkpointing** to fold the
 
 ## 30. 16 KB page size for Android apps
 
-Historically Android used a **4 KB memory page size**. Newer 64-bit devices (and the Android 15+ platform direction) support a **16 KB page size**, which improves performance: faster app launches, lower memory-management overhead, quicker camera starts, and faster boot.
+**16 KB page size support** means configuring Android apps to run on modern 64-bit devices that process memory in larger 16 KB pages instead of 4 KB pages.
+
+Newer 64-bit devices (and the Android 15+ platform direction) support a **16 KB page size**, which improves performance: faster app launches, lower memory-management overhead, quicker camera starts, and faster boot.
 
 What it means for you:
 
@@ -922,7 +960,9 @@ Use a recent AGP/NDK and re-test native paths on a 16 KB emulator image.
 
 ## 31. Gradle Version Catalogs (libs.versions.toml)
 
-A **version catalog** is a central, type-safe registry of dependency coordinates and versions, declared in `gradle/libs.versions.toml`. It replaces scattered hard-coded version strings and the older `ext`/`buildSrc` "Versions object" pattern. Since AGP 7.4+/Gradle 7.4 it's **stable and the default** in new Android Studio projects.
+**Gradle Version Catalogs** means a centralized, type-safe dependency registry declared in `libs.versions.toml` to manage dependency versions across multiple Gradle modules.
+
+It replaces scattered hard-coded version strings and the older `ext`/`buildSrc` "Versions object" pattern. Since AGP 7.4+/Gradle 7.4 it's **stable and the default** in new Android Studio projects.
 
 ```toml
 # gradle/libs.versions.toml
@@ -963,7 +1003,7 @@ Benefits: a **single source of truth** for versions across a multi-module projec
 
 ## 32. Build cache vs configuration cache
 
-Gradle has **two distinct caches** that speed up builds in different ways — a frequent point of confusion:
+**Build cache vs configuration cache** means the difference between caching compiled task outputs to skip execution (build cache), and caching the parsed build graph to skip the configuration phase (configuration cache).
 
 | | **Build cache** | **Configuration cache** |
 | --- | --- | --- |
@@ -979,7 +1019,7 @@ org.gradle.configuration-cache=true     # skip re-configuring the build
 org.gradle.parallel=true                # configure/execute modules in parallel
 ```
 
-A Gradle build runs in phases: **initialization → configuration → execution**. The **configuration cache** short-circuits the configuration phase (no re-evaluating `build.gradle` scripts) — a big win on large multi-module projects where configuration is expensive. The **build cache** short-circuits the execution phase by reusing the outputs of up-to-date tasks; a **remote** build cache lets CI and teammates reuse each other's outputs.
+A Gradle build runs in phases: **initialisation → configuration → execution**. The **configuration cache** short-circuits the configuration phase (no re-evaluating `build.gradle` scripts) — a big win on large multi-module projects where configuration is expensive. The **build cache** short-circuits the execution phase by reusing the outputs of up-to-date tasks; a **remote** build cache lets CI and teammates reuse each other's outputs.
 
 The configuration cache also enforces best practices: tasks must declare inputs/outputs properly and avoid reading mutable global state at execution time, so adopting it often surfaces latent build issues.
 

@@ -24,7 +24,9 @@ A focused reference for the Data Structures and Algorithms (DSA) portion of Andr
 
 ## 1. What is Big-O notation?
 
-**Big-O** describes how an algorithm's resource usage (time or memory) grows as the **input size `n`** grows. It expresses the **upper bound** — the worst-case growth rate — and ignores constant factors and lower-order terms.
+**Big-O notation** means a mathematical notation that describes how an algorithm's resource usage (time or space) scales with the input size.
+
+It expresses the **upper bound** — the worst-case growth rate — and ignores constant factors and lower-order terms.
 
 Key points:
 
@@ -43,6 +45,8 @@ O(1) (Constant) < O(log n) (Logarithmic) < O(n) (Linear) < O(n log n) (Linearith
 ---
 
 ## 2. Time complexity classes (with Kotlin examples)
+
+**Time complexity classes** means the mathematical categories (like O(1), O(log N), O(N), O(N log N), and O(N²)) that classify algorithm runtimes as input size grows.
 
 | Class | Name | Rating | Typical source |
 |-------|------|--------|----------------|
@@ -178,7 +182,7 @@ fun fib(n: Int, memo: HashMap<Int, Int> = HashMap()): Int {
 
 ## 3. Space complexity
 
-**Space complexity** measures the *extra* memory an algorithm needs as a function of input size — not counting the input itself (that's "auxiliary space").
+**Space complexity** means the measurement of extra memory an algorithm requires during execution relative to the input size.
 
 - An in-place loop that uses a few variables → `O(1)` auxiliary space.
 - Building a new list/map proportional to input → `O(n)`.
@@ -205,7 +209,7 @@ There is often a **time/space trade-off**: memoization, hash-based lookups, and 
 
 ## 4. Complexity cheat-sheet table
 
-### Common data-structure operations (average / amortized; worst case noted)
+**Data structure operations complexity** means the average and worst-case time complexities for accessing, searching, inserting, and deleting elements in fundamental structures.
 
 | Structure | Access | Search | Insert | Delete | Notes |
 |-----------|:------:|:------:|:------:|:------:|-------|
@@ -234,7 +238,9 @@ There is often a **time/space trade-off**: memoization, hash-based lookups, and 
 
 ## 5. Array vs ArrayList
 
-**Array** is a fixed-size, contiguous block of memory. **`ArrayList`** (`java.util.ArrayList`, Kotlin's `MutableList` default) is a growable, array-backed list.
+**Array vs ArrayList** means the difference between a fixed-size contiguous memory sequence (Array), and a dynamically-resized list wrapper (ArrayList).
+
+**`ArrayList`** (`java.util.ArrayList`, Kotlin's `MutableList` default) is a growable, array-backed list.
 
 | Aspect | Array | ArrayList |
 |--------|-------|-----------|
@@ -263,7 +269,7 @@ val first = list[0]          // O(1)
 
 ## 6. LinkedList
 
-A **doubly linked list** (`java.util.LinkedList`): each node holds a value plus pointers to the previous and next nodes.
+**LinkedList** means a sequential data structure consisting of nodes where each node contains a value and pointers to its neighbouring nodes.
 
 | Operation | Complexity | Why |
 |-----------|:----------:|-----|
@@ -281,13 +287,15 @@ ll.add(1, 99)    // O(n) to reach index 1
 val x = ll[0]    // O(n) — NOT O(1) like ArrayList
 ```
 
-**When to use:** frequent insertions/deletions at the ends (queue/deque behavior). **Avoid** when you need random index access — `ArrayList` wins there. In practice on Android, `ArrayDeque` is usually preferred over `LinkedList` for stack/queue use because it has better cache locality and no per-node object overhead.
+**When to use:** frequent insertions/deletions at the ends (queue/deque behaviour). **Avoid** when you need random index access — `ArrayList` wins there. In practice on Android, `ArrayDeque` is usually preferred over `LinkedList` for stack/queue use because it has better cache locality and no per-node object overhead.
 
 ---
 
 ## 7. HashMap and HashSet
 
-**`HashMap`** stores key→value pairs in buckets indexed by `hashCode()`. **`HashSet`** is a `HashMap` where only keys matter (it wraps a `HashMap` internally).
+**HashMap vs HashSet** means the distinction between a key-value mapping structure indexed by hash codes (HashMap), and a collection of unique elements backed by a HashMap (HashSet).
+
+**`HashSet`** is a `HashMap` where only keys matter (it wraps a `HashMap` internally).
 
 | Operation | Average | Worst case |
 |-----------|:-------:|:----------:|
@@ -307,7 +315,7 @@ set.add(5)                // O(1) avg
 val exists = 5 in set     // O(1) avg
 ```
 
-**Why "worst case O(log n)" and not O(n)?** Before Java 8, many keys colliding into one bucket degraded to an `O(n)` linked-list scan. Since Java 8 (and on modern Android runtimes), a bucket with too many collisions is **treeified** into a balanced (red-black) tree, capping worst-case lookups at `O(log n)`. With a poor/identical `hashCode()`, behavior still trends toward that bound.
+**Why "worst case O(log n)" and not O(n)?** Before Java 8, many keys colliding into one bucket degraded to an `O(n)` linked-list scan. Since Java 8 (and on modern Android runtimes), a bucket with too many collisions is **treeified** into a balanced (red-black) tree, capping worst-case lookups at `O(log n)`. With a poor/identical `hashCode()`, behaviour still trends toward that bound.
 
 **Interview must-know:** `HashMap` relies on correct, consistent `hashCode()` **and** `equals()`. If you override one you must override the other, and keys should be immutable in the fields used for hashing. `HashMap`/`HashSet` make **no ordering guarantee** — use `LinkedHashMap` for insertion order, `TreeMap` for sorted order.
 
@@ -315,7 +323,9 @@ val exists = 5 in set     // O(1) avg
 
 ## 8. TreeMap (and sorted structures)
 
-**`TreeMap`** is a **red-black self-balancing binary search tree**. It keeps keys in sorted order and guarantees `O(log n)` for the core operations. **`TreeSet`** is the set equivalent.
+**TreeMap** means a sorted map implementation backed by a red-black self-balancing binary search tree.
+
+It keeps keys in sorted order and guarantees `O(log n)` for the core operations. **`TreeSet`** is the set equivalent.
 
 | Operation | Complexity |
 |-----------|:----------:|
@@ -340,7 +350,7 @@ for ((k, v) in tm) print("$k$v ")  // a b c — in key order
 
 ## 9. Stack and Queue
 
-These are **abstract data types** defined by access discipline, not by a specific class.
+**Stack vs Queue** means the difference between a Last-In-First-Out data access structure (Stack), and a First-In-First-Out access structure (Queue).
 
 - **Stack** — LIFO (Last In, First Out): `push`, `pop`, `peek`.
 - **Queue** — FIFO (First In, First Out): `enqueue`/`offer`, `dequeue`/`poll`, `peek`.
@@ -373,7 +383,9 @@ println(queue.removeFirst())         // 1  (dequeue)
 
 ## 10. Android-specific: ArrayMap & SparseArray
 
-Standard `HashMap` is fast but memory-hungry on Android: it allocates a bucket array plus a wrapper **`Map.Entry` object for every entry**, and it **autoboxes primitive keys** (`int` → `Integer`). For the small maps common in UI/view code, this fragments memory and increases GC pressure (jank). Android's `androidx.collection` package offers leaner alternatives.
+**ArrayMap vs SparseArray** means Android-specific memory-efficient collections that use binary search on sorted primitive arrays to avoid the memory overhead of Java's HashMap.
+
+For the small maps common in UI/view code, this fragments memory and increases GC pressure (jank). Android's `androidx.collection` package offers leaner alternatives.
 
 ### ArrayMap
 
@@ -438,7 +450,7 @@ val v = views.get(10)     // O(log n), no boxing
 
 ## 11. Data-structure operation complexity comparison
 
-A consolidated reference for "which structure should I use?" decisions.
+**Data structure efficiency** means the performance trade-offs between linear structures (lists) and associative structures (trees, maps) for different tasks.
 
 | Need | Best choice | Why |
 |------|-------------|-----|
@@ -456,7 +468,9 @@ A consolidated reference for "which structure should I use?" decisions.
 
 ## 12. Common algorithm patterns
 
-Interview problems usually map to a handful of reusable patterns. Recognizing the pattern is half the battle.
+**Algorithm design patterns** means reusable algorithmic strategies—such as Sliding Window, Two Pointers, and Fast/Slow Pointers—used to solve coding problems.
+
+Recognizing the pattern is half the battle.
 
 ### Two pointers — `O(n)` time, `O(1)` space
 
@@ -575,7 +589,7 @@ Identify overlapping subproblems + optimal substructure, then cache (top-down me
 
 ## 13. How to analyze complexity in an interview
 
-A repeatable approach to stating Big-O on the spot:
+**Big-O analysis strategy** means a systematic process of identifying operations, loops, and recursive calls to determine the time and space complexity of code.
 
 1. **Identify the input size(s)** — `n` for one array, `n`/`m` for two, `V`/`E` for a graph.
 2. **Count loops & their bounds.** Sequential loops add (`O(n) + O(n) = O(n)`); nested loops multiply (`O(n) × O(n) = O(n²)`).
@@ -583,7 +597,7 @@ A repeatable approach to stating Big-O on the spot:
 4. **Account for recursion depth** for stack-space, and use the recurrence (e.g. `T(n) = 2T(n/2) + O(n)` → `O(n log n)`).
 5. **Drop constants and lower-order terms** → report the dominant term.
 6. **State both time and space**, and clarify whether it's worst/average/amortized.
-7. **Then optimize:** can a `HashMap` turn an `O(n)` inner search into `O(1)`? Can two pointers or a sliding window remove a nested loop? Can memoization collapse exponential recursion?
+7. **Then optimise:** can a `HashMap` turn an `O(n)` inner search into `O(1)`? Can two pointers or a sliding window remove a nested loop? Can memoization collapse exponential recursion?
 
 > **Android-flavored follow-ups** interviewers like: "Why might `ArrayMap`/`SparseArray` be better than `HashMap` here?" (memory/GC on UI thread), "What's the cost of `notifyDataSetChanged` vs `DiffUtil`?" (`DiffUtil` runs an `O(n + m)`-ish Myers diff to compute minimal updates), and "Why is `LinkedList` a poor `RecyclerView` adapter backing store?" (`O(n)` random access during binding).
 

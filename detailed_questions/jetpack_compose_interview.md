@@ -42,7 +42,7 @@ A comprehensive, code-first guide to Jetpack Compose interview topics, accurate 
 
 ## 1. Jetpack Compose vs Android View System
 
-Jetpack Compose is a **declarative** UI toolkit written entirely in Kotlin; the classic View system is an **imperative**, XML-and-`findViewById` toolkit backed by `android.view.View`.
+**Jetpack Compose vs View System** means the comparison between the modern declarative Kotlin UI toolkit (Compose), and the legacy imperative XML layout hierarchy (Views).
 
 | Aspect | Compose | View System |
 |---|---|---|
@@ -63,7 +63,9 @@ Compose has no inflation step, no view hierarchy of heavyweight objects, and avo
 
 ## 2. Declarative UI in Jetpack Compose
 
-Declarative UI means you **describe what the UI should look like for a given state**, and the framework figures out how to update the screen. You never hold or mutate widget objects.
+**Compose runtime compiler** means the system that uses a Kotlin compiler plugin to build a slot table, tracking state changes to recompose UI nodes.
+
+You never hold or mutate widget objects.
 
 ```kotlin
 @Composable
@@ -83,7 +85,7 @@ When `expanded` changes, Compose **recomposes** `Greeting`, re-evaluates the `if
 
 ## 3. Declarative UI vs Imperative UI
 
-**Imperative**: you mutate the UI tree step by step in response to events.
+**Declarative UI** means writing functions that describe the UI for a given state, whereas **imperative UI** means mutating view properties step-by-step.
 
 ```kotlin
 // View system (imperative)
@@ -113,7 +115,9 @@ Trade-off: declarative is easier to reason about and harder to desync, but you g
 
 ## 4. What are Composable functions?
 
-A composable is a function annotated with `@Composable` that emits UI into the Composition. Key properties:
+**Composable function** means a function annotated with `@Composable` that emits user interface nodes into the composition tree.
+
+Key properties:
 
 - They can only be called from other composables (the compiler enforces a `$composer` parameter is threaded through).
 - They should be **side-effect free** and **idempotent** — they may run many times, in any order, on any thread, or be skipped.
@@ -137,7 +141,7 @@ Rules to respect: don't mutate global state from a composable body, don't depend
 
 ## 5. What is Recomposition?
 
-Recomposition is Compose re-invoking composable functions when the **state they read** changes, then updating only the affected parts of the UI.
+**Recomposition** means the process where the Compose runtime executes composables with updated state parameters to repaint changes.
 
 ```kotlin
 @Composable
@@ -149,7 +153,7 @@ fun Counter() {
 }
 ```
 
-Important behaviors:
+Important behaviours:
 - Compose **skips** composables whose inputs haven't changed (if their parameters are *stable*).
 - Recomposition is **intelligent and scoped** — only the smallest recomposition scope reading the state re-runs.
 - It can run **out of order**, **in parallel**, and be **cancelled/restarted** (e.g., during fast scrolling). Therefore composables must be free of order-dependent side effects.
@@ -160,7 +164,9 @@ The runtime tracks reads via a **snapshot system**: reading a `State` inside a s
 
 ## 6. What is State in Compose?
 
-State is any value that can change over time and that, when changed, triggers recomposition. The core type is `State<T>` (read-only) / `MutableState<T>`.
+**Compose state** means an observable value wrapper (like `MutableState`) that triggers recomposition in reading composables when modified.
+
+The core type is `State<T>` (read-only) / `MutableState<T>`.
 
 ```kotlin
 val state: MutableState<Int> = mutableStateOf(0)
@@ -184,7 +190,7 @@ Other state factories: `mutableStateListOf`, `mutableStateMapOf`, `mutableIntSta
 
 ## 7. How does state management work?
 
-Compose state management rests on three pillars:
+**State management** means architecting data flow using hoisting, state holders, and ViewModels to maintain a unidirectional data flow.
 
 1. **Observable state** (`mutableStateOf`) tracked by the **snapshot** system.
 2. **`remember`** to persist that state across recompositions (in the slot table).
@@ -214,6 +220,8 @@ Guidance: keep UI state in the lowest common owner, expose immutable state down 
 
 ## 8. Stateful vs Stateless composables
 
+**Stateful vs Stateless composable** means the difference between a composable that holds and manages its own internal state (stateful), and a reusable composable that receives state via parameters (stateless).
+
 - **Stateful**: owns/holds its own state internally (via `remember`). Convenient but harder to reuse, test, and control.
 - **Stateless**: holds no state; receives state via parameters and reports changes via callbacks. Reusable, testable, previewable.
 
@@ -238,7 +246,9 @@ Best practice: write **stateless** composables and hoist state to a stateful cal
 
 ## 9. What are side effects?
 
-A side effect is any change to state that escapes the scope of a composable function — e.g., starting a coroutine, writing to a database, showing a Snackbar, registering a callback. Because composables can run repeatedly and unpredictably, such work must be wrapped in **Effect APIs** that give it controlled, lifecycle-aware execution.
+**Side effect** means an escape hatch or operation that happens outside the control of the Compose rendering thread, such as updating databases.
+
+Because composables can run repeatedly and unpredictably, such work must be wrapped in **Effect APIs** that give it controlled, lifecycle-aware execution.
 
 Key Effect APIs:
 
@@ -259,7 +269,7 @@ Key Effect APIs:
 
 ## 10. LaunchedEffect vs DisposableEffect
 
-Both are keyed effects scoped to the composition, but they serve different needs.
+**LaunchedEffect vs DisposableEffect** means the choice between running coroutines bound to a composable's lifecycle (LaunchedEffect), and running effects that require cleanup when leaving composition (DisposableEffect).
 
 **`LaunchedEffect`** runs a **suspending** block in a coroutine. It launches when entering composition, cancels on leaving, and **cancels-and-relaunches** when any key changes.
 
@@ -286,7 +296,9 @@ Rule of thumb: suspend/async work → `LaunchedEffect`; register-then-unregister
 
 ## 11. rememberCoroutineScope and use cases
 
-`rememberCoroutineScope()` returns a `CoroutineScope` bound to the call site's composition. Use it to launch coroutines from **non-composable callbacks** (e.g., `onClick`), where you can't call `LaunchedEffect`.
+**rememberCoroutineScope** means an API that returns a coroutine scope bound to the composition lifecycle to launch coroutines in response to user gestures.
+
+Use it to launch coroutines from **non-composable callbacks** (e.g., `onClick`), where you can't call `LaunchedEffect`.
 
 ```kotlin
 @Composable
@@ -308,7 +320,7 @@ Common use cases: animating on click (`scope.launch { animatable.animateTo(...) 
 
 ## 12. Observing Flow and LiveData in Compose
 
-Convert reactive streams into Compose `State`:
+**Reactive state observation** means converting LiveData or Flow streams into Compose `State` instances using `observeAsState()` or `collectAsStateWithLifecycle()`. 
 
 ```kotlin
 // StateFlow / Flow — lifecycle-aware (recommended)
@@ -329,7 +341,7 @@ For RxJava there are `subscribeAsState` adapters in `runtime-rxjava2/3`.
 
 ## 13. Handling asynchronous operations
 
-Choose the API by what triggers the work:
+**Asynchronous operations in Compose** means handling background operations using side-effect APIs like `LaunchedEffect` or `produceState`.
 
 - **Triggered by composition/keys** → `LaunchedEffect`.
 - **Triggered by user events** → `rememberCoroutineScope().launch`.
@@ -352,7 +364,7 @@ Best practice: keep heavy/business async work in the `ViewModel` (`viewModelScop
 
 ## 14. Converting non-Compose state into Compose state
 
-Use `produceState` to bridge callback/async APIs into observable `State`, with proper cleanup via `awaitDispose`:
+**State bridging** means using `produceState` or `remember` to wrap callbacks or sensor events into Compose-readable state.
 
 ```kotlin
 @Composable
@@ -374,7 +386,9 @@ Other bridges:
 
 ## 15. derivedStateOf
 
-`derivedStateOf` creates a `State` whose value is **computed** from other state reads, and which only **notifies readers when the computed result actually changes**. Use it when a frequently-changing input maps to a rarely-changing output.
+**Modifier** means an ordered collection of elements used to decorate, size, style, or add behaviour to composables.
+
+Use it when a frequently-changing input maps to a rarely-changing output.
 
 ```kotlin
 val listState = rememberLazyListState()
@@ -393,7 +407,7 @@ Anti-pattern: don't use it for a 1:1 transform of inputs (e.g., `derivedStateOf 
 
 ## 16. rememberUpdatedState
 
-`rememberUpdatedState` captures the **latest** value so a **long-running effect** can read it without being restarted when that value changes.
+**Modifier ordering** means the rule that modifier operations are applied sequentially from left-to-right, making their layout order significant.
 
 ```kotlin
 @Composable
@@ -414,7 +428,7 @@ Here `LaunchedEffect(Unit)` must run exactly once, but `onTimeout` may change ac
 
 ## 17. remember vs rememberSaveable
 
-Both persist a value across **recompositions**, but differ on **configuration changes / process death**.
+**remember vs rememberSaveable** means the choice between persisting values across recompositions only (remember), and persisting values across configuration changes and process death (rememberSaveable).
 
 - `remember`: stored in the composition's slot table. Survives recomposition; **lost** on configuration change (e.g., rotation) and process death.
 - `rememberSaveable`: also writes to a `Bundle` via the saved-instance-state mechanism. Survives recomposition **and** configuration changes **and** system-initiated process death.
@@ -448,7 +462,7 @@ Trade-off: `rememberSaveable` only suits small UI state (Bundle has a size limit
 
 ## 18. Lifecycle of a Composable
 
-A composable's lifecycle has three events, tracked by the runtime in the slot table:
+**Composable lifecycle** means the three phases: entering composition, recomposing zero or more times, and leaving composition.
 
 1. **Enter the Composition** — first time it's invoked and emits nodes.
 2. **Recompose 0..n times** — re-invoked when its observed state changes.
@@ -466,7 +480,9 @@ Enters Composition ──▶ Recomposes (0..n) ──▶ Leaves Composition
 
 ## 19. Handling lifecycle events in Compose
 
-For **composition** lifecycle, use the Effect APIs (Section 9–10). For the **Android `Lifecycle`** (Activity/Fragment ON_RESUME, ON_PAUSE, etc.), observe `LocalLifecycleOwner`:
+**Lifecycle coordination** means observing Android's lifecycle events (like resume or pause) inside a composable using a `DisposableEffect`.
+
+For the **Android `Lifecycle`** (Activity/Fragment ON_RESUME, ON_PAUSE, etc.), observe `LocalLifecycleOwner`:
 
 ```kotlin
 @Composable
@@ -499,7 +515,9 @@ Note the `rememberUpdatedState` + `DisposableEffect(lifecycleOwner)` pattern: th
 
 ## 20. Performance best practices
 
-**1. Stability & skipping.** Ensure parameters are *stable* so Compose can skip recomposition. Stable = immutable, or notifies Compose of changes. Mark types `@Immutable`/`@Stable`, use `val`, and prefer immutable/persistent collections (`kotlinx.collections.immutable`'s `ImmutableList`) since `List<T>` is treated as unstable.
+**Compose performance optimisation** means techniques like using stable parameters, derivedStateOf, lazy layouts, and minimising layout recalculations.
+
+Stability & skipping.** Ensure parameters are *stable* so Compose can skip recomposition. Stable = immutable, or notifies Compose of changes. Mark types `@Immutable`/`@Stable`, use `val`, and prefer immutable/persistent collections (`kotlinx.collections.immutable`'s `ImmutableList`) since `List<T>` is treated as unstable.
 
 ```kotlin
 @Immutable
@@ -533,7 +551,7 @@ Diagnose with the **Layout Inspector** recomposition counts and the **Compose co
 
 ## 21. Using Compose and Views together (interop)
 
-Yes — Compose and Views interoperate both ways, enabling incremental migration.
+**UI interoperability** means combining toolkits using `ComposeView` to host composables inside XML layouts, and `AndroidView` to host classic Views inside composables.
 
 **Views inside Compose** — use `AndroidView`:
 ```kotlin
@@ -559,7 +577,9 @@ Trade-offs: interop has a bridging cost; mixing the two scrolling systems (e.g.,
 
 ## 22. State Hoisting
 
-State hoisting is the pattern of moving state **up** to a composable's caller, making the child stateless. The canonical signature is **value down, events up**:
+**CompositionLocal** means a mechanism to pass data implicitly down the composition tree without parameter drilling.
+
+The canonical signature is **value down, events up**:
 
 ```kotlin
 // Stateless
@@ -582,7 +602,7 @@ Benefits: **single source of truth**, **encapsulation** (only owners mutate), **
 
 ## 23. CompositionLocal
 
-`CompositionLocal` provides a value implicitly to a subtree, avoiding "prop drilling" of cross-cutting data (theme, colors, density, locale).
+**rememberUpdatedState** means a utility that stores a value in a mutable reference so that long-running side effects can access the latest value without restarting.
 
 ```kotlin
 val LocalElevation = compositionLocalOf { 4.dp }   // dynamic, tracks reads
@@ -608,7 +628,7 @@ Use sparingly: it makes data flow implicit and harder to trace. Prefer explicit 
 
 ## 24. Jetpack Compose Phases
 
-Each frame, Compose runs up to three phases:
+**Compose phases** means the three sequential steps—Composition (what to show), Layout (where to place), and Drawing (how to paint)—that compose the UI.
 
 1. **Composition** — *what* to show. Runs `@Composable` functions, builds/updates the UI tree (LayoutNodes).
 2. **Layout** — *where* to place it. For each node: **measure** children, then **place** them (single measurement pass per node).
@@ -631,7 +651,9 @@ Box(Modifier.drawBehind { drawRect(color.value) })
 
 ## 25. The Modifier
 
-A `Modifier` decorates or configures a composable — sizing, padding, background, click handling, layout behavior, semantics, drawing. Modifiers form an **ordered chain**, and **order matters**.
+**derivedStateOf** means a state utility that computes a value from other state parameters and recomposes only when the computed output changes.
+
+Modifiers form an **ordered chain**, and **order matters**.
 
 ```kotlin
 Text(
@@ -648,7 +670,7 @@ Swapping `.padding` and `.background` changes whether the gray fills the padded 
 Key points:
 - Pass a `modifier: Modifier = Modifier` as the **first optional parameter** of your composables and apply it to the root element (convention for reusability).
 - Modifiers are immutable; chaining returns a new `Modifier`.
-- For custom behavior, prefer the `Modifier.Node` API (`Modifier.then`, custom `layout`, `drawWithCache`) over deprecated `composed {}` for performance.
+- For custom behaviour, prefer the `Modifier.Node` API (`Modifier.then`, custom `layout`, `drawWithCache`) over deprecated `composed {}` for performance.
 - Common: `fillMaxSize`, `weight` (in Row/Column scope), `align`, `clip`, `border`, `pointerInput`, `semantics`.
 
 **📚 Reference:** https://developer.android.com/jetpack/compose/modifiers
@@ -657,7 +679,9 @@ Key points:
 
 ## 26. Semantics
 
-The **semantics tree** is a parallel description of the UI's *meaning*, consumed by accessibility services (TalkBack), autofill, and UI tests. Compose generates it automatically for standard components; you augment it via `Modifier.semantics`.
+**Compose Canvas** means a composable layout that provides a drawing scope to paint custom 2D graphics.
+
+Compose generates it automatically for standard components; you augment it via `Modifier.semantics`.
 
 ```kotlin
 Icon(
@@ -685,11 +709,9 @@ The same tree powers **UI testing**, so good semantics improve both accessibilit
 
 ## 27. Handling user input and events
 
-**High-level gestures via modifiers:**
-```kotlin
-Modifier
-    .clickable { onClick() }
-    .combinedClickable(onLongClick = { ... }, onClick = { ... })
+**Gesture handling** means detecting user interactions like taps, drags, or swipes using click modifiers or pointer input detectors.
+
+}, onClick = { ... })
     .toggleable(value = checked, onValueChange = onCheckedChange)
     .draggable(state = rememberDraggableState { delta -> offset += delta }, orientation = Orientation.Horizontal)
     .scrollable(...)
@@ -719,7 +741,9 @@ Principle: handle the event in a callback (not in the composable body), then upd
 
 ## 28. Navigation in Compose
 
-Use **Navigation Compose** (`androidx.navigation:navigation-compose`). As of 2025–2026 the recommended approach is **type-safe navigation** with `@Serializable` route classes.
+**Compose Navigation** means a navigation framework that manages composable screens as destinations on a back stack using type-safe routes.
+
+As of 2025–2026 the recommended approach is **type-safe navigation** with `@Serializable` route classes.
 
 ```kotlin
 @Serializable object Home
@@ -751,7 +775,9 @@ Key concepts:
 
 ## 29. Orientation changes
 
-On rotation the Activity is recreated by default, so `remember`-only state is lost. Strategies:
+**Orientation handling** means adapting Compose layouts to screen rotations using `Configuration` details or size-class multipliers.
+
+Strategies:
 
 1. **`rememberSaveable`** for small UI state — survives via the saved-instance Bundle:
 ```kotlin
@@ -774,7 +800,7 @@ Avoid `android:configChanges` to "fix" rotation unless you specifically want to 
 
 ## 30. Unidirectional Data Flow
 
-UDF means **state flows down** and **events flow up** — a single, predictable loop.
+**Lazy layouts** means list components (`LazyColumn`/`LazyRow`) that only measure and compose visible items to optimise scroll performance.
 
 ```
         events (up)
@@ -804,7 +830,7 @@ Benefits: **single source of truth**, predictable/testable state transitions, no
 
 ## 31. Custom Layouts
 
-When built-in layouts (`Row`, `Column`, `Box`) aren't enough, use the **`Layout`** composable or the **`layout` modifier** to measure and place children yourself.
+**Custom Layout composable** means creating custom layouts by measuring children manually and positioning them on coordinates.
 
 **`layout` modifier** — adjust a single element:
 ```kotlin

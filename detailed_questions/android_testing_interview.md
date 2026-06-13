@@ -30,7 +30,9 @@ A comprehensive, code-first reference for Android testing interview questions, c
 
 ## 1. What is the testing pyramid?
 
-The **testing pyramid** is a model describing the ideal proportion of automated tests by type. It balances confidence against cost (speed, stability, maintenance).
+**Testing pyramid** means a testing model that recommends a large base of fast unit tests, a middle layer of integration tests, and a small peak of end-to-end UI tests.
+
+It balances confidence against cost (speed, stability, maintenance).
 
 ```
             /\
@@ -54,6 +56,8 @@ Google also describes a refinement (small/medium/large tests) with a roughly **7
 
 ## 2. Unit tests vs. instrumented tests
 
+**Local unit tests vs instrumented tests** means the distinction between tests running on the local JVM without emulator overhead, and tests running inside a physical or virtual Android device.
+
 | | **Local unit tests** | **Instrumented tests** |
 |---|---|---|
 | Source set | `src/test/` | `src/androidTest/` |
@@ -72,7 +76,7 @@ By default, the Android `android.jar` on the unit-test classpath has every metho
 
 ## 3. What is a unit test and what should it do?
 
-A **unit test** verifies the behavior of the smallest testable piece of code — usually a single function or class — in isolation from its collaborators.
+**Unit test** means an automated test that isolates and verifies the behaviour of the smallest testable piece of source code, usually a class or function.
 
 What it should do:
 - **Test one logical thing** with a clear name describing the scenario and expectation.
@@ -108,7 +112,9 @@ class PriceCalculatorTest {
 
 ## 4. What is an instrumented test?
 
-An **instrumented test** runs on a physical device or emulator, inside an actual Android process, so it has access to real framework APIs (`Context`, `Resources`, `SharedPreferences`, Room, sensors, etc.). It is built into an APK and executed by the `AndroidJUnitRunner`.
+**Instrumented test** means a test that runs on a physical device or emulator to test components that depend directly on the Android framework lifecycle or resources.
+
+It is built into an APK and executed by the `AndroidJUnitRunner`.
 
 Use it for:
 - UI interaction and assertions (Espresso, Compose UI tests).
@@ -146,12 +152,9 @@ dependencies {
 
 ## 5. How do you write testable code? What makes code hard to test?
 
-**What makes code hard to test:**
-- **Hard (concrete) dependencies** created inside a class with `new`/constructor calls — you cannot substitute a fake.
-- **Static methods and singletons** (`Object.method()`, `Calendar.getInstance()`, `System.currentTimeMillis()`) — global state that cannot be swapped per test.
-- **Tight coupling to the Android framework** (`Context`, `Log`, `TextUtils`) inside business logic.
-- **Side effects and non-determinism** — real network, real DB, real time/random, real threads.
-- **God classes** doing too much; private logic that can only be reached through complex setup.
+**Testable code design** means structuring software with loose coupling, dependency injection, and clean boundaries to facilitate mock insertion during testing.
+
+- **Static methods and singletons** (`Object.method()`, `Calendar.getInstance()`, `System.currentTimeMillis()`) — global state that cannot be swapped per test. - **Tight coupling to the Android framework** (`Context`, `Log`, `TextUtils`) inside business logic. - **Side effects and non-determinism** — real network, real DB, real time/random, real threads. - **God classes** doing too much; private logic that can only be reached through complex setup.
 
 **How to write testable code:**
 - **Dependency injection** — pass collaborators in via the constructor (manual DI or Hilt/Dagger) so tests inject fakes.
@@ -187,7 +190,9 @@ class GoodViewModel(
 
 ## 6. JUnit — structure, annotations, assertions, JUnit4 vs JUnit5
 
-**JUnit** is the standard Java/Kotlin testing framework that discovers, runs, and reports tests. Android tooling defaults to **JUnit 4**; **JUnit 5** (Jupiter) is usable for JVM unit tests via a plugin but is not supported on the instrumented (device) runner.
+**JUnit** means the standard Java/Kotlin testing framework used to structure, annotate, and run automated unit tests.
+
+Android tooling defaults to **JUnit 4**; **JUnit 5** (Jupiter) is usable for JVM unit tests via a plugin but is not supported on the instrumented (device) runner.
 
 **JUnit 4 lifecycle:**
 
@@ -245,7 +250,9 @@ For Android, JUnit 4 with `@get:Rule` (e.g. `InstantTaskExecutorRule`, `MainDisp
 
 ## 7. Why use Mockito? Core API
 
-**Mockito** is a Java mocking framework that creates **test doubles** so you can isolate the unit under test, stub return values, and verify interactions. It lets you test a class without its real (slow, non-deterministic, or unavailable) collaborators.
+**Mockito** means a Java mocking framework used to create mock objects and stub behaviours to isolate the system under test.
+
+It lets you test a class without its real (slow, non-deterministic, or unavailable) collaborators.
 
 Use Mockito to:
 - **Stub** a collaborator's return value (`when(...).thenReturn(...)`).
@@ -302,7 +309,9 @@ Argument matchers: `any()`, `eq()`, `anyInt()`, `argThat { ... }`. Stubbing styl
 
 ## 8. MockK — the Kotlin mocking library
 
-**MockK** is a mocking library built from the ground up **for Kotlin**. It natively understands Kotlin features that trip up Mockito: `final` classes (no extra plugin needed), `object`/singletons, extension functions, top-level functions, and especially **suspend functions** (`coEvery`/`coVerify`).
+**MockK** means a Kotlin-first mocking library designed to support Kotlin features like coroutines, properties, and companion objects.
+
+It natively understands Kotlin features that trip up Mockito: `final` classes (no extra plugin needed), `object`/singletons, extension functions, top-level functions, and especially **suspend functions** (`coEvery`/`coVerify`).
 
 ```kotlin
 // testImplementation("io.mockk:mockk:1.13.x")
@@ -354,6 +363,8 @@ class CaptureExample {
 
 ## 9. Mockito vs. MockK
 
+**Mockito vs MockK** means the choice between a Java-based mocking framework requiring helper adapters for Kotlin (Mockito), and a native Kotlin mocking library (MockK).
+
 | | **Mockito (+ mockito-kotlin)** | **MockK** |
 |---|---|---|
 | Origin | Java library, Kotlin wrapper | Kotlin-native |
@@ -361,7 +372,7 @@ class CaptureExample {
 | Suspend functions | needs `runTest`; no native API | first-class `coEvery` / `coVerify` |
 | Object / static / constructor | awkward | `mockkObject` / `mockkStatic` / `mockkConstructor` |
 | Extension functions | not supported well | supported |
-| Default behavior | mocks return null/defaults | strict unless `relaxed = true` |
+| Default behaviour | mocks return null/defaults | strict unless `relaxed = true` |
 | DSL | `whenever(x).thenReturn(y)` | `every { x } returns y` |
 
 **Rule of thumb:** For new Kotlin projects (especially with coroutines/Flow), **MockK** is the natural choice. **Mockito** remains common in Java-heavy or legacy codebases and is lighter weight. Both isolate the SUT; the choice is about Kotlin ergonomics.
@@ -372,11 +383,13 @@ class CaptureExample {
 
 ## 10. Fakes vs. Mocks vs. Stubs vs. Spies
 
-These are kinds of **test doubles** (Gerard Meszaros' taxonomy). Interviewers especially probe **fake vs. mock**.
+**Test doubles** means the various mock objects used in testing, where **fake** implements simplified working logic, and **mock** verifies specific interaction expectations.
+
+Interviewers especially probe **fake vs. mock**.
 
 - **Dummy** — passed to satisfy a signature, never actually used.
 - **Stub** — returns hard-coded answers to calls; no logic. Used for **state** setup.
-- **Mock** — a programmed double with **expectations**; you **verify interactions** (which methods were called, how often, with what). Used for **behavior** verification.
+- **Mock** — a programmed double with **expectations**; you **verify interactions** (which methods were called, how often, with what). Used for **behaviour** verification.
 - **Spy** — wraps a real object; records calls and lets you override some (partial mock).
 - **Fake** — a **working lightweight implementation** (real logic, not production-grade). Classic example: an in-memory repository or in-memory Room DB.
 
@@ -384,7 +397,7 @@ These are kinds of **test doubles** (Gerard Meszaros' taxonomy). Interviewers es
 
 | | **Mock** | **Fake** |
 |---|---|---|
-| Has working logic? | No — returns programmed values | Yes — real, simplified behavior |
+| Has working logic? | No — returns programmed values | Yes — real, simplified behaviour |
 | What you assert | Interactions (`verify`) | End state / outputs |
 | Created by | Mocking framework | Hand-written class |
 | Brittleness | Tied to call sequence → brittle | Robust to refactors |
@@ -413,7 +426,9 @@ fun fake_storesAndReturnsUser() = runTest {
 
 ## 11. What is Espresso?
 
-**Espresso** is Google's UI testing framework for **in-app** instrumented tests. It is fast and reliable because it **automatically synchronizes** with the UI thread and the message queue — it waits until the app is idle before performing the next action, eliminating most `sleep()`-based flakiness.
+**Espresso** means Google's UI testing framework that provides automatic synchronisation between test actions and the application's UI thread.
+
+It is fast and reliable because it **automatically synchronizes** with the UI thread and the message queue — it waits until the app is idle before performing the next action, eliminating most `sleep()`-based flakiness.
 
 Three core building blocks:
 - **`onView(matcher)`** — find a view using a **ViewMatcher** (`withId`, `withText`, `withContentDescription`).
@@ -447,7 +462,9 @@ class LoginScreenTest {
 
 ## 12. What is UI Automator?
 
-**UI Automator** is a UI testing framework for **black-box, cross-app** testing. Unlike Espresso (scoped to your own app), UI Automator can interact with **any** app and the **system UI** — open the notification shade, press Home/Back/Recents, toggle settings, grant runtime permissions, interact with another app, and come back.
+**UI Automator** means a black-box UI testing framework that allows interaction with system-level elements and cross-app workflows.
+
+Unlike Espresso (scoped to your own app), UI Automator can interact with **any** app and the **system UI** — open the notification shade, press Home/Back/Recents, toggle settings, grant runtime permissions, interact with another app, and come back.
 
 Core APIs:
 - **`UiDevice`** — represents the device; performs system actions (`pressHome()`, `pressBack()`, `openNotification()`, `wait(...)`).
@@ -480,7 +497,9 @@ class CrossAppTest {
 
 ## 13. What is Robolectric? Pros and cons
 
-**Robolectric** is a framework that lets you run Android-dependent tests on the **local JVM** — no emulator or device required. It provides "**shadow**" objects that simulate Android framework classes (`Activity`, `Resources`, `SharedPreferences`, `Looper`, etc.), so framework calls return real-ish values instead of the default `"Method not mocked"` exception.
+**Robolectric** means a testing framework that executes Android-dependent tests on the local JVM by providing simulated Android framework shadows.
+
+It provides "**shadow**" objects that simulate Android framework classes (`Activity`, `Resources`, `SharedPreferences`, `Looper`, etc.), so framework calls return real-ish values instead of the default `"Method not mocked"` exception.
 
 ```kotlin
 @RunWith(AndroidJUnit4::class)   // Robolectric runner via robolectric.properties / config
@@ -504,10 +523,10 @@ class MainActivityRobolectricTest {
 - Integrates with AndroidX Test / Espresso APIs (`ActivityScenario`, `onView`) for off-device UI-ish tests.
 
 **Cons / disadvantages (common interview answer):**
-- **Simulation, not the real thing** — shadows can diverge from real device behavior, so a passing Robolectric test does not guarantee correctness on hardware (false confidence).
+- **Simulation, not the real thing** — shadows can diverge from real device behaviour, so a passing Robolectric test does not guarantee correctness on hardware (false confidence).
 - **Incomplete coverage** — not every framework class/feature is shadowed; some APIs are unimplemented or behave differently.
 - **Slower than pure JVM unit tests** — it loads a large Android runtime simulation and per-SDK jars.
-- **Maintenance lag** — must keep up with new Android SDK levels; new platform behavior may not be modeled yet.
+- **Maintenance lag** — must keep up with new Android SDK levels; new platform behaviour may not be modeled yet.
 - **Hides integration bugs** — things like real rendering, animations, IPC, hardware, and timing aren't truly exercised, so it can't replace instrumented UI tests.
 
 **Where it fits:** between pure unit tests and instrumented tests. Use it for framework-touching logic you want fast feedback on; still keep a smaller set of real instrumented/UI tests for end-to-end confidence.
@@ -518,7 +537,9 @@ class MainActivityRobolectricTest {
 
 ## 14. Testing coroutines — runTest and TestDispatchers
 
-Use the **`kotlinx-coroutines-test`** artifact. It controls **virtual time** so delays are skipped and execution is deterministic.
+**Coroutine testing** means controlling asynchronous execution using `runTest` and `TestDispatcher` to skip delays and ensure deterministic test assertions.
+
+It controls **virtual time** so delays are skipped and execution is deterministic.
 
 ```kotlin
 // testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.x")
@@ -586,7 +607,9 @@ class MyViewModelTest {
 
 ## 15. Turbine — testing Kotlin Flow
 
-**Turbine** (Cash App) is a small library that turns push-based `Flow` emissions into **pull-based suspend calls**, making Flow/StateFlow tests readable and non-flaky. You call `.test { }` on a flow and then `awaitItem()` / `awaitComplete()` / `awaitError()` to consume emissions one at a time.
+**Turbine** means a lightweight library from Cash App that simplifies Kotlin Flow testing by converting asynchronous emissions into a synchronous queue.
+
+You call `.test { }` on a flow and then `awaitItem()` / `awaitComplete()` / `awaitError()` to consume emissions one at a time.
 
 ```kotlin
 // testImplementation("app.cash.turbine:turbine:1.x")
@@ -631,9 +654,9 @@ Turbine fails the test if an unconsumed event remains, an unexpected event type 
 
 ## 16. Testing a ViewModel with Coroutines and LiveData
 
-Two essentials:
-1. **`InstantTaskExecutorRule`** (from `androidx.arch.core:core-testing`) — runs LiveData's background `ArchTaskExecutor` work **synchronously on the same thread**, so `setValue`/`postValue` are observed immediately in tests.
-2. **`MainDispatcherRule`** — replaces `Dispatchers.Main` used by `viewModelScope`.
+**ViewModel LiveData testing** means verifying state changes by swapping the main thread execution with `InstantTaskExecutorRule` and mocking coroutines.
+
+**`InstantTaskExecutorRule`** (from `androidx.arch.core:core-testing`) — runs LiveData's background `ArchTaskExecutor` work **synchronously on the same thread**, so `setValue`/`postValue` are observed immediately in tests. 2. **`MainDispatcherRule`** — replaces `Dispatchers.Main` used by `viewModelScope`.
 
 ```kotlin
 // testImplementation("androidx.arch.core:core-testing:2.2.0")
@@ -716,7 +739,9 @@ fun load_emitsLoadingThenSuccess() = runTest {
 
 ## 17. Testing a ViewModel with Flow and StateFlow
 
-`StateFlow` is a **hot** flow that always has a current value and never completes, so collecting it requires care. The cleanest approach is **Turbine**; you can also read `.value` directly for the latest state.
+**ViewModel Flow testing** means validating Flow emissions using Turbine or collecting emissions inside a test coroutine scope.
+
+The cleanest approach is **Turbine**; you can also read `.value` directly for the latest state.
 
 ```kotlin
 class SearchViewModel(
@@ -785,12 +810,11 @@ fun search_finalStateIsSuccess() = runTest {
 
 ## 18. Code coverage and JaCoCo
 
-**Code coverage** measures how much of your production code is exercised by tests, reported as percentages of:
-- **Line coverage** — lines executed.
-- **Branch coverage** — `if`/`when`/conditional branches taken.
-- **Method / class coverage** — methods and classes touched.
+**Code coverage** means a metric generated by tools like JaCoCo that measures the percentage of production code executed by automated tests.
 
-It is a **guidance metric, not a goal**: high coverage means a lot of code *ran* during tests, not that behavior was *meaningfully asserted*. 100% coverage with weak assertions is still poor testing; conversely, you don't need to cover trivial getters/generated code. Use it to find **untested critical paths**, set a sensible team threshold (often 70–85% on business logic), and gate it in CI.
+- **Branch coverage** — `if`/`when`/conditional branches taken. - **Method / class coverage** — methods and classes touched.
+
+It is a **guidance metric, not a goal**: high coverage means a lot of code *ran* during tests, not that behaviour was *meaningfully asserted*. 100% coverage with weak assertions is still poor testing; conversely, you don't need to cover trivial getters/generated code. Use it to find **untested critical paths**, set a sensible team threshold (often 70–85% on business logic), and gate it in CI.
 
 **JaCoCo** (Java Code Coverage) is the standard tool on Android/JVM. It instruments bytecode and produces HTML/XML reports.
 
@@ -828,7 +852,9 @@ Run with `./gradlew jacocoTestReport`; the HTML report lands in `build/reports/j
 
 ## 19. Testing Jetpack Compose UI
 
-Compose UI tests don't drive a `View` tree — they query the **semantics tree** (the same accessibility metadata screen readers use). You assert on nodes by their semantics and perform actions on them. Tests run as instrumented tests (on device/emulator) or with **Robolectric** for JVM-only Compose tests.
+**Compose UI testing** means verifying declarative layouts by query matching semantic nodes and asserting UI states using Compose test rules.
+
+You assert on nodes by their semantics and perform actions on them. Tests run as instrumented tests (on device/emulator) or with **Robolectric** for JVM-only Compose tests.
 
 **Rules:** use `createComposeRule()` to set content directly, or `createAndroidComposeRule<MyActivity>()` when you need a real `Activity` (e.g. testing navigation in an existing screen).
 
@@ -860,7 +886,7 @@ Key APIs:
 
 **Debugging:** `composeTestRule.onRoot().printToLog("TAG")` dumps the semantics tree so you can see why a finder didn't match.
 
-**Why it matters:** Compose is the default UI toolkit for new apps, so "how do you test a composable?" is now a standard question. The expected answer hits the **semantics tree**, the `createComposeRule` vs `createAndroidComposeRule` choice, the finder→assertion→action flow, `testTag`, and automatic recomposition synchronization.
+**Why it matters:** Compose is the default UI toolkit for new apps, so "how do you test a composable?" is now a standard question. The expected answer hits the **semantics tree**, the `createComposeRule` vs `createAndroidComposeRule` choice, the finder→assertion→action flow, `testTag`, and automatic recomposition synchronisation.
 
 **📚 Reference:** <https://developer.android.com/develop/ui/compose/testing>
 

@@ -34,7 +34,9 @@ It also includes a curated set of HR/soft-skill questions, a **Preparation Tips*
 
 ## 1. Describe SQLite
 
-**SQLite** is a lightweight, self-contained, serverless, zero-configuration, transactional SQL database engine that is embedded directly into Android. Every app gets its own private SQLite database stored in the app's sandbox (`/data/data/<package>/databases/`). It is the canonical relational store on the platform.
+**SQLite** means a lightweight, serverless, relational SQL database engine embedded directly inside the Android OS.
+
+Every app gets its own private SQLite database stored in the app's sandbox (`/data/data/<package>/databases/`). It is the canonical relational store on the platform.
 
 Key characteristics:
 
@@ -80,7 +82,9 @@ The downsides of using raw SQLite directly: lots of boilerplate, no compile-time
 
 ## 2. Have you used Room?
 
-Yes. **Room** is the Jetpack persistence library that provides an abstraction layer over SQLite. It keeps the power of SQLite while removing boilerplate and adding **compile-time verification** of SQL queries.
+**Room** means an official Jetpack database persistence library that provides a compile-time validated, object-oriented abstraction layer over raw SQLite.
+
+**Room** is the Jetpack persistence library that provides an abstraction layer over SQLite. It keeps the power of SQLite while removing boilerplate and adding **compile-time verification** of SQL queries.
 
 Room has three core components:
 
@@ -145,6 +149,8 @@ Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
 
 ## 3. SQLite vs Room — when to use which
 
+**SQLite vs Room** means the choice between writing manual SQLite helper boilerplate and runtime queries, and using a compile-safe ORM library (Room).
+
 | Aspect | Raw SQLite (`SQLiteOpenHelper`) | Room |
 |---|---|---|
 | SQL verification | Runtime only | **Compile time** |
@@ -160,7 +166,9 @@ Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
 
 ## 4. Can we identify users who uninstalled our app?
 
-**You cannot directly detect an uninstall on the device** — Android does not deliver a callback to your own app when it is being removed, and there is no per-user "uninstalled" event for your own package. What you can do is **infer** uninstalls server-side:
+**Uninstall detection** means the process of tracking app uninstalls indirectly using silent push notifications or backend logs, since the OS provides no direct on-device callback.
+
+What you can do is **infer** uninstalls server-side:
 
 1. **FCM unregistration signal (most reliable).** When you send a message to a token that belongs to an uninstalled app, FCM eventually returns an error such as `UNREGISTERED` (HTTP 404 / `messaging/registration-token-not-registered`). Your backend treats that as "device gone" and marks the user inactive. There is normally a delay (days) because FCM only learns the app is gone when it next tries to reach the device.
 
@@ -182,7 +190,7 @@ Server: mark token stale -> count as probable uninstall
 
 ## 5. Android development best practices
 
-A condensed checklist interviewers expect you to know:
+**Android development best practices** means a set of guidelines including lifecycle-aware components, offline-first architectures, memory leak prevention, and secure key storage.
 
 - **Architecture:** Use a clear, layered architecture (MVVM / MVI) with unidirectional data flow. Follow Google's recommended app architecture: UI layer (Compose/Views + ViewModel) -> domain layer (optional use cases) -> data layer (repositories + data sources).
 - **Single source of truth:** Repositories expose data; UI observes immutable state.
@@ -191,7 +199,7 @@ A condensed checklist interviewers expect you to know:
 - **Reactive & async:** Kotlin coroutines + Flow for concurrency; never block the main thread.
 - **Background work:** WorkManager for deferrable/guaranteed work; avoid raw services.
 - **Persistence:** Room for relational data; DataStore (not SharedPreferences) for key-value/proto.
-- **Networking:** Retrofit + OkHttp + a serializer (Moshi/kotlinx.serialization); centralized error handling.
+- **Networking:** Retrofit + OkHttp + a serializer (Moshi/kotlinx.serialisation); centralized error handling.
 - **UI:** Prefer Jetpack Compose for new UI; follow Material 3; support multiple screen sizes and dark theme.
 - **Resources & i18n:** Externalize strings; support RTL and localization; use vector drawables.
 - **Performance:** Avoid overdraw, lazy-load, paginate, use baseline profiles, cache wisely.
@@ -205,7 +213,9 @@ A condensed checklist interviewers expect you to know:
 
 ## 6. React Native vs Flutter
 
-Both are cross-platform UI frameworks that let you target Android and iOS from one codebase. The difference is the language, rendering model, and ecosystem.
+**Cross-platform frameworks** means the comparison between React Native using JavaScript and bridge-based rendering, and Flutter using Dart and a custom graphics engine.
+
+The difference is the language, rendering model, and ecosystem.
 
 | Dimension | React Native | Flutter |
 |---|---|---|
@@ -226,11 +236,11 @@ Both are cross-platform UI frameworks that let you target Android and iOS from o
 
 ## 7. What metrics should you measure continuously?
 
-During development and in production you should continuously track:
+**Continuous performance monitoring** means tracking key production metrics like ANR rates, crash frequencies, rendering frame drops, and battery usage via Android Vitals.
 
 - **App startup time** — cold, warm, and hot start (Time To Initial Display / Time To Full Display). Use Macrobenchmark and Play Console's Android Vitals.
 - **Frame rendering / jank** — frozen frames (>700ms) and slow frames (>16ms at 60fps). Track via `JankStats` and Android Vitals.
-- **ANRs (Application Not Responding)** — main-thread blocks > 5s. A key Play Console "bad behavior" metric that affects ranking.
+- **ANRs (Application Not Responding)** — main-thread blocks > 5s. A key Play Console "bad behaviour" metric that affects ranking.
 - **Crash rate / crash-free sessions** — via Crashlytics / Play Console.
 - **Memory usage & leaks** — heap growth, leaks (LeakCanary), OOMs.
 - **Battery / power** — wakelocks, background CPU, network wakeups.
@@ -247,7 +257,7 @@ Tools: **Android Studio Profiler**, **Macrobenchmark/Microbenchmark**, **JankSta
 
 ## 8. How to avoid checking API keys into VCS
 
-The goal is to keep secrets out of source control while still making them available to the build.
+**VCS secrets management** means keeping API keys and credentials out of Git repositories by storing them in local `local.properties` and reading them via Gradle.
 
 1. **Store keys outside committed source** — typically in `local.properties` (which is git-ignored by default) or in environment variables / CI secret stores.
 
@@ -295,7 +305,7 @@ val key = BuildConfig.MAPS_API_KEY
 
 ## 9. How does Kotlin Multiplatform work?
 
-**Kotlin Multiplatform (KMP)** lets you write **shared business logic once in Kotlin** and reuse it across platforms (Android, iOS, desktop, web, server) while keeping each platform's UI native.
+**Kotlin Multiplatform (KMP)** means a framework that compiles shared Kotlin code into native JVM, JS, or iOS libraries to reuse business logic across multiple platforms.
 
 How it works:
 
@@ -318,7 +328,7 @@ actual fun platformName(): String = UIDevice.currentDevice.systemName()
 ```
 
 - You typically share **logic** and keep UI native (Jetpack Compose on Android, SwiftUI on iOS). **Compose Multiplatform** can additionally share UI.
-- Common libraries: Ktor (networking), kotlinx.coroutines, kotlinx.serialization, SQLDelight (DB), Koin (DI).
+- Common libraries: Ktor (networking), kotlinx.coroutines, kotlinx.serialisation, SQLDelight (DB), Koin (DI).
 
 Benefit: one tested implementation of core logic, native performance and UX on each platform, incremental adoption (you can share just one module).
 
@@ -328,7 +338,9 @@ Benefit: one tested implementation of core logic, native performance and UX on e
 
 ## 10. How to use memory heap dumps
 
-A **heap dump** is a snapshot of all objects in your app's Java/Kotlin heap at a moment in time — what exists, how big it is, and what references keep each object alive. You use it to find **memory leaks** and **bloat**.
+**Memory heap dumps** means capturing a snapshot of all active Java/Kotlin object instances in memory at a specific point in time to diagnose memory leaks.
+
+You use it to find **memory leaks** and **bloat**.
 
 Workflow:
 
@@ -352,7 +364,9 @@ The key interpretation skill: large **retained size** + a reference chain to a d
 
 ## 11. How to implement Dark Theme
 
-Dark theme reduces power on OLED screens and improves usability in low light. Implement it via **resource qualifiers** and **`DayNight`/Material 3** themes so the system swaps resources automatically.
+**Dark theme implementation** means defining DayNight styling themes and configuring alternative drawable/color resource qualifiers for night mode.
+
+Implement it via **resource qualifiers** and **`DayNight`/Material 3** themes so the system swaps resources automatically.
 
 **Views (XML) approach:**
 
@@ -400,7 +414,9 @@ Best practices: support **Follow System** (Android 10+ system-wide toggle), test
 
 ## 12. How to secure API keys in an Android app
 
-Critical mindset: **an APK can always be decompiled.** Anything shipped in the binary — `BuildConfig`, strings, native libs, even obfuscated values — can ultimately be extracted. So "securing" keys is about raising cost and moving secrets off the device.
+**API key protection** means obfuscating credentials, using native C++ wrappers, or restricting key access on the server backend since any client APK can be decompiled.
+
+So "securing" keys is about raising cost and moving secrets off the device.
 
 Defense in depth, strongest first:
 
@@ -438,9 +454,11 @@ val prefs = EncryptedSharedPreferences.create(
 
 ## 13. What is cleartext traffic? Network Security Config
 
-**Cleartext traffic** is network traffic sent **unencrypted** — plain HTTP (and other unencrypted protocols) rather than HTTPS/TLS. It can be read or tampered with by anyone on the path (Wi-Fi sniffing, MITM), so it is a security risk.
+**Cleartext traffic** means unencrypted network data sent over HTTP, which is disabled by default on modern Android versions in favour of HTTPS.
 
-**Default behavior:** Since Android 9 (API 28), **cleartext is disabled by default** — apps targeting API 28+ that attempt an `http://` connection get an error unless explicitly allowed.
+It can be read or tampered with by anyone on the path (Wi-Fi sniffing, MITM), so it is a security risk.
+
+**Default behaviour:** Since Android 9 (API 28), **cleartext is disabled by default** — apps targeting API 28+ that attempt an `http://` connection get an error unless explicitly allowed.
 
 **Network Security Config** is an XML file that declaratively controls TLS/cleartext policy, trust anchors, and certificate pinning without code changes:
 
@@ -479,7 +497,9 @@ You can also set `android:usesCleartextTraffic="false"` on `<application>` as a 
 
 ## 14. Memory usage in Android
 
-Android runs each app in its own process with a **bounded heap** (the per-app limit varies by device, e.g., 256/512 MB). Exceeding it triggers an `OutOfMemoryError`. The runtime (ART) garbage-collects unreachable objects, but GC has a CPU/jank cost, so the goal is to keep allocations low and lifetimes short.
+**Android process memory limits** means the restricted RAM boundaries (heaps) allocated to individual applications by the OS, which vary by device RAM size.
+
+Exceeding it triggers an `OutOfMemoryError`. The runtime (ART) garbage-collects unreachable objects, but GC has a CPU/jank cost, so the goal is to keep allocations low and lifetimes short.
 
 Key points to cover:
 
@@ -505,7 +525,9 @@ override fun onTrimMemory(level: Int) {
 
 ## 15. Explain annotation processing
 
-**Annotation processing** is a compile-time mechanism that reads annotations in your source and **generates additional code** (or validates code) before/while the app compiles. It powers many Android libraries — Room, Dagger/Hilt, Moshi, Glide, Data Binding — letting them avoid runtime reflection by generating boilerplate at build time.
+**Annotation processing** means a compile-time build step that scans source code annotations and generates additional Java/Kotlin source files.
+
+It powers many Android libraries — Room, Dagger/Hilt, Moshi, Glide, Data Binding — letting them avoid runtime reflection by generating boilerplate at build time.
 
 How it works:
 
@@ -530,7 +552,9 @@ When asked "what's the difference between kapt and KSP?": kapt generates Java st
 
 ## 16. How does the Android push notification system work?
 
-A push notification lets a server display a message on a device without the app polling. On Android the transport is **Firebase Cloud Messaging (FCM)**, which relies on a persistent, battery-efficient connection between the device and Google's servers.
+**Android push notification system** means the architecture where a server sends payloads to Google's FCM servers, which then deliver them to a background system service on the device.
+
+On Android the transport is **Firebase Cloud Messaging (FCM)**, which relies on a persistent, battery-efficient connection between the device and Google's servers.
 
 High-level flow:
 
@@ -554,7 +578,7 @@ Notes: FCM is the standard transport; **WorkManager/AlarmManager are for local, 
 
 ## 17. Android push notification flow using FCM
 
-A concrete, code-level walkthrough using the modern **FCM HTTP v1 API**.
+**FCM push flow** means the sequence of registering a device token, sending a JSON payload from a backend via FCM HTTP v1, and receiving it in `FirebaseMessagingService`.
 
 ### Client setup
 
@@ -614,7 +638,7 @@ Authorization: Bearer <OAuth2 access token>
 }
 ```
 
-### Notification vs data messages — delivery behavior
+### Notification vs data messages — delivery behaviour
 
 - **Notification message** (`notification` block): when the app is in the **background/killed**, the **FCM SDK auto-displays** it in the system tray; `onMessageReceived` is *not* called until the user taps it (the data payload arrives in the launch intent).
 - **Data message** (`data` only): **always** delivered to `onMessageReceived` so your code fully controls handling — required if you want custom logic in the background.
@@ -638,12 +662,14 @@ Authorization: Bearer <OAuth2 access token>
 
 ## 18. How to show a local notification at an exact time
 
-For an alarm/reminder that must fire at a precise wall-clock time, use **`AlarmManager`** with an exact-alarm API and a `BroadcastReceiver` that posts the notification. This is **local scheduling** (no server, works offline) — different from FCM push.
+**Exact time notifications** means scheduling precise alarms using `AlarmManager` combined with intent broadcasts to display local notifications.
+
+This is **local scheduling** (no server, works offline) — different from FCM push.
 
 ### The APIs
 
 - `setExact(...)` / `setExactAndAllowWhileIdle(...)` — fire at an exact time; the `...AllowWhileIdle` variant fires even during **Doze**.
-- For repeating exact behavior, reschedule from the receiver (exact repeating was removed).
+- For repeating exact behaviour, reschedule from the receiver (exact repeating was removed).
 
 ### Permissions (this is the part interviewers probe)
 
@@ -714,7 +740,9 @@ Additional notes:
 
 ## 19. General / soft-skill HR questions
 
-Recruiters and hiring managers use these to gauge experience, communication, and culture fit. Prepare honest, concrete answers (use the STAR method — see Q20).
+**HR interview questions** means the behavioural and scenario-based questions used by recruiters to assess communication, teamwork, and cultural alignment.
+
+Prepare honest, concrete answers (use the STAR method — see Q20).
 
 1. Name the last three apps you worked on. Which did you like most and why?
 2. What is your favorite programming language, and why?
@@ -741,7 +769,7 @@ Recruiters and hiring managers use these to gauge experience, communication, and
 
 ## 20. Preparation Tips
 
-Distilled interview-readiness guidance.
+**Interview preparation strategies** means reviewing fundamentals, mock-interviewing out loud, coding on whiteboards, and preparing project architecture deep dives.
 
 ### Dos
 
@@ -768,7 +796,7 @@ Distilled interview-readiness guidance.
 - Don't oversell yourself or pretend to be someone you're not.
 - Don't get distracted (e.g., dwelling on a previous question) and miss what's being asked now.
 
-### The STAR method (for behavioral questions)
+### The STAR method (for behavioural questions)
 
 Structure stories as:
 
@@ -791,20 +819,22 @@ Structure stories as:
 
 ## 21. Mock Interview Questions
 
-Use these to rehearse out loud. Many overlap with deeper topics elsewhere in this guide — pointers note where to read more.
+**Mock interview practice** means rehearsing typical question sets covering OOP, Kotlin, Jetpack, architecture, and DSA to build confidence.
 
-1. **Tell me about the most challenging Android app you've worked on and your specific contributions.** — Behavioral; use STAR (Q20). Cover architecture, integration, security.
+Many overlap with deeper topics elsewhere in this guide — pointers note where to read more.
+
+1. **Tell me about the most challenging Android app you've worked on and your specific contributions.** — Behavioural; use STAR (Q20). Cover architecture, integration, security.
 2. **How do you ensure your apps adhere to Material Design guidelines?** — Material Components/Material 3 library, official docs, design reviews, UI tests. See Dark Theme (Q11).
 3. **How do you manage compatibility across different Android OS versions?** — AndroidX/Jetpack libraries, sensible `minSdk`/`targetSdk`, feature checks via `Build.VERSION`, testing on emulators + real devices.
 4. **Walk me through identifying and resolving a tricky bug.** — Reproduce -> Logcat/ADB -> isolate -> fix -> regression test. Mention debugger and crash reports.
-5. **What strategies optimize app performance?** — Memory, app size, CPU; Android Profiler; lazy loading; efficient data structures. See Metrics (Q7), Memory (Q14).
+5. **What strategies optimise app performance?** — Memory, app size, CPU; Android Profiler; lazy loading; efficient data structures. See Metrics (Q7), Memory (Q14).
 6. **Describe integrating a third-party API.** — Retrofit/OkHttp, secure transport, error handling, retries. See securing keys (Q12), cleartext (Q13).
 7. **Experience with Git/SVN?** — Branching, merging, PR collaboration, GitFlow vs trunk-based (Q19).
 8. **Experience with automated testing frameworks?** — JUnit, Mockito, Espresso, UI Automator, CI/CD integration.
 9. **How do you design for multiple device sizes/resolutions?** — ConstraintLayout, size qualifiers, vector assets, responsive Compose layouts.
 10. **How do you handle memory management issues?** — Memory Profiler, WeakReferences, lifecycle-aware context handling, LeakCanary. See Q10 and Q14.
 11. **How do you ensure secure data storage and transmission?** — Encryption at rest (Keystore/EncryptedSharedPreferences) and in transit (HTTPS/TLS), OWASP MASVS. See Q12, Q13.
-12. **A time you troubleshot a major issue in a live app.** — Behavioral; e.g., ANR/deadlock found via crash reports + analysis, then fixed. STAR.
+12. **A time you troubleshot a major issue in a live app.** — Behavioural; e.g., ANR/deadlock found via crash reports + analysis, then fixed. STAR.
 13. **How do you stay up to date with Android?** — Blogs, conferences, forums, open source. See Q19 references.
 14. **How do you design intuitive, user-friendly interfaces?** — Usability testing, user feedback, consistent navigation, Material patterns.
 15. **How do you reduce battery consumption?** — Batch network calls, WorkManager/JobScheduler for background work, avoid wakelocks, profile power. See Q7, Q18.
