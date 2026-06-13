@@ -12,13 +12,13 @@ Describes how an algorithm's resource usage (time/memory) grows as input size `n
 
 ## 2. Time complexity classes (with Kotlin examples)
 
-- `O(1)` — index/hash access.
-- `O(log n)` — binary search, balanced-tree ops.
-- `O(n)` — single loop.
-- `O(n log n)` — efficient sorts.
-- `O(n²)` — nested loops.
-- `O(2ⁿ)` — naive recursion (e.g. recursive Fibonacci).
-- `O(n!)` — brute-force permutations.
+- `O(1)` (Constant) — index/hash access.
+- `O(log n)` (Logarithmic) — binary search, balanced-tree ops.
+- `O(n)` (Linear) — single loop.
+- `O(n log n)` (Linearithmic) — efficient sorts.
+- `O(n²)` (Quadratic) — nested loops.
+- `O(2ⁿ)` (Exponential) — naive recursion (e.g. recursive Fibonacci).
+- `O(n!)` (Factorial) — brute-force permutations.
 
 Tip: naive `O(2ⁿ)` Fibonacci → `O(n)` with memoization/DP.
 
