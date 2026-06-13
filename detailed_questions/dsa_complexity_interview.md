@@ -35,7 +35,7 @@ Key points:
 
 ```
 Growth rate (best → worst):
-O(1) < O(log n) < O(n) < O(n log n) < O(n²) < O(2ⁿ) < O(n!)
+O(1) (Constant) < O(log n) (Logarithmic) < O(n) (Linear) < O(n log n) (Linearithmic) < O(n²) (Quadratic) < O(2ⁿ) (Exponential) < O(n!) (Factorial)
 ```
 
 **📚 Reference:** [Android Developer should know these Data Structures for Next Interview — Outcome School](https://outcomeschool.com/blog/android-developer-should-know-these-data-structures-for-next-interview)

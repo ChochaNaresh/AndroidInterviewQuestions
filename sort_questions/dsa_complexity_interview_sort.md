@@ -6,7 +6,7 @@
 
 ## 1. What is Big-O notation?
 
-Describes how an algorithm's resource usage (time/memory) grows as input size `n` grows — the worst-case **upper bound**, ignoring constants and lower-order terms. Related: Big-Ω (lower bound), Big-Θ (tight bound), and **amortized** (averaged over a sequence, e.g. `ArrayList.add` is amortized `O(1)`). Order: `O(1) < O(log n) < O(n) < O(n log n) < O(n²) < O(2ⁿ) < O(n!)`.
+Describes how an algorithm's resource usage (time/memory) grows as input size `n` grows — the worst-case **upper bound**, ignoring constants and lower-order terms. Related: Big-Ω (lower bound), Big-Θ (tight bound), and **amortized** (averaged over a sequence, e.g. `ArrayList.add` is amortized `O(1)`). Order: `O(1)` (Constant) < `O(log n)` (Logarithmic) < `O(n)` (Linear) < `O(n log n)` (Linearithmic) < `O(n²)` (Quadratic) < `O(2ⁿ)` (Exponential) < `O(n!)` (Factorial).
 
 ---
 
